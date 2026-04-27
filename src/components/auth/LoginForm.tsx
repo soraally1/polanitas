@@ -12,6 +12,7 @@ import { auth } from "@/lib/firebase-client";
 import { createSession } from "@/actions/auth-actions";
 import { Mail, Lock, LogIn, AlertCircle, Globe } from "lucide-react";
 import { ThemeLogo } from "@/components/layout/ThemeLogo";
+import { motion, AnimatePresence } from "framer-motion";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -67,149 +68,178 @@ export default function LoginForm() {
   const loading = isPending || isGooglePending;
 
   return (
-    <div
-      className="animate-fade-in-up"
-      style={{ width: "100%", maxWidth: 420 }}
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="w-full max-w-[420px]"
     >
-      <div>
+      <div className="bg-surface p-8 rounded-3xl border border-border shadow-md">
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+        <div className="text-center mb-7">
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="flex justify-center mb-4"
+          >
             <ThemeLogo height={32} />
-          </div>
-          <h2 style={{ marginBottom: 6, fontSize: "1.25rem" }}>Masuk ke Akun</h2>
-          <p style={{ fontSize: "0.875rem" }}>
+          </motion.div>
+          <motion.h2 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mb-1.5 text-xl font-bold"
+          >
+            Masuk ke Akun
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-sm text-secondary"
+          >
             Belum punya akun?{" "}
             <Link
               href="/register"
-              style={{ color: "var(--color-accent-text)", fontWeight: 600 }}
+              className="text-accent-text font-semibold hover:underline"
             >
               Daftar gratis
             </Link>
-          </p>
+          </motion.p>
         </div>
 
         {/* Error */}
-        {error && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 8,
-              padding: "10px 14px",
-              background: "color-mix(in srgb, var(--color-error) 10%, transparent)",
-              border: "1px solid color-mix(in srgb, var(--color-error) 30%, transparent)",
-              borderRadius: "var(--radius-sm)",
-              marginBottom: 20,
-              fontSize: "0.875rem",
-              color: "var(--color-error)",
-            }}
-          >
-            <AlertCircle size={15} strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
-            {error}
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: "auto", marginBottom: 20 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+              className="flex items-start gap-2 py-2.5 px-3.5 bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-error)_30%,transparent)] rounded-[var(--radius-sm)] text-sm text-error overflow-hidden"
+            >
+              <AlertCircle size={15} strokeWidth={2} className="shrink-0 mt-px" />
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: 14 }}
-        >
-          <div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+          >
             <label htmlFor="login-email" className="label">
               Email
             </label>
-            <div style={{ position: "relative" }}>
+            <div className="relative">
               <Mail
                 size={15}
                 strokeWidth={2}
-                color="var(--color-text-muted)"
-                style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted"
               />
               <input
                 id="login-email"
                 name="email"
                 type="email"
-                className="input"
+                className="input pl-9"
                 placeholder="nama@email.com"
                 required
                 autoComplete="email"
-                style={{ paddingLeft: 36 }}
               />
             </div>
-          </div>
+          </motion.div>
 
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <label htmlFor="login-password" className="label" style={{ margin: 0 }}>
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            <div className="flex justify-between items-center mb-1.5">
+              <label htmlFor="login-password" className="label m-0">
                 Password
               </label>
-              <a href="#" style={{ fontSize: "0.8125rem", color: "var(--color-accent-text)" }}>
+              <a href="#" className="text-[0.8125rem] text-accent-text font-medium hover:underline">
                 Lupa password?
               </a>
             </div>
-            <div style={{ position: "relative" }}>
+            <div className="relative">
               <Lock
                 size={15}
                 strokeWidth={2}
-                color="var(--color-text-muted)"
-                style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted"
               />
               <input
                 id="login-password"
                 name="password"
                 type="password"
-                className="input"
+                className="input pl-9"
                 placeholder="••••••••"
                 required
                 minLength={6}
                 autoComplete="current-password"
-                style={{ paddingLeft: 36 }}
               />
             </div>
-          </div>
+          </motion.div>
 
-          <button
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             id="login-submit-btn"
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-primary mt-2 w-full justify-center py-3 shadow-[0_4px_12px_var(--color-accent-glow)]"
             disabled={loading}
-            style={{ marginTop: 4, width: "100%", justifyContent: "center" }}
           >
-            <LogIn size={15} strokeWidth={2.5} />
+            {loading ? (
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <LogIn size={15} strokeWidth={2.5} />
+              </motion.div>
+            ) : (
+              <LogIn size={15} strokeWidth={2.5} />
+            )}
             {isPending ? "Memproses..." : "Masuk"}
-          </button>
+          </motion.button>
         </form>
 
         {/* Divider */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            margin: "20px 0",
-          }}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="flex items-center gap-3 my-6"
         >
-          <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
-          <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", whiteSpace: "nowrap" }}>
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-xs text-muted whitespace-nowrap">
             atau masuk dengan
           </span>
-          <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
-        </div>
+          <div className="flex-1 h-px bg-border" />
+        </motion.div>
 
         {/* Google Sign In */}
-        <button
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9 }}
+          whileHover={{ scale: 1.02, backgroundColor: "var(--color-surface-3)" }}
+          whileTap={{ scale: 0.98 }}
           id="login-google-btn"
           onClick={handleGoogle}
           disabled={loading}
-          className="btn btn-secondary"
-          style={{ width: "100%", justifyContent: "center" }}
+          className="btn btn-secondary w-full justify-center py-3"
         >
           <Globe size={15} strokeWidth={2} />
           {isGooglePending ? "Membuka Google..." : "Lanjutkan dengan Google"}
-        </button>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

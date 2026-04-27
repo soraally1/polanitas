@@ -29,24 +29,24 @@ export default function AgentStatusPanel({ sessionId }: AgentStatusPanelProps) {
   const { session, isLoading } = useAgentSync(sessionId);
 
   return (
-    <div className="bento-card" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+    <div className="bento-card flex flex-col gap-3">
+      <div className="flex items-center justify-between">
         <h3>Status Agen</h3>
         {session && (
-          <span className="chip" style={{ fontSize: "0.6875rem", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span className="chip text-[0.6875rem] max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap">
             {session.topic}
           </span>
         )}
       </div>
 
       {isLoading && sessionId ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div className="flex flex-col gap-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="skeleton" style={{ height: 74, borderRadius: "var(--radius-md)" }} />
+            <div key={i} className="skeleton h-[74px] rounded-[var(--radius-md)]" />
           ))}
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div className="flex flex-col gap-2">
           {AGENT_CONFIG.map(({ id, Icon, label, desc }) => {
             const agentRun = session?.agents?.[id];
             const status: AgentStatus = agentRun?.status ?? "idle";
@@ -58,29 +58,28 @@ export default function AgentStatusPanel({ sessionId }: AgentStatusPanelProps) {
             return (
               <div
                 key={id}
-                className={`agent-card ${status === "running" ? "agent-card--active" : ""}`}
-                style={{ padding: 14, gap: 0, flexDirection: "row", alignItems: "center" }}
+                className={`agent-card p-3.5 !gap-0 !flex-row items-center ${status === "running" ? "agent-card--active" : ""}`}
               >
-                <div className="agent-icon" style={{ width: 38, height: 38, marginRight: 12, borderRadius: "var(--radius-sm)" }}>
+                <div className="agent-icon !w-[38px] !h-[38px] mr-3 !rounded-[var(--radius-sm)]">
                   <Icon size={16} strokeWidth={1.75} />
                 </div>
 
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: "0.875rem", marginBottom: 2, color: "var(--color-text-primary)" }}>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm mb-0.5 text-primary">
                     {label}
                   </div>
                   <div className="caption">{desc}</div>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, marginLeft: 12 }}>
+                <div className="flex flex-col items-end gap-1 ml-3">
                   <span className={getStatusClass(status)}>{getStatusLabel(status)}</span>
                   {elapsed !== null && (
-                    <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: "0.6875rem", color: "var(--color-text-muted)" }}>
+                    <span className="flex items-center gap-[3px] text-[0.6875rem] text-muted">
                       <Clock size={10} strokeWidth={2} /> {elapsed}s
                     </span>
                   )}
                   {agentRun?.errorMessage && (
-                    <span style={{ fontSize: "0.6875rem", color: "var(--color-error)", maxWidth: 120, textAlign: "right", lineHeight: 1.4 }}>
+                    <span className="text-[0.6875rem] text-error max-w-[120px] text-right leading-[1.4]">
                       {agentRun.errorMessage.substring(0, 50)}
                     </span>
                   )}
@@ -92,7 +91,7 @@ export default function AgentStatusPanel({ sessionId }: AgentStatusPanelProps) {
       )}
 
       {!sessionId && (
-        <div style={{ textAlign: "center", padding: "28px 0", color: "var(--color-text-muted)", fontSize: "0.875rem" }}>
+        <div className="text-center py-7 text-muted text-sm">
           Mulai sesi baru untuk melihat status agen secara real-time
         </div>
       )}

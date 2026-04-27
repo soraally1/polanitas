@@ -20,14 +20,14 @@ export default function SessionStarterForm() {
 
   return (
     <div className="bento-card bento-card--accent">
-      <div style={{ marginBottom: 18 }}>
+      <div className="mb-[18px]">
         <h3>Mulai Sesi Riset Baru</h3>
-        <p style={{ fontSize: "0.875rem", marginTop: 5 }}>
+        <p className="text-sm mt-1.5">
           Masukkan topik konten dan ketiga agen AI akan bekerja secara otomatis.
         </p>
       </div>
 
-      <form action={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <form action={handleSubmit} className="flex flex-col gap-3.5">
         <div>
           <label htmlFor="topic" className="label">Topik Konten</label>
           <input
@@ -53,9 +53,8 @@ export default function SessionStarterForm() {
         <button
           id="start-research-btn"
           type="submit"
-          className="btn btn-primary"
+          className="btn btn-primary mt-0.5"
           disabled={isPending}
-          style={{ marginTop: 2 }}
         >
           <Zap size={15} strokeWidth={2.5} />
           {isPending ? "Mengaktifkan Agen..." : "Jalankan MAS"}
@@ -63,26 +62,18 @@ export default function SessionStarterForm() {
       </form>
 
       {/* Agent flow indicator */}
-      <div
-        style={{
-          marginTop: 18,
-          padding: "10px 14px",
-          background: "var(--color-surface-2)",
-          borderRadius: "var(--radius-sm)",
-          border: "1px solid var(--color-border)",
-        }}
-      >
-        <div className="caption" style={{ marginBottom: 8 }}>Alur Eksekusi Agen</div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.8125rem" }}>
-          <span className="chip" style={{ display: "flex", alignItems: "center", gap: 5 }}>
+      <div className="mt-[18px] py-2.5 px-3.5 bg-surface-2 rounded-[var(--radius-sm)] border border-border">
+        <div className="caption mb-2">Alur Eksekusi Agen</div>
+        <div className="flex items-center gap-2 text-[0.8125rem]">
+          <span className="chip flex items-center gap-[5px]">
             <Search size={11} strokeWidth={2} /> Researcher
           </span>
-          <ChevronRight size={12} color="var(--color-accent-text)" />
-          <span className="chip" style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <ChevronRight size={12} className="text-accent-text" />
+          <span className="chip flex items-center gap-[5px]">
             <Brain size={11} strokeWidth={2} /> Strategist
           </span>
-          <ChevronRight size={12} color="var(--color-accent-text)" />
-          <span className="chip" style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <ChevronRight size={12} className="text-accent-text" />
+          <span className="chip flex items-center gap-[5px]">
             <Eye size={11} strokeWidth={2} /> Analyst
           </span>
         </div>

@@ -14,9 +14,8 @@ export function ThemeToggle() {
     return (
       <button
         id="theme-toggle-btn"
-        className="btn btn-ghost btn-icon"
+        className="btn btn-ghost btn-icon w-9 h-9"
         aria-label="Toggle theme"
-        style={{ width: 36, height: 36 }}
       />
     );
   }
@@ -27,10 +26,9 @@ export function ThemeToggle() {
     <button
       id="theme-toggle-btn"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="btn btn-ghost btn-icon"
+      className="btn btn-ghost btn-icon w-9 h-9 rounded-[var(--radius-sm)]"
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       title={isDark ? "Light mode" : "Dark mode"}
-      style={{ width: 36, height: 36, borderRadius: "var(--radius-sm)" }}
     >
       {isDark ? (
         <Sun size={16} strokeWidth={2} />

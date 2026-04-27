@@ -3,40 +3,18 @@ import { useAuth } from "@/components/auth/AuthProvider";
 
 export function UserChip() {
   const { user, loading } = useAuth();
-  if (loading) return <div className="skeleton" style={{ width: 80, height: 28, borderRadius: 100 }} />;
+  if (loading) return <div className="skeleton w-20 h-7 rounded-full" />;
   const name = user?.displayName?.split(" ")[0] ?? user?.email?.split("@")[0] ?? "Pengguna";
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "4px 12px 4px 4px",
-        borderRadius: 100,
-        border: "1px solid var(--color-border)",
-        background: "var(--color-surface)",
-        fontSize: "0.8125rem",
-        fontWeight: 700,
-        color: "var(--color-text-secondary)",
-        boxShadow: "var(--shadow-sm)",
-      }}
-    >
-      <div
-        style={{
-          width: 26,
-          height: 26,
-          borderRadius: "50%",
-          overflow: "hidden",
-          background: "var(--color-surface-2)",
-        }}
-      >
+    <div className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-border bg-surface text-[0.8125rem] font-bold text-secondary shadow-sm">
+      <div className="w-[26px] h-[26px] rounded-full overflow-hidden bg-surface-2">
         <img
           src={user?.photoURL || `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(name)}`}
           alt={name}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          className="w-full h-full object-cover"
         />
       </div>
-      {name}
+      <span className="hidden sm:inline">{name}</span>
     </div>
   );
 }

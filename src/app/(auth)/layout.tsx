@@ -13,54 +13,22 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        background: "var(--color-bg)",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div className="min-h-dvh bg-bg flex flex-col">
       {/* Minimal top bar */}
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "16px 32px",
-          borderBottom: "1px solid var(--color-border)",
-          background: "var(--color-surface)",
-        }}
-      >
-        <Link href="/" style={{ display: "flex", alignItems: "center" }}>
+      <header className="flex items-center justify-between px-8 py-4 border-b border-border bg-surface">
+        <Link href="/" className="flex items-center">
           <ThemeLogo height={26} />
         </Link>
         <ThemeToggle />
       </header>
 
       {/* Centered content */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "40px 24px",
-        }}
-      >
+      <div className="flex-1 flex items-center justify-center py-10 px-6">
         {children}
       </div>
 
       {/* Footer */}
-      <footer
-        style={{
-          padding: "16px 32px",
-          borderTop: "1px solid var(--color-border)",
-          textAlign: "center",
-          fontSize: "0.8125rem",
-          color: "var(--color-text-muted)",
-        }}
-      >
+      <footer className="py-4 px-8 border-t border-border text-center text-[0.8125rem] text-muted">
         © 2026 POLANITAS. All rights reserved.
       </footer>
     </div>

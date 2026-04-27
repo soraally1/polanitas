@@ -10,10 +10,9 @@ export function SignOutButton() {
     <button
       id="sign-out-btn"
       onClick={signOut}
-      className="btn btn-ghost btn-icon"
+      className="btn btn-ghost btn-icon w-9 h-9"
       title="Keluar"
       aria-label="Sign out"
-      style={{ width: 36, height: 36 }}
     >
       <LogOut size={15} strokeWidth={2} />
     </button>
