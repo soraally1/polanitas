@@ -1,9 +1,8 @@
+"use client";
+
 import React from "react";
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-
-export const metadata: Metadata = { title: "Kurikulum — POLANITAS" };
 
 // ── 12 Modules ──────────────────────────────────────────────────────────────
 const MODULES = [
@@ -23,89 +22,54 @@ const MODULES = [
 
 export default function LearnIndexPage() {
   return (
-    <div className="animate-fade-in-up" style={{ display: "flex", flexDirection: "column", gap: 56, paddingBottom: 64 }}>
+    <div className="animate-fade-in-up flex flex-col gap-14 pb-16">
       
       {/* ── Minimalist Header ──────────────────────────────────────────── */}
-      <div style={{ maxWidth: 640 }}>
-        <h1 style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)", fontWeight: 800, color: "var(--color-text-primary)", letterSpacing: "-0.04em", marginBottom: 16, lineHeight: 1.1 }}>
+      <div className="max-w-[640px]">
+        <h1 className="text-[clamp(2rem,4vw,2.75rem)] font-extrabold text-primary tracking-[-0.04em] mb-4 leading-[1.1]">
           Kurikulum Polanitas
         </h1>
-        <p style={{ fontSize: "1.0625rem", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+        <p className="text-[1.0625rem] text-secondary leading-relaxed">
           12 modul esensial yang dirancang secara profesional. Dari fundamental analitik hingga kepemimpinan orkestrasi AI tingkat lanjut.
         </p>
       </div>
 
       {/* ── Modules Grid ──────────────────────────────────────── */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-          gap: 24,
-        }}
-      >
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-6">
         {MODULES.map((m) => {
           const Content = (
             <div
-              className={`module-card ${m.available ? "module-card--active" : "module-card--inactive"}`}
+              className={`module-card relative flex flex-col h-full bg-surface border border-border rounded-[18px] transition-all overflow-hidden cursor-pointer ${m.available ? "hover:border-border-2 hover:-translate-y-1 hover:shadow-lg" : "opacity-60 grayscale-[30%] cursor-not-allowed"}`}
             >
               {/* Colored Top Block */}
               <div
-                style={{
-                  background: m.color,
-                  borderRadius: 14,
-                  height: 130,
-                  display: "flex",
-                  alignItems: "flex-end",
-                  padding: "20px",
-                  position: "relative",
-                  overflow: "hidden",
-                }}
+                className="h-[130px] flex items-end p-5 relative overflow-hidden shrink-0"
+                style={{ background: m.color }}
               >
                 {/* Large Text Effect */}
-                <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                  <span
-                    style={{
-                      fontSize: "4.5rem",
-                      fontWeight: 800,
-                      color: "rgba(255,255,255,0.9)",
-                      lineHeight: 0.8,
-                      fontFamily: "var(--font-sans)",
-                      letterSpacing: "-0.05em",
-                    }}
-                  >
+                <div className="flex items-baseline gap-1 relative z-10">
+                  <span className="text-[4.5rem] font-extrabold text-white/90 leading-[0.8] tracking-[-0.05em] font-sans">
                     {m.num}
                   </span>
-                  <span
-                    style={{
-                      fontSize: "1.5rem",
-                      fontWeight: 700,
-                      color: "rgba(255,255,255,0.7)",
-                    }}
-                  >
+                  <span className="text-[1.5rem] font-bold text-white/70">
                     mod
                   </span>
                 </div>
               </div>
 
               {/* Card Body */}
-              <div style={{ padding: "20px 14px 10px", display: "flex", flexDirection: "column", flex: 1 }}>
-                <h3 style={{ fontSize: "1.0625rem", fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 8, lineHeight: 1.3 }}>
+              <div className="p-[20px_14px_10px] flex flex-col flex-1">
+                <h3 className="text-[1.0625rem] font-extrabold text-primary mb-2 leading-[1.3]">
                   {m.title}
                 </h3>
-                <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", lineHeight: 1.5, marginBottom: 24, flex: 1 }}>
+                <p className="text-[0.875rem] text-muted leading-relaxed mb-6 flex-1">
                   {m.subtitle}
                 </p>
 
                 {/* CTA Link */}
                 <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 4,
-                    fontSize: "0.8125rem",
-                    fontWeight: 700,
-                    color: m.available ? m.color : "var(--color-text-muted)",
-                  }}
+                  className={`flex items-center gap-1 text-[0.8125rem] font-bold ${m.available ? "" : "text-muted"}`}
+                  style={{ color: m.available ? m.color : undefined }}
                 >
                   {m.available ? "Pelajari" : "Segera Hadir"}
                   {m.available && <ChevronRight size={14} />}
@@ -116,13 +80,13 @@ export default function LearnIndexPage() {
 
           if (m.available) {
             return (
-              <Link key={m.id} href={`/dashboard/learn/${m.id}`} style={{ textDecoration: "none" }}>
+              <Link key={m.id} href={`/dashboard/learn/${m.id}`} className="no-underline">
                 {Content}
               </Link>
             );
           }
           
-          return React.cloneElement(Content, { key: m.id });
+          return <div key={m.id}>{Content}</div>;
         })}
       </div>
     </div>

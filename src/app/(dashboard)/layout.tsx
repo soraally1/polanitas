@@ -7,6 +7,8 @@ import { SignOutButton } from "@/components/auth/SignOutButton";
 import { UserChip } from "@/components/layout/UserChip";
 import "../globals.css";
 
+import { BottomNav } from "@/components/layout/BottomNav";
+
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default function DashboardLayout({
@@ -18,12 +20,11 @@ export default function DashboardLayout({
     <div className="app-shell">
       {/* Header */}
       <header className="app-header">
-        <Link href="/dashboard" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+        <Link href="/dashboard" className="flex items-center no-underline">
           <ThemeLogo height={28} />
         </Link>
 
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
-          <span className="chip">Beta v0.1</span>
+        <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
           <UserChip />
           <SignOutButton />
@@ -37,6 +38,9 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <main className="app-main">{children}</main>
+
+      {/* Mobile Nav */}
+      <BottomNav />
     </div>
   );
 }

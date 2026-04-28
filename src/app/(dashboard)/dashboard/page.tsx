@@ -83,14 +83,14 @@ function Ring({ pct, size = 52 }: { pct: number; size?: number }) {
   const circ = 2 * Math.PI * r;
   const dash = (pct / 100) * circ;
   return (
-    <svg width={size} height={size} style={{ flexShrink: 0 }}>
+    <svg width={size} height={size} className="shrink-0">
       <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="4" />
       <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#fff" strokeWidth="4"
         strokeDasharray={`${dash} ${circ-dash}`} strokeLinecap="round"
-        transform={`rotate(-90 ${size/2} ${size/2})`} style={{ transition: "stroke-dasharray 0.8s ease" }} />
+        transform={`rotate(-90 ${size/2} ${size/2})`} className="transition-[stroke-dasharray] duration-[800ms] ease-out" />
       {pct === 100
         ? <path d={`M ${size/2-5} ${size/2+1} L ${size/2-1} ${size/2+5} L ${size/2+6} ${size/2-4}`} fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        : <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" fill="#fff" fontSize="10" fontWeight="800" fontFamily="var(--font-sans)">{pct}%</text>
+        : <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" fill="#fff" fontSize="10" fontWeight="800" className="font-sans">{pct}%</text>
       }
     </svg>
   );
@@ -99,46 +99,46 @@ function Ring({ pct, size = 52 }: { pct: number; size?: number }) {
 // ─── Skeleton Components ──────────────────────────────────────────────
 function SkeletonDashboard() {
   return (
-    <div className="dashboard-grid">
+    <div className="dashboard-grid w-full max-w-full">
       {/* Left */}
       <div className="dashboard-col dashboard-col--left">
         {/* greeting */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <div className="skeleton" style={{ width: 60, height: 14, borderRadius: 6 }} />
-            <div className="skeleton" style={{ width: 180, height: 40, borderRadius: 8 }} />
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2">
+            <div className="skeleton w-[60px] h-3.5 rounded-[6px]" />
+            <div className="skeleton w-[180px] h-10 rounded-lg" />
           </div>
-          <div className="skeleton" style={{ width: 52, height: 52, borderRadius: "50%" }} />
+          <div className="skeleton w-[52px] h-[52px] rounded-full" />
         </div>
         {/* stats */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
+        <div className="grid grid-cols-3 gap-3">
           {[0,1,2].map(i => (
-            <div key={i} style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "16px 18px" }}>
-              <div className="skeleton" style={{ width: 30, height: 30, borderRadius: "var(--radius-sm)", marginBottom: 10 }} />
-              <div className="skeleton" style={{ width: 40, height: 24, borderRadius: 6, marginBottom: 6 }} />
-              <div className="skeleton" style={{ width: 80, height: 12, borderRadius: 4 }} />
+            <div key={i} className="bg-surface border border-border rounded-[var(--radius-lg)] py-4 px-[18px]">
+              <div className="skeleton w-[30px] h-[30px] rounded-[var(--radius-sm)] mb-2.5" />
+              <div className="skeleton w-10 h-6 rounded-[6px] mb-1.5" />
+              <div className="skeleton w-20 h-3 rounded" />
             </div>
           ))}
         </div>
         {/* search */}
-        <div className="skeleton" style={{ height: 44, borderRadius: "var(--radius-lg)" }} />
+        <div className="skeleton h-11 rounded-[var(--radius-lg)]" />
         {/* cards row */}
-        <div style={{ display: "flex", gap: 14, overflowX: "hidden" }}>
+        <div className="flex gap-3.5 overflow-x-hidden">
           {[0,1,2].map(i => (
-            <div key={i} className="skeleton" style={{ minWidth: 200, height: 240, borderRadius: 22, flexShrink: 0 }} />
+            <div key={i} className="skeleton min-w-[200px] h-[240px] rounded-[22px] shrink-0" />
           ))}
         </div>
       </div>
 
       {/* Right */}
       <div className="dashboard-col dashboard-col--right">
-        <div className="skeleton" style={{ width: 120, height: 24, borderRadius: 6 }} />
-        <div className="skeleton" style={{ height: 44, borderRadius: 100 }} />
-        <div className="skeleton" style={{ height: 120, borderRadius: 20 }} />
+        <div className="skeleton w-[120px] h-6 rounded-[6px]" />
+        <div className="skeleton h-11 rounded-full" />
+        <div className="skeleton h-[120px] rounded-[20px]" />
         {[0,1].map(i => (
-          <div key={i} className="skeleton" style={{ height: 110, borderRadius: 20 }} />
+          <div key={i} className="skeleton h-[110px] rounded-[20px]" />
         ))}
-        <div className="skeleton" style={{ height: 80, borderRadius: 20 }} />
+        <div className="skeleton h-20 rounded-[20px]" />
       </div>
     </div>
   );
@@ -165,75 +165,84 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="dashboard-grid">
+    <div className="dashboard-grid w-full max-w-full">
 
       {/* ══ LEFT COLUMN ══════════════════════════════════════════════ */}
       <div className="dashboard-col dashboard-col--left">
 
         {/* Greeting */}
-        <div className="animate-fade-in-up" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+        <div className="animate-fade-in-up flex items-center justify-between gap-4">
           <div>
-            <p style={{ fontSize: "0.9rem", color: "var(--color-text-muted)", marginBottom: 4, fontWeight: 500 }}>Halo,</p>
-            <h1 style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.25rem)", letterSpacing: "-0.04em", fontWeight: 800, lineHeight: 1.1, display: "flex", alignItems: "center", gap: 10 }}>
-              {firstName} <span style={{ animation: "wave 2.5s infinite", transformOrigin: "70% 70%", display: "inline-block" }}>👋</span>
+            <p className="text-[0.9rem] text-muted mb-1 font-medium">Halo,</p>
+            <h1 className="text-[clamp(1.75rem,3.5vw,2.25rem)] tracking-[-0.04em] font-extrabold leading-[1.1] flex items-center gap-2.5">
+              {firstName} <span className="animate-[wave_2.5s_infinite] origin-[70%_70%] inline-block"></span>
             </h1>
           </div>
-          <div style={{ width: 52, height: 52, borderRadius: "50%", overflow: "hidden", border: "3px solid var(--color-surface)", boxShadow: "var(--shadow-md)", flexShrink: 0 }}>
-            <img src={avatarUrl} alt={firstName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div className="w-[52px] h-[52px] rounded-full overflow-hidden border-[3px] border-surface shadow-md shrink-0">
+            <img src={avatarUrl} alt={firstName} className="w-full h-full object-cover" />
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="animate-fade-in-up" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, animationDelay: "60ms" }}>
+        <div className="animate-fade-in-up grid grid-cols-1 md:grid-cols-3 gap-3 [animation-delay:60ms]">
           {[
             { label: "Modul Tersedia", value: "12", Icon: BookOpen, color: "#6366F1" },
             { label: "Sedang Belajar", value: String(ACTIVE_COURSES.filter(c=>c.progress>0).length), Icon: Flame, color: "#F59E0B" },
             { label: "AI Tutor Lab", value: "Aktif", Icon: Zap, color: "#10B981" },
           ].map(({ label, value, Icon: I, color }) => (
-            <div key={label} style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "16px 18px", boxShadow: "var(--shadow-sm)" }}>
-              <div style={{ width: 30, height: 30, borderRadius: "var(--radius-sm)", background: `${color}15`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+            <div key={label} className="bg-surface border border-border rounded-[var(--radius-lg)] py-4 px-[18px] shadow-sm flex md:flex-col items-center md:items-start gap-4 md:gap-0">
+              <div
+                className="w-[30px] h-[30px] rounded-[var(--radius-sm)] flex items-center justify-center mb-0 md:mb-2.5 shrink-0"
+                style={{ background: `${color}15` }}
+              >
                 <I size={14} color={color} />
               </div>
-              <div style={{ fontWeight: 800, fontSize: "1.25rem", color: "var(--color-text-primary)", lineHeight: 1 }}>{value}</div>
-              <div style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", marginTop: 4, fontWeight: 500 }}>{label}</div>
+              <div>
+                <div className="font-extrabold text-xl text-primary leading-none">{value}</div>
+                <div className="text-[0.7rem] text-muted mt-1 font-medium">{label}</div>
+              </div>
             </div>
           ))}
         </div>
 
         {/* Search */}
-        <div className="animate-fade-in-up" style={{ display: "flex", gap: 10, animationDelay: "120ms" }}>
-          <div style={{ flex: 1, position: "relative" }}>
-            <Search size={15} color="var(--color-text-muted)" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
+        <div className="animate-fade-in-up flex gap-2.5 [animation-delay:120ms]">
+          <div className="flex-1 relative">
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted" />
             <input
               type="text" placeholder="Cari modul pembelajaran..." value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ width: "100%", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "10px 14px 10px 38px", fontSize: "0.875rem", color: "var(--color-text-primary)", fontFamily: "var(--font-sans)", background: "var(--color-surface)", outline: "none", boxSizing: "border-box", boxShadow: "var(--shadow-sm)", transition: "border-color 0.2s, box-shadow 0.2s" }}
-              onFocus={e => { e.target.style.borderColor = "#6366F1"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.12)"; }}
-              onBlur={e => { e.target.style.borderColor = "var(--color-border)"; e.target.style.boxShadow = "var(--shadow-sm)"; }}
+              className="w-full border border-border rounded-[var(--radius-lg)] py-2.5 pl-[38px] pr-3.5 text-sm text-primary font-sans bg-surface outline-none shadow-sm transition-[border-color,box-shadow] duration-200 focus:border-[#6366F1] focus:shadow-[0_0_0_3px_rgba(99,102,241,0.12)]"
             />
           </div>
-          <button style={{ width: 42, height: 42, borderRadius: "var(--radius-md)", background: "var(--color-accent)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, boxShadow: "0 4px 12px var(--color-accent-glow)", transition: "transform 0.15s" }}
-            onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.06)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}>
+          <button className="w-[42px] h-[42px] rounded-[var(--radius-md)] bg-accent border-none flex items-center justify-center cursor-pointer shrink-0 shadow-[0_4px_12px_var(--color-accent-glow)] transition-transform duration-150 hover:scale-[1.06] active:scale-100">
             <SlidersHorizontal size={16} color="#1A2E0A" />
           </button>
         </div>
 
         {/* Courses horizontal scroll */}
-        <div className="animate-fade-in-up" style={{ animationDelay: "180ms" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-            <h2 style={{ fontWeight: 800, fontSize: "1.05rem" }}>Kurikulum — 12 Modul</h2>
-            <Link href="/dashboard/learn" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "0.78rem", fontWeight: 700, color: "var(--color-accent-text)", textDecoration: "none" }}>
+        <div className="animate-fade-in-up [animation-delay:180ms]">
+          <div className="flex items-center justify-between mb-3.5">
+            <h2 className="font-extrabold text-[1.05rem]">Kurikulum — 12 Modul</h2>
+            <Link href="/dashboard/learn" className="flex items-center gap-1 text-[0.78rem] font-bold text-accent-text no-underline">
               Lihat Semua <ArrowUpRight size={13} />
             </Link>
           </div>
 
           {/* Filter pills */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 18, overflowX: "auto", paddingBottom: 4, scrollbarWidth: "none" }}>
+          <div className="flex gap-2 mb-[18px] overflow-x-auto pb-1 [scrollbar-width:none]">
             {FILTERS.map(f => {
               const active = activeFilter === f;
               return (
-                <button key={f} onClick={() => setActiveFilter(f)} style={{ padding: "6px 14px", borderRadius: 100, border: active ? "none" : "1px solid var(--color-border)", background: active ? "var(--color-accent)" : "var(--color-surface)", color: active ? "#12200A" : "var(--color-text-secondary)", fontSize: "0.78rem", fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, boxShadow: active ? "0 3px 10px var(--color-accent-glow)" : "var(--shadow-sm)", transition: "all 0.2s", fontFamily: "var(--font-sans)" }}>
+                <button
+                  key={f}
+                  onClick={() => setActiveFilter(f)}
+                  className={`py-1.5 px-3.5 rounded-full text-[0.78rem] font-bold cursor-pointer whitespace-nowrap shrink-0 transition-all duration-200 font-sans ${
+                    active
+                      ? "border-none bg-accent text-[#12200A] shadow-[0_3px_10px_var(--color-accent-glow)]"
+                      : "border border-border bg-surface text-secondary shadow-sm"
+                  }`}
+                >
                   {f}
                 </button>
               );
@@ -241,52 +250,41 @@ export default function DashboardPage() {
           </div>
 
           {/* Horizontal scroll row */}
-          <div
-            style={{
-              display: "flex",
-              gap: 14,
-              overflowX: "auto",
-              paddingBottom: 12,
-              scrollbarWidth: "thin",
-              scrollbarColor: "var(--color-border) transparent",
-              scrollSnapType: "x mandatory",
-            }}
-          >
+          <div className="flex gap-3.5 overflow-x-auto pb-3 [scrollbar-width:thin] [scrollbar-color:var(--color-border)_transparent] snap-x snap-mandatory">
             {filtered.map(({ id, num, title, subtitle, level, gradient, Icon, lessons, duration, href, available }) => (
-              <Link key={id} href={available ? href : "/dashboard/learn"} style={{ textDecoration: "none", flexShrink: 0, scrollSnapAlign: "start" }}>
+              <Link key={id} href={available ? href : "/dashboard/learn"} className="no-underline shrink-0 snap-start">
                 <div
-                  style={{ background: gradient, borderRadius: 22, padding: "22px 20px 18px", width: 230, height: 250, display: "flex", flexDirection: "column", position: "relative", overflow: "hidden", opacity: available ? 1 : 0.65, cursor: "pointer", transition: "transform 0.22s ease, box-shadow 0.22s ease", filter: available ? "none" : "grayscale(25%)" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 36px rgba(0,0,0,0.2)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                  className={`rounded-[22px] p-[22px_20px_18px] w-[230px] h-[250px] flex flex-col relative overflow-hidden cursor-pointer transition-[transform,box-shadow] duration-[220ms] ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.2)] ${!available ? "opacity-65 grayscale-[25%]" : ""}`}
+                  style={{ background: gradient }}
                 >
                   {/* decorative blob */}
-                  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" style={{ position: "absolute", right: -24, top: -24, opacity: 0.15, pointerEvents: "none" }}>
+                  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" className="absolute -right-6 -top-6 opacity-15 pointer-events-none">
                     <circle cx="60" cy="60" r="60" fill="#fff" />
                     <circle cx="60" cy="60" r="36" fill="none" stroke="#fff" strokeWidth="2" />
                   </svg>
 
                   {/* num + level */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                    <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "rgba(255,255,255,0.6)", letterSpacing: "0.1em" }}>#{String(num).padStart(2,"0")}</span>
-                    {!available && <span style={{ fontSize: "0.6rem", fontWeight: 700, color: "rgba(255,255,255,0.7)", background: "rgba(0,0,0,0.2)", padding: "2px 8px", borderRadius: 100 }}>Segera</span>}
+                  <div className="flex items-center justify-between mb-3.5">
+                    <span className="text-[0.65rem] font-extrabold text-white/60 tracking-[0.1em]">#{String(num).padStart(2,"0")}</span>
+                    {!available && <span className="text-[0.6rem] font-bold text-white/70 bg-black/20 py-0.5 px-2 rounded-full">Segera</span>}
                   </div>
 
                   {/* Icon */}
-                  <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="w-[60px] h-[60px] rounded-full bg-white/15 flex items-center justify-center">
                       <Icon size={28} color="#FFF" strokeWidth={1.5} />
                     </div>
                   </div>
 
                   {/* Info */}
-                  <div style={{ position: "relative", zIndex: 1 }}>
-                    <div style={{ fontWeight: 800, fontSize: "0.9375rem", color: "#FFF", marginBottom: 3, lineHeight: 1.3 }}>{title}</div>
-                    <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.75)", marginBottom: 12, lineHeight: 1.4 }}>{subtitle}</div>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "0.68rem", fontWeight: 600, color: "rgba(255,255,255,0.85)", background: "rgba(255,255,255,0.15)", padding: "2px 8px", borderRadius: 100 }}>
+                  <div className="relative z-[1]">
+                    <div className="font-extrabold text-[0.9375rem] text-white mb-[3px] leading-[1.3]">{title}</div>
+                    <div className="text-[0.72rem] text-white/75 mb-3 leading-[1.4]">{subtitle}</div>
+                    <div className="flex gap-2">
+                      <span className="flex items-center gap-1 text-[0.68rem] font-semibold text-white/85 bg-white/15 py-0.5 px-2 rounded-full">
                         <BookOpen size={10} /> {lessons}
                       </span>
-                      <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "0.68rem", fontWeight: 600, color: "rgba(255,255,255,0.85)", background: "rgba(255,255,255,0.15)", padding: "2px 8px", borderRadius: 100 }}>
+                      <span className="flex items-center gap-1 text-[0.68rem] font-semibold text-white/85 bg-white/15 py-0.5 px-2 rounded-full">
                         <Clock size={10} /> {duration}
                       </span>
                     </div>
@@ -299,61 +297,68 @@ export default function DashboardPage() {
       </div>
 
       {/* ══ RIGHT COLUMN ═════════════════════════════════════════════ */}
-      <div className="dashboard-col dashboard-col--right animate-fade-in-up" style={{ animationDelay: "240ms" }}>
+      <div className="dashboard-col dashboard-col--right animate-fade-in-up [animation-delay:240ms]">
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <h2 style={{ fontWeight: 800, fontSize: "1.05rem" }}>Modul Saya</h2>
-          <Link href="/dashboard/learn" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "0.78rem", fontWeight: 600, color: "var(--color-text-muted)", textDecoration: "none" }}>
+        <div className="flex items-center justify-between">
+          <h2 className="font-extrabold text-[1.05rem]">Modul Saya</h2>
+          <Link href="/dashboard/learn" className="flex items-center gap-1 text-[0.78rem] font-semibold text-muted no-underline">
             Lihat Semua <ChevronRight size={13} />
           </Link>
         </div>
 
         {/* Tab pills */}
-        <div style={{ display: "flex", padding: 4, borderRadius: 100, gap: 3, background: "var(--color-surface-2)", border: "1px solid var(--color-border)" }}>
+        <div className="flex p-1 rounded-full gap-[3px] bg-surface-2 border border-border">
           {[{ i:BookOpen, l:"Semua" }, { i:Zap, l:"Berlangsung" }, { i:CheckCircle, l:"Selesai" }].map(({ i: Ti, l },idx) => (
-            <button key={l} style={{ flex: 1, padding: "7px 8px", borderRadius: 100, border: "none", background: idx===0 ? "var(--color-accent)" : "transparent", color: idx===0 ? "#12200A" : "var(--color-text-muted)", fontWeight: idx===0 ? 700 : 500, fontSize: "0.72rem", display: "flex", justifyContent: "center", alignItems: "center", gap: 5, cursor: "pointer", boxShadow: idx===0 ? "0 3px 8px var(--color-accent-glow)" : "none", fontFamily: "var(--font-sans)" }}>
+            <button
+              key={l}
+              className={`flex-1 py-[7px] px-2 rounded-full border-none text-[0.72rem] flex justify-center items-center gap-[5px] cursor-pointer font-sans ${
+                idx===0
+                  ? "bg-accent text-[#12200A] font-bold shadow-[0_3px_8px_var(--color-accent-glow)]"
+                  : "bg-transparent text-muted font-medium"
+              }`}
+            >
               <Ti size={12} /> {l}
             </button>
           ))}
         </div>
 
         {/* Promo banner */}
-        <div style={{ background: "linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)", borderRadius: 18, padding: "20px 20px", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", right: -16, top: -16, width: 100, height: 100, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
-          <div style={{ position: "absolute", right: 16, top: 16, width: 52, height: 52, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Target size={24} color="rgba(255,255,255,0.65)" />
+        <div className="bg-[linear-gradient(135deg,#3B82F6_0%,#1D4ED8_100%)] rounded-[18px] p-5 relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 w-[100px] h-[100px] rounded-full bg-white/[0.08]" />
+          <div className="absolute right-4 top-4 w-[52px] h-[52px] rounded-full bg-white/10 flex items-center justify-center">
+            <Target size={24} className="text-white/65" />
           </div>
-          <div style={{ position: "relative", zIndex: 1, maxWidth: "72%" }}>
-            <div style={{ fontWeight: 800, fontSize: "0.9375rem", color: "#FFF", lineHeight: 1.4, marginBottom: 12 }}>
+          <div className="relative z-[1] max-w-[72%]">
+            <div className="font-extrabold text-[0.9375rem] text-white leading-[1.4] mb-3">
               Mulai jalur belajar barumu!
             </div>
-            <Link href="/dashboard/learn" style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#FFF", color: "#1D4ED8", fontWeight: 700, fontSize: "0.75rem", padding: "7px 14px", borderRadius: 100, textDecoration: "none", boxShadow: "0 4px 10px rgba(0,0,0,0.15)", transition: "transform 0.15s" }}
-              onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-2px)")}
-              onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}>
+            <Link
+              href="/dashboard/learn"
+              className="inline-flex items-center gap-[5px] bg-white text-[#1D4ED8] font-bold text-xs py-[7px] px-3.5 rounded-full no-underline shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition-transform duration-150 hover:-translate-y-0.5"
+            >
               Cek Kurikulum <ArrowUpRight size={13} />
             </Link>
           </div>
         </div>
 
         {/* Active modules */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div className="flex flex-col gap-3">
           {ACTIVE_COURSES.map(({ id, title, desc, progress, gradient, href, Icon: CourseIcon }) => (
-            <Link key={id} href={href} style={{ textDecoration: "none" }}>
+            <Link key={id} href={href} className="no-underline">
               <div
-                style={{ background: gradient, borderRadius: 18, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, position: "relative", overflow: "hidden", transition: "transform 0.2s, filter 0.2s", cursor: "pointer" }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.filter = "brightness(1.06)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.filter = "brightness(1)"; }}
+                className="rounded-[18px] py-4 px-[18px] flex items-center gap-3.5 relative overflow-hidden transition-[transform,filter] duration-200 cursor-pointer hover:-translate-y-0.5 hover:brightness-[1.06]"
+                style={{ background: gradient }}
               >
-                <div style={{ position: "absolute", left: -16, top: -16, width: 64, height: 64, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
+                <div className="absolute -left-4 -top-4 w-16 h-16 rounded-full bg-white/[0.08]" />
 
-                <div style={{ flex: 1, zIndex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 800, fontSize: "0.875rem", color: "#FFF", marginBottom: 3 }}>{title}</div>
-                  <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.72)", marginBottom: 10, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", lineHeight: 1.4 }}>{desc}</div>
-                  <div style={{ height: 4, background: "rgba(255,255,255,0.2)", borderRadius: 999, overflow: "hidden", marginBottom: 4 }}>
-                    <div style={{ height: "100%", width: `${progress}%`, background: "#FFF", borderRadius: 999, transition: "width 0.8s ease" }} />
+                <div className="flex-1 z-[1] min-w-0">
+                  <div className="font-extrabold text-sm text-white mb-[3px]">{title}</div>
+                  <div className="text-[0.72rem] text-white/[0.72] mb-2.5 overflow-hidden line-clamp-2 leading-[1.4]">{desc}</div>
+                  <div className="h-1 bg-white/20 rounded-full overflow-hidden mb-1">
+                    <div className="h-full bg-white rounded-full transition-[width] duration-[800ms] ease-out" style={{ width: `${progress}%` }} />
                   </div>
-                  <div style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.65)", fontWeight: 700 }}>
+                  <div className="text-[0.65rem] text-white/65 font-bold">
                     {progress === 0 ? "Belum dimulai" : `Selesai ${progress}%`}
                   </div>
                 </div>
@@ -365,15 +370,15 @@ export default function DashboardPage() {
         </div>
 
         {/* AI Agents CTA */}
-        <div style={{ border: "1.5px dashed var(--color-border)", borderRadius: 18, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, background: "var(--color-surface)" }}>
-          <div style={{ width: 40, height: 40, borderRadius: "var(--radius-md)", background: "var(--color-accent-subtle)", border: "1px solid var(--color-border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <PlayCircle size={20} color="var(--color-accent-text)" />
+        <div className="border-[1.5px] border-dashed border-border rounded-[18px] py-4 px-[18px] flex items-center gap-3.5 bg-surface">
+          <div className="w-10 h-10 rounded-[var(--radius-md)] bg-accent-subtle border border-border flex items-center justify-center shrink-0">
+            <PlayCircle size={20} className="text-accent-text" />
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: "0.84rem", color: "var(--color-text-primary)", marginBottom: 2 }}>Simulasi Agen AI</div>
-            <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", lineHeight: 1.4 }}>Selesaikan Modul 1 untuk membuka akses penuh.</div>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-[0.84rem] text-primary mb-0.5">Simulasi Agen AI</div>
+            <div className="text-[0.72rem] text-muted leading-[1.4]">Selesaikan Modul 1 untuk membuka akses penuh.</div>
           </div>
-          <Link href="/dashboard/sessions" className="btn btn-primary btn-sm" style={{ flexShrink: 0, gap: 4, padding: "7px 12px", fontSize: "0.72rem" }}>
+          <Link href="/dashboard/sessions" className="btn btn-primary btn-sm shrink-0 gap-1 py-[7px] px-3 text-[0.72rem]">
             Mulai <ChevronRight size={12} />
           </Link>
         </div>

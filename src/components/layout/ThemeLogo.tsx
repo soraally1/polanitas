@@ -19,8 +19,8 @@ export function ThemeLogo({ height = 32, className }: ThemeLogoProps) {
   if (!mounted) {
     return (
       <div
-        style={{ height, width: height * 4, borderRadius: 4 }}
-        className="skeleton"
+        style={{ height, width: height * 4 }}
+        className="rounded skeleton"
         aria-hidden="true"
       />
     );
@@ -37,9 +37,9 @@ export function ThemeLogo({ height = 32, className }: ThemeLogoProps) {
       alt="POLANITAS"
       height={height}
       width={height * 4}          // aspect-ratio placeholder; Next.js will use intrinsic SVG size
-      style={{ height, width: "auto", objectFit: "contain" }}
+      style={{ height, width: "auto" }}
+      className={`object-contain ${className ?? ""}`}
       priority
-      className={className}
     />
   );
 }

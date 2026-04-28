@@ -52,13 +52,6 @@ const REGIONS = [
   { code: "US", label: "Amerika Serikat" },
 ];
 
-const STATUS_COLOR: Record<string, string> = {
-  done: "var(--color-done)",
-  running: "var(--color-running)",
-  idle: "var(--color-idle)",
-  error: "var(--color-error)",
-};
-
 function timeAgo(ts: number) {
   const diff = Date.now() - ts;
   const m = Math.floor(diff / 60000);
@@ -96,7 +89,10 @@ export default function SessionsPage() {
       orderBy("createdAt", "desc")
     );
     const unsub = onSnapshot(q,
-      (snap) => { setSessions(snap.docs.map((d) => d.data() as ExtendedSession)); setLoadingSessions(false); },
+      (snap) => { 
+        setSessions(snap.docs.map((d) => ({ ...d.data(), id: d.id } as ExtendedSession))); 
+        setLoadingSessions(false); 
+      },
       () => setLoadingSessions(false)
     );
     return () => unsub();
@@ -140,26 +136,26 @@ export default function SessionsPage() {
   const canSubmit = topic.trim().length >= 3 && selectedPlatforms.length > 0 && !isPending;
 
   return (
-    <div className="animate-fade-in-up" style={{ display: "flex", flexDirection: "column", gap: 48, paddingBottom: 80 }}>
+    <div className="animate-fade-in-up flex flex-col gap-12 pb-20">
 
       {/* ── Page Header ────────────────────────────────────────────── */}
       <div>
-        <h1 style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: 8 }}>
+        <h1 className="text-[clamp(1.75rem,3vw,2.25rem)] font-extrabold tracking-[-0.04em] mb-2 leading-tight">
           Sesi Riset
         </h1>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: "1rem" }}>
+        <p className="text-secondary text-base">
           Konfigurasi parameter riset, lalu biarkan tiga agen AI bekerja paralel.
         </p>
       </div>
 
       {/* ── Form ───────────────────────────────────────────────────── */}
       <form onSubmit={handleSubmit}>
-        <div style={{ display: "grid", gap: 28 }}>
+        <div className="grid gap-7">
 
           {/* Block 1: Topik */}
           <div>
-            <label style={{ display: "block", fontWeight: 700, fontSize: "0.875rem", marginBottom: 10, color: "var(--color-text-primary)" }}>
-              Topik / Produk / Bisnis <span style={{ color: "var(--color-error)" }}>*</span>
+            <label className="block font-bold text-[0.875rem] mb-2.5 text-primary">
+              Topik / Produk / Bisnis <span className="text-error">*</span>
             </label>
             <input
               type="text"
@@ -167,37 +163,27 @@ export default function SessionsPage() {
               onChange={(e) => setTopic(e.target.value)}
               placeholder="Contoh: Brand skincare khusus kulit berminyak Gen Z"
               disabled={isPending}
-              style={{
-                width: "100%", padding: "16px 20px", borderRadius: 14, fontSize: "1rem",
-                border: "1.5px solid var(--color-border)", background: "var(--color-surface)",
-                color: "var(--color-text-primary)", fontFamily: "var(--font-sans)", outline: "none",
-                transition: "border-color 0.2s, box-shadow 0.2s", boxSizing: "border-box",
-              }}
-              onFocus={e => { e.target.style.borderColor = "#6366F1"; e.target.style.boxShadow = "0 0 0 4px rgba(99,102,241,0.08)"; }}
-              onBlur={e => { e.target.style.borderColor = "var(--color-border)"; e.target.style.boxShadow = "none"; }}
+              className="w-full p-4 rounded-xl text-base border border-border bg-surface text-primary outline-none focus:border-[#6366F1] focus:ring-4 focus:ring-[#6366F1]/10 transition-all font-sans"
             />
           </div>
 
           {/* Block 2: Platform + Region */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 28, alignItems: "start" }}>
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-7 items-start">
             <div>
-              <label style={{ display: "block", fontWeight: 700, fontSize: "0.875rem", marginBottom: 10, color: "var(--color-text-primary)" }}>
-                Platform yang Diriset <span style={{ color: "var(--color-error)" }}>*</span>
+              <label className="block font-bold text-[0.875rem] mb-2.5 text-primary">
+                Platform yang Diriset <span className="text-error">*</span>
               </label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              <div className="flex flex-wrap gap-2.5">
                 {PLATFORMS.map(({ id, label, color }) => {
                   const active = selectedPlatforms.includes(id);
                   return (
                     <button
                       key={id} type="button" onClick={() => togglePlatform(id)}
-                      style={{
-                        padding: "8px 18px", borderRadius: 100, fontSize: "0.875rem", fontWeight: 600,
-                        border: active ? `1.5px solid ${color}` : "1.5px solid var(--color-border)",
-                        background: active ? `${color}12` : "var(--color-surface)",
-                        color: active ? color : "var(--color-text-muted)",
-                        cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
-                        transition: "all 0.15s", fontFamily: "var(--font-sans)",
-                      }}
+                      className={`py-2 px-4.5 rounded-full text-[0.875rem] font-semibold flex items-center gap-1.5 transition-all border font-sans ${
+                        active 
+                        ? "border-primary bg-primary/10 text-primary" 
+                        : "border-border bg-surface text-muted"
+                      }`}
                     >
                       {active && <CheckCircle size={13} />}
                       {label}
@@ -208,17 +194,13 @@ export default function SessionsPage() {
             </div>
 
             {/* Region */}
-            <div style={{ minWidth: 160 }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, fontSize: "0.875rem", marginBottom: 10, color: "var(--color-text-primary)" }}>
+            <div className="min-w-[160px]">
+              <label className="flex items-center gap-1.5 font-bold text-[0.875rem] mb-2.5 text-primary">
                 <MapPin size={14} /> Region
               </label>
               <select
                 value={regionCode} onChange={(e) => setRegionCode(e.target.value)}
-                style={{
-                  width: "100%", padding: "11px 16px", borderRadius: 10, fontSize: "0.9rem",
-                  border: "1.5px solid var(--color-border)", background: "var(--color-surface)",
-                  color: "var(--color-text-primary)", fontFamily: "var(--font-sans)", outline: "none", cursor: "pointer",
-                }}
+                className="w-full py-2.5 px-4 rounded-[10px] text-[0.9rem] border border-border bg-surface text-primary outline-none cursor-pointer font-sans"
               >
                 {REGIONS.map(r => <option key={r.code} value={r.code}>{r.label} ({r.code})</option>)}
               </select>
@@ -227,29 +209,26 @@ export default function SessionsPage() {
 
           {/* Block 3: Fokus Riset */}
           <div>
-            <label style={{ display: "block", fontWeight: 700, fontSize: "0.875rem", marginBottom: 10, color: "var(--color-text-primary)" }}>
+            <label className="block font-bold text-[0.875rem] mb-2.5 text-primary">
               Fokus Riset
             </label>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2.5">
               {FOCUS_OPTIONS.map(({ id, label, desc, Icon }) => {
                 const active = researchFocus === id;
                 return (
                   <button
                     key={id} type="button" onClick={() => setResearchFocus(id)}
-                    style={{
-                      padding: "14px 16px", borderRadius: 14, textAlign: "left",
-                      border: active ? "1.5px solid #6366F1" : "1.5px solid var(--color-border)",
-                      background: active ? "rgba(99,102,241,0.06)" : "var(--color-surface)",
-                      cursor: "pointer", transition: "all 0.15s", fontFamily: "var(--font-sans)",
-                    }}
+                    className={`p-4 rounded-xl text-left transition-all border font-sans ${
+                      active ? "border-[#6366F1] bg-[#6366F1]/5" : "border-border bg-surface"
+                    }`}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <Icon size={15} color={active ? "#6366F1" : "var(--color-text-muted)"} />
-                      <span style={{ fontWeight: 700, fontSize: "0.875rem", color: active ? "#6366F1" : "var(--color-text-primary)" }}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon size={15} className={active ? "text-[#6366F1]" : "text-muted"} />
+                      <span className={`font-bold text-[0.875rem] ${active ? "text-[#6366F1]" : "text-primary"}`}>
                         {label}
                       </span>
                     </div>
-                    <p style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", margin: 0, lineHeight: 1.4 }}>
+                    <p className="text-[0.78rem] text-muted leading-tight m-0">
                       {desc}
                     </p>
                   </button>
@@ -260,10 +239,10 @@ export default function SessionsPage() {
 
           {/* Block 4: Target Audiens (optional) */}
           <div>
-            <label style={{ display: "block", fontWeight: 700, fontSize: "0.875rem", marginBottom: 4, color: "var(--color-text-primary)" }}>
-              Target Audiens <span style={{ color: "var(--color-text-muted)", fontWeight: 500 }}>(opsional)</span>
+            <label className="block font-bold text-[0.875rem] mb-1 text-primary">
+              Target Audiens <span className="text-muted font-normal">(opsional)</span>
             </label>
-            <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", margin: "0 0 10px" }}>
+            <p className="text-[0.8rem] text-muted mb-2.5">
               Misal: Perempuan 18–25 tahun, urban, tertarik gaya hidup sehat
             </p>
             <input
@@ -272,45 +251,36 @@ export default function SessionsPage() {
               onChange={(e) => setTargetAudience(e.target.value)}
               placeholder="Deskripsikan target pasarmu..."
               disabled={isPending}
-              style={{
-                width: "100%", padding: "13px 18px", borderRadius: 12, fontSize: "0.9375rem",
-                border: "1.5px solid var(--color-border)", background: "var(--color-surface)",
-                color: "var(--color-text-primary)", fontFamily: "var(--font-sans)", outline: "none",
-                transition: "border-color 0.2s", boxSizing: "border-box",
-              }}
-              onFocus={e => { e.target.style.borderColor = "#6366F1"; }}
-              onBlur={e => { e.target.style.borderColor = "var(--color-border)"; }}
+              className="w-full py-3 px-4.5 rounded-xl text-[0.9375rem] border border-border bg-surface text-primary outline-none focus:border-[#6366F1] transition-all font-sans"
             />
           </div>
 
           {/* Error / Success */}
           {submitError && (
-            <div style={{ padding: "12px 16px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, color: "#DC2626", fontSize: "0.875rem", fontWeight: 600 }}>
+            <div className="py-3 px-4 bg-error/10 border border-error/20 rounded-xl text-error text-[0.875rem] font-semibold">
               {submitError}
             </div>
           )}
           {successId && (
-            <div style={{ padding: "12px 16px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 10, color: "#15803D", fontSize: "0.875rem", fontWeight: 600 }}>
-              ✓ Agen AI sedang berjalan! <Link href={`/dashboard/sessions/${successId}`} style={{ textDecoration: "underline", color: "inherit" }}>Pantau progres →</Link>
+            <div className="py-3 px-4 bg-done/10 border border-done/25 rounded-xl text-done text-[0.875rem] font-semibold">
+              ✓ Agen AI sedang berjalan! <Link href={`/dashboard/sessions/${successId}`} className="underline">Pantau progres →</Link>
             </div>
           )}
 
           {/* Submit */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16, paddingTop: 4 }}>
+          <div className="flex items-center gap-4 pt-1">
             <button
               type="submit"
               disabled={!canSubmit}
-              style={{
-                padding: "14px 32px", borderRadius: 12, background: canSubmit ? "var(--color-accent)" : "var(--color-surface-3)",
-                color: canSubmit ? "#12200A" : "var(--color-text-muted)", fontWeight: 800, fontSize: "0.9375rem",
-                border: "none", cursor: canSubmit ? "pointer" : "not-allowed", display: "flex", alignItems: "center", gap: 8,
-                transition: "all 0.2s", fontFamily: "var(--font-sans)",
-                boxShadow: canSubmit ? "0 4px 16px var(--color-accent-glow)" : "none",
-              }}
+              className={`py-3.5 px-8 rounded-xl font-extrabold text-[0.9375rem] flex items-center gap-2 transition-all font-sans border-none cursor-pointer ${
+                canSubmit 
+                ? "bg-accent text-[#12200A] shadow-[0_4px_16px_var(--color-accent-glow)]" 
+                : "bg-surface-3 text-muted cursor-not-allowed"
+              }`}
             >
-              {isPending ? <><Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} /> Agen Berjalan...</> : "Mulai Riset AI"}
+              {isPending ? <><Loader2 size={18} className="animate-spin" /> Agen Berjalan...</> : "Mulai Riset AI"}
             </button>
-            <span style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
+            <span className="text-[0.8125rem] text-muted">
               {selectedPlatforms.length === 0 ? "Pilih minimal 1 platform" : `${selectedPlatforms.length} platform dipilih`}
             </span>
           </div>
@@ -319,76 +289,71 @@ export default function SessionsPage() {
       </form>
 
       {/* ── Divider ─────────────────────────────────────────────────── */}
-      <div style={{ height: 1, background: "var(--color-border)" }} />
+      <div className="h-px bg-border" />
 
       {/* ── Riwayat Sesi ─────────────────────────────────────────────── */}
       <div>
-        <h2 style={{ fontWeight: 800, fontSize: "1.0625rem", marginBottom: 20 }}>Riwayat Sesi</h2>
+        <h2 className="font-extrabold text-[1.0625rem] mb-5">Riwayat Sesi</h2>
 
         {loadingSessions || authLoading ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 96, borderRadius: 16 }} />)}
+          <div className="flex flex-col gap-3">
+            {[1, 2, 3].map(i => <div key={i} className="skeleton h-24 rounded-2xl" />)}
           </div>
         ) : sessions.length === 0 ? (
-          <div style={{ padding: "64px 24px", textAlign: "center", background: "var(--color-surface)", border: "1.5px dashed var(--color-border)", borderRadius: 20, display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--color-surface-2)", border: "1px solid var(--color-border)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <FolderOpen size={24} color="var(--color-text-muted)" />
+          <div className="py-16 px-6 text-center bg-surface border-[1.5px] border-dashed border-border rounded-[20px] flex flex-col items-center gap-3">
+            <div className="w-14 h-14 rounded-full bg-surface-2 border border-border flex items-center justify-center">
+              <FolderOpen size={24} className="text-muted" />
             </div>
-            <p style={{ color: "var(--color-text-muted)", maxWidth: 360 }}>
+            <p className="text-muted text-sm max-w-[360px]">
               Belum ada sesi. Isi form di atas untuk memulai riset pertamamu bersama agen AI.
             </p>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div className="flex flex-col gap-3">
             {sessions.map((s) => {
-              const agentStatuses = Object.values(s.agents).map((a) => a.status);
-              const allDone = agentStatuses.every(st => st === "done");
+              const agentStatuses = Object.values(s.agents || {}).map((a: any) => a.status);
+              const allDone = agentStatuses.length > 0 && agentStatuses.every(st => st === "done");
               const hasRunning = agentStatuses.some(st => st === "running");
               const statusLabel = allDone ? "Selesai" : hasRunning ? "Berjalan" : "Menunggu";
-              const statusBg = allDone ? "rgba(34,197,94,0.08)" : hasRunning ? "rgba(245,158,11,0.08)" : "var(--color-surface-2)";
-              const statusTextColor = allDone ? "#15803D" : hasRunning ? "#B45309" : "var(--color-text-muted)";
+              const statusBg = allDone ? "bg-done/10" : hasRunning ? "bg-running/10" : "bg-surface-2";
+              const statusTextColor = allDone ? "text-done" : hasRunning ? "text-running" : "text-muted";
 
               return (
-                <Link key={s.id} href={`/dashboard/sessions/${s.id}`} style={{ textDecoration: "none" }}>
-                  <div style={{
-                    background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 18,
-                    padding: "20px 24px", display: "flex", alignItems: "center", gap: 20,
-                    transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s",
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--color-border-2)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "var(--shadow-md)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--color-border)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-                  >
+                <Link key={s.id} href={`/dashboard/sessions/${s.id}`} className="no-underline">
+                  <div className="bg-surface border border-border rounded-[18px] py-5 px-6 flex items-center gap-5 transition-all hover:border-border-2 hover:-translate-y-0.5 hover:shadow-md">
 
                     {/* Status dot */}
-                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: allDone ? "var(--color-done)" : hasRunning ? "var(--color-running)" : "var(--color-idle)", flexShrink: 0, boxShadow: hasRunning ? "0 0 8px var(--color-running)" : "none", animation: hasRunning ? "pulse 1.5s infinite" : "none" }} />
+                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                      allDone ? "bg-done" : hasRunning ? "bg-running shadow-[0_0_8px_var(--color-running)] animate-pulse" : "bg-idle"
+                    }`} />
 
                     {/* Info */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 800, fontSize: "0.9375rem", color: "var(--color-text-primary)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-extrabold text-[0.9375rem] text-primary mb-1 truncate">
                         {s.topic}
                       </div>
-                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                      <div className="flex gap-2.5 flex-wrap">
                         {s.platforms?.map(p => (
-                          <span key={p} style={{ fontSize: "0.71rem", fontWeight: 600, padding: "2px 8px", borderRadius: 100, background: "var(--color-surface-2)", border: "1px solid var(--color-border)", color: "var(--color-text-muted)", textTransform: "capitalize" }}>{p}</span>
+                          <span key={p} className="text-[0.71rem] font-semibold py-0.5 px-2 rounded-full bg-surface-2 border border-border text-muted capitalize">{p}</span>
                         ))}
                         {s.researchFocus && (
-                          <span style={{ fontSize: "0.71rem", fontWeight: 600, padding: "2px 8px", borderRadius: 100, background: "rgba(99,102,241,0.08)", color: "#6366F1" }}>{FOCUS_OPTIONS.find(f => f.id === s.researchFocus)?.label ?? s.researchFocus}</span>
+                          <span className="text-[0.71rem] font-semibold py-0.5 px-2 rounded-full bg-[#6366F1]/10 text-[#6366F1]">{FOCUS_OPTIONS.find(f => f.id === s.researchFocus)?.label ?? s.researchFocus}</span>
                         )}
                       </div>
                     </div>
 
                     {/* Time */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "0.78rem", color: "var(--color-text-muted)", flexShrink: 0 }}>
+                    <div className="flex items-center gap-1 text-[0.78rem] text-muted flex-shrink-0">
                       <Clock size={12} />
                       {timeAgo(s.createdAt)}
                     </div>
 
                     {/* Status badge */}
-                    <div style={{ padding: "5px 14px", borderRadius: 100, background: statusBg, color: statusTextColor, fontSize: "0.78rem", fontWeight: 700, flexShrink: 0 }}>
+                    <div className={`py-1 px-3.5 rounded-full text-[0.78rem] font-bold flex-shrink-0 ${statusBg} ${statusTextColor}`}>
                       {statusLabel}
                     </div>
 
-                    <ChevronRight size={17} color="var(--color-text-muted)" style={{ flexShrink: 0 }} />
+                    <ChevronRight size={17} className="text-muted flex-shrink-0" />
                   </div>
                 </Link>
               );
@@ -396,8 +361,6 @@ export default function SessionsPage() {
           </div>
         )}
       </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `@keyframes spin { 100% { transform: rotate(360deg); } }` }} />
     </div>
   );
 }

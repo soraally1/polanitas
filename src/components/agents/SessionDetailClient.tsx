@@ -23,34 +23,34 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
 
   if (isLoading) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <div className="skeleton" style={{ height: 72, borderRadius: "var(--radius-lg)" }} />
-        <div className="skeleton" style={{ height: 260, borderRadius: "var(--radius-lg)" }} />
+      <div className="flex flex-col gap-4">
+        <div className="skeleton h-[72px] rounded-[var(--radius-lg)]" />
+        <div className="skeleton h-[260px] rounded-[var(--radius-lg)]" />
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="bento-card" style={{ textAlign: "center", padding: 56 }}>
+      <div className="bento-card text-center p-14">
         <h3>Sesi tidak ditemukan</h3>
-        <p style={{ marginTop: 8 }}>Session ID: {sessionId}</p>
+        <p className="mt-2">Session ID: {sessionId}</p>
       </div>
     );
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 24 }} className="animate-fade-in-up">
+    <div className="flex flex-col gap-6 animate-fade-in-up">
 
       {/* Session header */}
       <div className="page-header">
         <div>
-          <div className="caption" style={{ marginBottom: 6 }}>
+          <div className="caption mb-1.5">
             SESSION · {session.id.substring(0, 8).toUpperCase()}
           </div>
           <h1>{session.topic}</h1>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="flex gap-2">
           <span className="chip">{session.regionCode}</span>
           <span className="chip">
             <Clock size={10} strokeWidth={2} />
@@ -65,12 +65,12 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
       {/* Research output */}
       {research && (
         <div className="bento-card animate-fade-in-up">
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-            <BarChart2 size={18} strokeWidth={1.75} color="var(--color-accent-text)" />
-            <h3 style={{ margin: 0 }}>Hasil Riset</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart2 size={18} strokeWidth={1.75} className="text-accent-text" />
+            <h3 className="m-0">Hasil Riset</h3>
           </div>
 
-          <div className="stats-grid" style={{ marginBottom: 20 }}>
+          <div className="stats-grid mb-5">
             <StatCard label="YouTube Trends" value={research.youtubeTrends.length} Icon={Play} />
             <StatCard label="Social Trends"  value={research.socialTrends.length}  Icon={Hash} />
             <StatCard label="Marketplace"    value={research.marketplaceProducts.length} Icon={ShoppingBag} />
@@ -78,47 +78,18 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
 
           {research.youtubeTrends.length > 0 && (
             <>
-              <div className="caption" style={{ marginBottom: 10 }}>Top YouTube Trends</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div className="caption mb-2.5">Top YouTube Trends</div>
+              <div className="flex flex-col gap-2">
                 {research.youtubeTrends.slice(0, 4).map((v) => (
                   <div
                     key={v.videoId}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "10px 14px",
-                      background: "var(--color-surface-2)",
-                      borderRadius: "var(--radius-sm)",
-                      border: "1px solid var(--color-border)",
-                    }}
+                    className="flex items-center gap-3 py-2.5 px-3.5 bg-surface-2 rounded-[var(--radius-sm)] border border-border"
                   >
-                    <div
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: "var(--radius-sm)",
-                        background: "var(--color-surface-3)",
-                        border: "1px solid var(--color-border)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Play size={13} strokeWidth={2} color="var(--color-accent-text)" fill="var(--color-accent-text)" />
+                    <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-surface-3 border border-border flex items-center justify-center shrink-0">
+                      <Play size={13} strokeWidth={2} className="text-accent-text fill-accent-text" />
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontWeight: 600,
-                          fontSize: "0.875rem",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          color: "var(--color-text-primary)",
-                        }}
-                      >
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-sm overflow-hidden text-ellipsis whitespace-nowrap text-primary">
                         {v.title}
                       </div>
                       <div className="caption">
@@ -136,12 +107,12 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
       {/* Strategy output */}
       {strategy && (
         <div className="bento-card animate-fade-in-up">
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-            <Megaphone size={18} strokeWidth={1.75} color="var(--color-accent-text)" />
-            <h3 style={{ margin: 0 }}>Strategi Konten</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <Megaphone size={18} strokeWidth={1.75} className="text-accent-text" />
+            <h3 className="m-0">Strategi Konten</h3>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="flex flex-col gap-4">
             {strategy.scripts.map((script: ContentScript, i) => (
               <ScriptCard key={i} script={script} index={i} />
             ))}
@@ -174,18 +145,10 @@ function StatCard({
 }) {
   return (
     <div className="stat-card">
-      <div className="agent-icon" style={{ width: 32, height: 32, marginBottom: 10, borderRadius: 6 }}>
+      <div className="agent-icon !w-8 !h-8 mb-2.5 !rounded-[6px]">
         <Icon size={14} strokeWidth={1.75} />
       </div>
-      <div
-        style={{
-          fontSize: "1.5rem",
-          fontWeight: 800,
-          color: "var(--color-accent-text)",
-          lineHeight: 1,
-          marginBottom: 4,
-        }}
-      >
+      <div className="text-2xl font-extrabold text-accent-text leading-none mb-1">
         {value}
       </div>
       <div className="caption">{label}</div>
@@ -205,18 +168,11 @@ function ScriptCard({ script, index }: { script: ContentScript; index: number })
   return (
     <div className="script-card">
       <div className="script-header">
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="flex items-center gap-2">
           <span className="caption">Skrip {String(index + 1).padStart(2, "0")}</span>
           <span
-            style={{
-              padding: "2px 9px",
-              borderRadius: 999,
-              fontSize: "0.6875rem",
-              fontWeight: 700,
-              color: accentColor,
-              background: `${accentColor}18`,
-              fontFamily: "var(--font-sans)",
-            }}
+            className="py-0.5 px-[9px] rounded-full text-[0.6875rem] font-bold font-sans"
+            style={{ color: accentColor, background: `${accentColor}18` }}
           >
             {script.duration}
           </span>
@@ -230,12 +186,10 @@ function ScriptCard({ script, index }: { script: ContentScript; index: number })
       <div className="script-body">
         {/* Viral hook */}
         <div className="hook-box">
-          <div className="caption" style={{ color: "var(--color-accent-text)", marginBottom: 5 }}>
+          <div className="caption text-accent-text mb-[5px]">
             Viral Hook
           </div>
-          <div
-            style={{ fontWeight: 700, fontSize: "1rem", color: "var(--color-text-primary)", lineHeight: 1.4 }}
-          >
+          <div className="font-bold text-base text-primary leading-[1.4]">
             &ldquo;{script.viralHook}&rdquo;
           </div>
         </div>
@@ -243,17 +197,17 @@ function ScriptCard({ script, index }: { script: ContentScript; index: number })
         {/* Script */}
         <div>
           <div className="label">Skrip</div>
-          <p style={{ fontSize: "0.875rem", lineHeight: 1.75 }}>{script.script}</p>
+          <p className="text-sm leading-[1.75]">{script.script}</p>
         </div>
 
         {/* CTA */}
         <div>
           <div className="label">Call to Action</div>
-          <p style={{ fontSize: "0.875rem" }}>{script.callToAction}</p>
+          <p className="text-sm">{script.callToAction}</p>
         </div>
 
         {/* Hashtags */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        <div className="flex flex-wrap gap-1.5">
           {script.hashtags.map((tag) => (
             <span key={tag} className="chip">
               <Hash size={10} strokeWidth={2} />

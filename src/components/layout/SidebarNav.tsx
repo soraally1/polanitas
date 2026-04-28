@@ -64,7 +64,7 @@ export function SidebarNav() {
                 href={href}
                 className={`nav-item ${isActive ? "nav-item--active" : ""}`}
               >
-                <Icon size={15} strokeWidth={2} style={{ flexShrink: 0 }} />
+                <Icon size={15} strokeWidth={2} className="shrink-0" />
                 {label}
               </Link>
             );

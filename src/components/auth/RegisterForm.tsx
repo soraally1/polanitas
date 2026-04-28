@@ -13,6 +13,7 @@ import { auth } from "@/lib/firebase-client";
 import { createSession } from "@/actions/auth-actions";
 import { Mail, Lock, User, UserPlus, AlertCircle, Globe, CheckCircle } from "lucide-react";
 import { ThemeLogo } from "@/components/layout/ThemeLogo";
+import { motion, AnimatePresence } from "framer-motion";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -87,237 +88,265 @@ export default function RegisterForm() {
   const strengthLabels = ["", "Lemah", "Cukup", "Kuat", "Sangat Kuat"];
 
   return (
-    <div className="animate-fade-in-up" style={{ width: "100%", maxWidth: 420 }}>
-      <div>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="w-full max-w-[460px] my-8"
+    >
+      <div className="bg-surface p-8 rounded-3xl border border-border shadow-md">
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+        <div className="text-center mb-7">
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="flex justify-center mb-4"
+          >
             <ThemeLogo height={32} />
-          </div>
-          <h2 style={{ marginBottom: 6, fontSize: "1.25rem" }}>Buat Akun Baru</h2>
-          <p style={{ fontSize: "0.875rem" }}>
+          </motion.div>
+          <motion.h2 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mb-1.5 text-xl font-bold"
+          >
+            Buat Akun Baru
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-sm text-secondary"
+          >
             Sudah punya akun?{" "}
             <Link
               href="/login"
-              style={{ color: "var(--color-accent-text)", fontWeight: 600 }}
+              className="text-accent-text font-semibold hover:underline"
             >
               Masuk di sini
             </Link>
-          </p>
+          </motion.p>
         </div>
 
         {/* Error */}
-        {error && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 8,
-              padding: "10px 14px",
-              background: "color-mix(in srgb, var(--color-error) 10%, transparent)",
-              border: "1px solid color-mix(in srgb, var(--color-error) 30%, transparent)",
-              borderRadius: "var(--radius-sm)",
-              marginBottom: 20,
-              fontSize: "0.875rem",
-              color: "var(--color-error)",
-            }}
-          >
-            <AlertCircle size={15} strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
-            {error}
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: "auto", marginBottom: 20 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+              className="flex items-start gap-2 py-2.5 px-3.5 bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] border border-[color-mix(in_srgb,var(--color-error)_30%,transparent)] rounded-[var(--radius-sm)] text-sm text-error overflow-hidden"
+            >
+              <AlertCircle size={15} strokeWidth={2} className="shrink-0 mt-px" />
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: 14 }}
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Name */}
-          <div>
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
             <label htmlFor="reg-name" className="label">Nama Lengkap</label>
-            <div style={{ position: "relative" }}>
+            <div className="relative">
               <User
                 size={15}
                 strokeWidth={2}
-                color="var(--color-text-muted)"
-                style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted"
               />
               <input
                 id="reg-name"
                 name="name"
                 type="text"
-                className="input"
+                className="input pl-9"
                 placeholder="Nama kamu"
                 required
                 autoComplete="name"
-                style={{ paddingLeft: 36 }}
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Email */}
-          <div>
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}>
             <label htmlFor="reg-email" className="label">Email</label>
-            <div style={{ position: "relative" }}>
+            <div className="relative">
               <Mail
                 size={15}
                 strokeWidth={2}
-                color="var(--color-text-muted)"
-                style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted"
               />
               <input
                 id="reg-email"
                 name="email"
                 type="email"
-                className="input"
+                className="input pl-9"
                 placeholder="nama@email.com"
                 required
                 autoComplete="email"
-                style={{ paddingLeft: 36 }}
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Password */}
-          <div>
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 }}>
             <label htmlFor="reg-password" className="label">Password</label>
-            <div style={{ position: "relative" }}>
+            <div className="relative">
               <Lock
                 size={15}
                 strokeWidth={2}
-                color="var(--color-text-muted)"
-                style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted"
               />
               <input
                 id="reg-password"
                 name="password"
                 type="password"
-                className="input"
+                className="input pl-9"
                 placeholder="Min. 6 karakter"
                 required
                 minLength={6}
                 autoComplete="new-password"
-                style={{ paddingLeft: 36 }}
                 onChange={(e) => checkStrength(e.target.value)}
               />
             </div>
 
             {/* Password strength bar */}
-            {passwordStrength > 0 && (
-              <div style={{ marginTop: 8 }}>
-                <div style={{ display: "flex", gap: 4, marginBottom: 5 }}>
-                  {[1, 2, 3, 4].map((lvl) => (
-                    <div
-                      key={lvl}
-                      style={{
-                        flex: 1,
-                        height: 3,
-                        borderRadius: 999,
-                        background: lvl <= passwordStrength
-                          ? (strengthColors[passwordStrength] ?? "var(--color-border)")
-                          : "var(--color-border)",
-                        transition: "background 0.3s ease",
-                      }}
-                    />
-                  ))}
-                </div>
-                <span
-                  className="caption"
-                  style={{ color: strengthColors[passwordStrength] }}
+            <AnimatePresence>
+              {passwordStrength > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="mt-2"
                 >
-                  Password {strengthLabels[passwordStrength]}
-                </span>
-              </div>
-            )}
-          </div>
+                  <div className="flex gap-1 mb-1.5">
+                    {[1, 2, 3, 4].map((lvl) => (
+                      <motion.div
+                        key={lvl}
+                        className="flex-1 h-[3px] rounded-full transition-colors duration-300"
+                        style={{
+                          background: lvl <= passwordStrength
+                            ? (strengthColors[passwordStrength] ?? "var(--color-border)")
+                            : "var(--color-border)",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <span
+                    className="caption font-bold"
+                    style={{ color: strengthColors[passwordStrength] }}
+                  >
+                    Password {strengthLabels[passwordStrength]}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           {/* Confirm Password */}
-          <div>
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }}>
             <label htmlFor="reg-confirm" className="label">Konfirmasi Password</label>
-            <div style={{ position: "relative" }}>
+            <div className="relative">
               <Lock
                 size={15}
                 strokeWidth={2}
-                color="var(--color-text-muted)"
-                style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted"
               />
               <input
                 id="reg-confirm"
                 name="confirm"
                 type="password"
-                className="input"
+                className="input pl-9"
                 placeholder="Ulangi password"
                 required
                 minLength={6}
                 autoComplete="new-password"
-                style={{ paddingLeft: 36 }}
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Terms */}
-          <p style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="text-[0.8125rem] text-muted leading-[1.6]">
             Dengan mendaftar, kamu menyetujui{" "}
-            <a href="#" style={{ color: "var(--color-accent-text)" }}>Ketentuan Layanan</a>{" "}
+            <a href="#" className="text-accent-text font-medium hover:underline">Ketentuan Layanan</a>{" "}
             dan{" "}
-            <a href="#" style={{ color: "var(--color-accent-text)" }}>Kebijakan Privasi</a> kami.
-          </p>
+            <a href="#" className="text-accent-text font-medium hover:underline">Kebijakan Privasi</a> kami.
+          </motion.p>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
             id="register-submit-btn"
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-primary w-full justify-center py-3 shadow-[0_4px_12px_var(--color-accent-glow)]"
             disabled={loading}
-            style={{ width: "100%", justifyContent: "center" }}
           >
             <UserPlus size={15} strokeWidth={2.5} />
             {isPending ? "Membuat akun..." : "Buat Akun"}
-          </button>
+          </motion.button>
         </form>
 
         {/* Divider */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            margin: "20px 0",
-          }}
-        >
-          <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
-          <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", whiteSpace: "nowrap" }}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }} className="flex items-center gap-3 my-6">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-xs text-muted whitespace-nowrap">
             atau daftar dengan
           </span>
-          <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
-        </div>
+          <div className="flex-1 h-px bg-border" />
+        </motion.div>
 
         {/* Google */}
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02, backgroundColor: "var(--color-surface-3)" }}
+          whileTap={{ scale: 0.98 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
           id="register-google-btn"
           onClick={handleGoogle}
           disabled={loading}
-          className="btn btn-secondary"
-          style={{ width: "100%", justifyContent: "center" }}
+          className="btn btn-secondary w-full justify-center py-3"
         >
           <Globe size={15} strokeWidth={2} />
           {isGooglePending ? "Membuka Google..." : "Daftar dengan Google"}
-        </button>
+        </motion.button>
       </div>
 
       {/* Benefits below card */}
-      <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 8 }}>
+      <motion.div 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 1.3 } }
+        }}
+        className="mt-6 flex flex-col gap-3"
+      >
         {[
           "Akses 3 AI Agents sekaligus — Researcher, Strategist & Analyst",
           "Real-time eye tracking untuk analisis konten berbasis data",
           "Gratis untuk kreator individual",
         ].map((benefit) => (
-          <div key={benefit} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-            <CheckCircle size={15} strokeWidth={2} color="var(--color-done)" style={{ flexShrink: 0, marginTop: 2 }} />
-            <span style={{ fontSize: "0.8125rem", color: "var(--color-text-secondary)" }}>{benefit}</span>
-          </div>
+          <motion.div 
+            key={benefit} 
+            variants={{
+              hidden: { opacity: 0, x: -10 },
+              visible: { opacity: 1, x: 0 }
+            }}
+            className="flex items-start gap-2.5"
+          >
+            <div className="bg-done/10 p-1 rounded-full">
+              <CheckCircle size={14} strokeWidth={2.5} className="shrink-0 text-done" />
+            </div>
+            <span className="text-sm text-secondary font-medium">{benefit}</span>
+          </motion.div>
         ))}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

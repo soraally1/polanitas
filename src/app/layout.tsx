@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
@@ -9,10 +9,16 @@ const jakarta = Plus_Jakarta_Sans({
   variable: "--font-sans",
 });
 
+const spaceMono = Space_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
+
 export const metadata: Metadata = {
   title: {
-    default: "POLANITAS — Digital Content Intelligence Platform",
-    template: "%s | POLANITAS",
+    default: "Polanitas",
+    template: "",
   },
   description:
     "Platform strategi dan analisis konten digital bertenaga Multi-Agent AI dan Eye Tracking. Riset tren otomatis, strategi konten viral, dan analisis perhatian berbasis biometrik.",
@@ -25,12 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" suppressHydrationWarning className={jakarta.variable}>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-      </head>
-      <body>
+    <html lang="id" suppressHydrationWarning className={`${jakarta.variable} ${spaceMono.variable} antialiased`}>
+      <body className="bg-bg text-primary font-sans min-h-dvh overflow-x-hidden leading-[1.6]">
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
