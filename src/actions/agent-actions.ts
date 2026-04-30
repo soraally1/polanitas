@@ -16,7 +16,7 @@ import { runContentStrategy } from "@/services/content-strategy-service";
 import { runFinalAnalysis } from "@/services/analytics-orchestrator";
 import { GazePoint, ResearchOutput, Session, StrategyOutput } from "@/types";
 import { cookies } from "next/headers";
-import { z } from "zod/v4";
+import { z } from "zod";
 import {
   collection,
   doc,
@@ -240,8 +240,9 @@ export async function submitGazeData(
   });
 
   try {
-    // runAttentionAnalysis is not yet wired — placeholder
-    const report = { sessionId, scriptIndex, gazePoints, scriptContent, recordedAt: Date.now() };
+    // ── Gaze Analysis (Eye Tracking) ───────────────────────────
+    const { runAttentionAnalysis } = await import("@/services/analytics-orchestrator");
+    const report = await runAttentionAnalysis(sessionId, scriptIndex, gazePoints, scriptContent);
 
     await addDoc(collection(db, "sessions", sessionId, "analytics"), report);
 

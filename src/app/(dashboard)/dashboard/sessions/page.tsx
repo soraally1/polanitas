@@ -150,7 +150,7 @@ export default function SessionsPage() {
       try {
         const res = await startResearchSession(fd);
         if (res?.error) {
-          setSubmitError("Gagal memulai sesi. Periksa inputmu.");
+          setSubmitError(typeof res.error === 'string' ? res.error : (res.error._ || "Gagal memulai sesi. Periksa inputmu."));
         } else if (res?.sessionId) {
           setTopic("");
           setTargetAudience("");

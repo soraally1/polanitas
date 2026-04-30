@@ -76,8 +76,9 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
             <StatCard label="Marketplace"    value={research.marketplaceProducts.length} Icon={ShoppingBag} />
           </div>
 
+          {/* YouTube List */}
           {research.youtubeTrends.length > 0 && (
-            <>
+            <div className="mt-6">
               <div className="caption mb-2.5">Top YouTube Trends</div>
               <div className="flex flex-col gap-2">
                 {research.youtubeTrends.slice(0, 4).map((v) => (
@@ -99,7 +100,64 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
                   </div>
                 ))}
               </div>
-            </>
+            </div>
+          )}
+
+          {/* Social List */}
+          {research.socialTrends.length > 0 && (
+            <div className="mt-8">
+              <div className="caption mb-2.5">Viral Hashtags & Topics</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {research.socialTrends.slice(0, 8).map((t, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between py-2.5 px-3.5 bg-surface-2 rounded-[var(--radius-sm)] border border-border"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-6 h-6 rounded-full bg-surface-3 border border-border flex items-center justify-center shrink-0">
+                        <Hash size={11} className="text-accent-text" />
+                      </div>
+                      <span className="font-bold text-sm text-primary truncate">#{t.hashtag.replace(/^#/, "")}</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0 ml-4">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted py-0.5 px-1.5 bg-surface-3 rounded border border-border">
+                        {t.platform}
+                      </span>
+                      {t.usageCount !== undefined && t.usageCount > 0 && (
+                        <span className="text-[10px] font-bold text-accent-text bg-accent-glow/10 py-0.5 px-1.5 rounded">
+                          {t.usageCount.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Marketplace List */}
+          {research.marketplaceProducts.length > 0 && (
+            <div className="mt-8">
+              <div className="caption mb-2.5">Competitor Products (Marketplace)</div>
+              <div className="flex flex-col gap-2">
+                {research.marketplaceProducts.slice(0, 5).map((p, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between py-2.5 px-3.5 bg-surface-2 rounded-[var(--radius-sm)] border border-border"
+                  >
+                    <div className="flex flex-col min-w-0">
+                      <div className="font-semibold text-sm text-primary truncate">{p.productName}</div>
+                      <div className="caption">Rp{p.price.toLocaleString()} · {p.platform}</div>
+                    </div>
+                    {p.soldCount !== undefined && p.soldCount > 0 && (
+                      <div className="text-[10px] font-bold text-done bg-done/5 border border-done/10 py-1 px-2 rounded-full shrink-0 ml-4">
+                        {p.soldCount} Terjual
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}

@@ -47,9 +47,14 @@ export function getAnalystClient(): Groq {
 
 /** General — Speech-to-Text (Whisper) + misc tasks */
 export function getGeneralClient(): Groq {
-  const key = process.env.GROQ_API_KEY_GENERAL;
-  if (!key) throw new Error("GROQ_API_KEY_GENERAL is not set in .env.local");
+  const key = process.env.GROQ_API_KEY || process.env.GROQ_API_KEY_GENERAL;
+  if (!key) throw new Error("GROQ_API_KEY or GROQ_API_KEY_GENERAL is not set in .env.local");
   return createClient(key);
+}
+
+/** Legacy alias for backwards compatibility */
+export function getGroqClient(): Groq {
+  return getGeneralClient();
 }
 
 // ── Shared constants ─────────────────────────────────────────────────────────
@@ -126,16 +131,10 @@ export async function analystChat(
  * General / Tutor chat — uses GROQ_API_KEY.
  * Kept for backwards compatibility with learn-actions.ts.
  */
-export function getGroqClient(): Groq {
-  const key = process.env.GROQ_API_KEY || process.env.GROQ_API_KEY_GENERAL;
-  if (!key) throw new Error("GROQ_API_KEY or GROQ_API_KEY_GENERAL is not set in .env.local");
-  return createClient(key);
-}
-
 export async function groqChat(
   systemPrompt: string,
   userMessage: string,
   overrides?: GroqOverrides
 ): Promise<string> {
-  return chatWithClient(getGroqClient(), systemPrompt, userMessage, overrides);
+  return chatWithClient(getGeneralClient(), systemPrompt, userMessage, overrides);
 }

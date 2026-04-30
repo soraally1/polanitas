@@ -3,7 +3,7 @@
  * All shared interfaces, enums, and Zod schemas live here.
  */
 
-import { z } from "zod/v4";
+import { z } from "zod";
 
 // ============================================================
 // Agent Status & Orchestration

@@ -20,21 +20,24 @@ const apify = new ApifyClient({ token: process.env.APIFY_API_TOKEN });
 // ============================================================
 
 export async function fetchYouTubeTrends(
+  topic: string,
   regionCode = "ID",
   maxResults = 10
 ): Promise<YouTubeTrend[]> {
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey) throw new Error("YOUTUBE_API_KEY is not set.");
 
-  const url = new URL("https://www.googleapis.com/youtube/v3/videos");
-  url.searchParams.set("part", "snippet,statistics");
-  url.searchParams.set("chart", "mostPopular");
+  const url = new URL("https://www.googleapis.com/youtube/v3/search");
+  url.searchParams.set("part", "snippet");
+  url.searchParams.set("q", topic);
+  url.searchParams.set("type", "video");
   url.searchParams.set("regionCode", regionCode);
   url.searchParams.set("maxResults", String(maxResults));
+  url.searchParams.set("order", "relevance"); // Get the most relevant videos
   url.searchParams.set("key", apiKey);
 
   const res = await fetch(url.toString(), {
-    next: { revalidate: 3600 }, // Cache for 1 hour
+    next: { revalidate: 3600 },
   });
 
   if (!res.ok) {
@@ -43,13 +46,14 @@ export async function fetchYouTubeTrends(
 
   const data = await res.json();
 
+  // The search endpoint returns videoId inside an id object
   return (data.items ?? []).map((item: any): YouTubeTrend => ({
-    videoId: item.id,
+    videoId: item.id.videoId,
     title: item.snippet.title,
     channelTitle: item.snippet.channelTitle,
-    viewCount: item.statistics.viewCount ?? "0",
-    likeCount: item.statistics.likeCount ?? "0",
-    tags: item.snippet.tags ?? [],
+    viewCount: "0", // Search endpoint doesn't return stats by default without extra calls
+    likeCount: "0",
+    tags: [],
     thumbnail: item.snippet.thumbnails?.high?.url ?? "",
     publishedAt: item.snippet.publishedAt,
   }));
@@ -216,7 +220,7 @@ export async function runMarketResearch(
 
   const [youtubeTrends, socialTikTok, socialIG, marketplaceProducts] =
     await Promise.allSettled([
-      fetchYouTubeTrends(regionCode),
+      fetchYouTubeTrends(topic, regionCode),
       fetchTikTokTrends(topic),
       fetchInstagramTrends(topic),
       fetchTokopediaProducts(topic),
@@ -251,7 +255,7 @@ export async function runMarketResearch(
       ...viralKeywords.map((kw) => ({
         platform: "tiktok" as const,
         hashtag: kw,
-        usageCount: undefined,
+        usageCount: 0,
         relatedSounds: [],
         scrapedAt: Date.now(),
       })),
