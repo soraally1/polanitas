@@ -263,121 +263,124 @@ export function SpeechToAction() {
   const isError = status === "error";
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-2">
+    <div className="flex flex-col items-end gap-3 pointer-events-none">
 
       {/* Feedback toast */}
       <AnimatePresence>
         {feedback && (
           <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
-            className="bg-[color:var(--color-bg)] border border-border rounded-xl px-4 py-2.5 shadow-lg max-w-[260px] pointer-events-none"
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 5, scale: 0.95 }}
+            className="bg-surface border border-border rounded-xl px-4 py-3 shadow-xl max-w-[280px] pointer-events-auto backdrop-blur-xl bg-opacity-95 flex flex-col gap-1"
           >
-            <p className="text-xs font-semibold text-primary leading-snug">{feedback}</p>
+            <p className="text-sm font-semibold text-primary leading-snug">{feedback}</p>
             {liveTranscript && (
-              <p className="text-[10px] text-muted mt-0.5">"{liveTranscript}"</p>
+              <p className="text-xs text-muted-foreground italic line-clamp-2">"{liveTranscript}"</p>
             )}
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Widget */}
-      <div className="bg-[color:var(--color-bg)] border border-border rounded-2xl shadow-lg overflow-hidden min-w-[190px]">
-
+      <div className="bg-surface border border-border rounded-2xl shadow-2xl overflow-hidden w-[100px] md:w-[260px] pointer-events-auto backdrop-blur-xl bg-opacity-95 transition-all duration-300">
+        
         {/* Header */}
-        <div className="flex items-center gap-2 px-3 py-2.5">
-          <div className="flex items-center gap-1.5 flex-1 min-w-0">
+        <div className="flex items-center justify-between px-4 py-3  bg-muted/20">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0 hidden md:block">
             {isAsking ? (
-              <Loader2 size={10} className="text-primary animate-spin shrink-0" />
+              <Loader2 size={14} className="text-primary animate-spin shrink-0" />
             ) : isError ? (
-              <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
             ) : isListening ? (
               <motion.span
-                className="w-2 h-2 rounded-full bg-green-500 shrink-0"
-                animate={{ scale: [1, 1.6, 1] }}
-                transition={{ repeat: Infinity, duration: 1 }}
+                className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0 shadow-[0_0_8px_rgba(34,197,94,0.5)]"
+                animate={{ scale: [1, 1.4, 1] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
               />
             ) : isProcessing ? (
               <motion.span
-                className="w-2 h-2 rounded-full bg-yellow-400 shrink-0"
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ repeat: Infinity, duration: 0.5 }}
+                className="w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0 shadow-[0_0_8px_rgba(250,204,21,0.5)]"
+                animate={{ opacity: [1, 0.4, 1] }}
+                transition={{ repeat: Infinity, duration: 0.8 }}
               />
             ) : (
-              <span className="w-2 h-2 rounded-full bg-border shrink-0" />
+              <span className="w-2.5 h-2.5 rounded-full bg-muted shrink-0" />
             )}
 
-            <span className="text-[10px] font-bold text-secondary truncate">
+            <span className="text-xs font-semibold text-foreground truncate">
               {isAsking     ? "AI Menjawab..."
-              : isError     ? "Mic error"
-              : isListening ? "Merekam..."
-              : isProcessing? "Groq AI..."
+              : isError     ? "Mic Error"
+              : isListening ? "Mendengarkan..."
+              : isProcessing? "Memproses..."
               : enabled     ? "Standby"
-              :               "Mic mati"}
+              :               "Mic Nonaktif"}
             </span>
           </div>
 
-          {/* Toggle */}
-          <button
-            onClick={() => {
-              const next = !enabled;
-              setEnabled(next);
-              if (next) speak("Aktif. Siap mendengarkan.");
-            }}
-            className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer border-none
-              ${enabled ? "bg-primary text-[color:var(--color-bg)]" : "bg-surface-2 text-muted hover:bg-surface"}`}
-            title={enabled ? "Matikan mic" : "Aktifkan mic"}
-          >
-            {enabled ? <Mic size={12} /> : <MicOff size={12} />}
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Toggle */}
+            <button
+              onClick={() => {
+                const next = !enabled;
+                setEnabled(next);
+                if (next) speak("Aktif. Siap mendengarkan.");
+              }}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer border-none outline-none focus:ring-2 focus:ring-primary/50
+                ${enabled ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" : "bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}
+              title={enabled ? "Matikan mic" : "Aktifkan mic"}
+            >
+              {enabled ? <Mic size={14} /> : <MicOff size={14} />}
+            </button>
 
-          {/* Collapse */}
-          <button
-            onClick={() => setCollapsed((v) => !v)}
-            className="w-7 h-7 rounded-full bg-surface-2 text-muted hover:bg-surface flex items-center justify-center cursor-pointer border-none transition-colors"
-          >
-            {collapsed ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-          </button>
+            {/* Collapse */}
+            <button
+              onClick={() => setCollapsed((v) => !v)}
+              className="w-8 h-8 rounded-full bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex items-center justify-center cursor-pointer border-none outline-none transition-colors"
+            >
+              {collapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+          </div>
         </div>
 
         {/* Expandable body */}
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {!collapsed && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden border-t border-border"
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="overflow-hidden border-t border-border bg-surface"
             >
               {/* Live transcript */}
-              <div className="px-3 py-2 min-h-[30px]">
+              <div className="px-4 py-3 min-h-[44px] flex items-center justify-center">
                 {liveTranscript ? (
-                  <p className="text-[10px] text-primary font-mono italic truncate">"{liveTranscript}"</p>
+                  <p className="text-xs text-primary font-medium italic line-clamp-2 w-full text-center">"{liveTranscript}"</p>
                 ) : (
-                  <p className="text-[10px] text-muted">
-                    {isListening ? "🎤 Sedang merekam..." : isProcessing ? "⚡ Groq memproses..." : "Klik 🎤 untuk mulai"}
+                  <p className="text-xs text-muted-foreground w-full text-center">
+                    {isListening ? "Ucapkan sesuatu..." : isProcessing ? "Memproses audio..." : "Klik 🎤 untuk mulai"}
                   </p>
                 )}
               </div>
 
               {/* Quick commands (clickable for test) */}
-              <div className="px-3 pb-2 flex flex-col gap-0.5">
-                {["buka dashboard", "buka materi", "buka sesi riset", "modul satu", "kembali", "ulangi"].map((cmd) => (
+              <div className="px-3 pb-3 flex flex-col gap-1">
+                <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1">Perintah Cepat</div>
+                {["buka dashboard", "buka materi", "sesi riset", "kembali"].map((cmd) => (
                   <button key={cmd} type="button"
                     onClick={() => handleTranscript(cmd)}
-                    className="text-left text-[10px] font-mono text-secondary hover:text-primary transition-colors px-2 py-1 rounded-lg hover:bg-surface-2 border-none bg-transparent cursor-pointer"
+                    className="text-left text-xs font-medium text-foreground hover:text-primary transition-all px-3 py-1.5 rounded-md hover:bg-primary/10 border-none bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/30"
                     title="Klik untuk simulasi perintah"
                   >
-                    &ldquo;{cmd}&rdquo;
+                    "{cmd}"
                   </button>
                 ))}
               </div>
 
               {/* Error */}
               {isError && errorMsg && (
-                <div className="mx-3 mb-3 text-[10px] text-red-500 bg-red-50 dark:bg-red-900/10 rounded-lg p-2 leading-relaxed">
+                <div className="mx-4 mb-4 text-xs font-medium text-destructive bg-destructive/10 rounded-lg p-2.5 leading-relaxed">
                   {errorMsg}
                 </div>
               )}
