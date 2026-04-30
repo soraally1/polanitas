@@ -76,15 +76,14 @@ User bisa mereview hasil kerja tiga AI Agent dalam format yang terstruktur.
   // ── Module contexts ──────────────────────────────────────────────────────
   "/dashboard/learn/ai-orchestration": `
 Ini adalah Modul 1: Orkestrasi AI — Menjadi Dirigen Jaringan Agen.
-Level: Fundamental. Terdiri dari 6 pelajaran, estimasi 3 jam.
-Topik yang dibahas:
-- Apa itu orchestration dalam sistem AI multi-agent
-- Bagaimana membangun pipeline agen yang saling terhubung
-- Pola desain: Sequential, Parallel, dan Hierarchical orchestration
-- Membuat dirigen (orchestrator) yang mengontrol kapan agen berjalan
-- Handling error dan fallback antar agen
-- Studi kasus: pipeline 3 agen POLANITAS (Researcher → Strategist → Analyst)
-Setelah menyelesaikan modul ini, user bisa merancang sistem multi-agent sendiri.
+Level: Fundamental. Terdiri dari 6 materi utama:
+1. Apa itu AI Orchestration? — Menjelaskan perubahan paradigma dari pekerja eksekusi menjadi dirigen (konduktor) yang mengawasi jaringan agen.
+2. Anatomi Pipeline — Menjelaskan 3 lapisan sistem: Layer Orchestrator (User), Layer Agent (Researcher, Strategist, Analyst), dan Layer Tool (API, Groq, WebGazer).
+3. Dekomposisi Tujuan Bisnis — Cara memecah tujuan besar (KPI) menjadi instruksi mikro yang bisa dimengerti AI menggunakan teknik OKR.
+4. Quality Gate & Human Oversight — Menjelaskan kapan manusia harus mengintervensi (keputusan high-stakes, hukum, reputasi) dan kapan bisa otomatis penuh.
+5. Studi Kasus: Kampanye 48 Jam — Contoh nyata peluncuran produk sunscreen Luminara Beauty menggunakan pipeline 3 agen dalam waktu singkat.
+6. Merancang SOP Orkestrasi — Cara membangun Standard Operating Procedure agar sistem bisa direplikasi dan diskalakan oleh tim.
+User bisa bertanya detail tentang salah satu dari 6 materi di atas.
   `.trim(),
 
   "/dashboard/learn/trend-signal": `

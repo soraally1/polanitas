@@ -18,6 +18,7 @@ import {
   Network,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useSpeechFormFill } from "@/hooks/use-speech-form-fill";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface QuizAnswer {
@@ -240,7 +241,8 @@ Rancang SOP mini untuk satu workflow yang paling relevan dengan bisnis/pekerjaan
 
 Upload deskripsinya ke AI Lab untuk mendapat review dan saran penyempurnaan!`,
     quiz: {
-      question: "Mengapa SOP orkestrasi AI penting untuk skalabilitas bisnis?",
+      question:
+        "Mengapa SOP orkestrasi AI penting untuk skalabilitas bisnis?",
       options: [
         "Karena AI membutuhkan dokumen formal untuk bekerja",
         "SOP tidak penting, yang penting hasilnya bagus",
@@ -254,12 +256,31 @@ Upload deskripsinya ke AI Lab untuk mendapat review dan saran penyempurnaan!`,
   },
 ];
 
+// ── Types ─────────────────────────────────────────────────────────────────────
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function AIOrchestrationPage() {
   const [currentLesson, setCurrentLesson] = useState(0);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Voice navigation for lessons
+  useSpeechFormFill((action) => {
+    if (action.type === "set-lesson" && typeof action.index === "number") {
+      if (action.index >= 0 && action.index < LESSONS.length) {
+        goToLesson(action.index);
+      }
+    } else if (action.type === "next-lesson") {
+      if (currentLesson < LESSONS.length - 1) {
+        goToLesson(currentLesson + 1);
+      }
+    } else if (action.type === "prev-lesson") {
+      if (currentLesson > 0) {
+        goToLesson(currentLesson - 1);
+      }
+    }
+  });
 
   const lesson = LESSONS[currentLesson];
   const progress = (completed.size / LESSONS.length) * 100;

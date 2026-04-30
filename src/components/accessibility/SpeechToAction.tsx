@@ -26,11 +26,11 @@ const ROUTE_COMMANDS: { patterns: string[]; path: string; announce: string }[] =
   { patterns: ["buka strategist", "strategist"], path: "/dashboard/strategist", announce: "Membuka Strategist." },
   { patterns: ["buka analyst", "analyst"], path: "/dashboard/analyst", announce: "Membuka Analyst." },
   { patterns: ["buka laporan", "laporan"], path: "/dashboard/reports", announce: "Membuka Laporan." },
-  { patterns: ["modul satu", "modul 1", "orkestrasi ai", "orkestrasi"], path: "/dashboard/learn/ai-orchestration", announce: "Membuka Modul satu." },
-  { patterns: ["modul dua", "modul 2", "deteksi tren", "tren dini"], path: "/dashboard/learn/trend-signal", announce: "Membuka Modul dua." },
-  { patterns: ["modul tiga", "modul 3", "whitespace", "marketplace"], path: "/dashboard/learn/marketplace-whitespace", announce: "Membuka Modul tiga." },
-  { patterns: ["modul empat", "modul 4", "eye tracking mastery"], path: "/dashboard/learn/eye-tracking", announce: "Membuka Modul empat." },
-  { patterns: ["modul lima", "modul 5", "copywriting", "llm"], path: "/dashboard/learn/llm-copywriting", announce: "Membuka Modul lima." },
+  { patterns: ["modul satu", "modul 1", "materi satu", "materi 1", "orkestrasi ai", "orkestrasi"], path: "/dashboard/learn/ai-orchestration", announce: "Membuka Modul satu." },
+  { patterns: ["modul dua", "modul 2", "materi dua", "materi 2", "deteksi tren", "tren dini"], path: "/dashboard/learn/trend-signal", announce: "Membuka Modul dua." },
+  { patterns: ["modul tiga", "modul 3", "materi tiga", "materi 3", "whitespace", "marketplace"], path: "/dashboard/learn/marketplace-whitespace", announce: "Membuka Modul tiga." },
+  { patterns: ["modul empat", "modul 4", "materi empat", "materi 4", "eye tracking mastery"], path: "/dashboard/learn/eye-tracking", announce: "Membuka Modul empat." },
+  { patterns: ["modul lima", "modul 5", "materi lima", "materi 5", "copywriting", "llm"], path: "/dashboard/learn/llm-copywriting", announce: "Membuka Modul lima." },
 ];
 
 const PATH_NAMES: Record<string, string> = {
@@ -187,8 +187,8 @@ export function SpeechToAction() {
         return;
       }
 
-      // Back
-      if (text.includes("kembali") || text.includes("sebelumnya")) {
+      // Back (Special handling: skip if it sounds like lesson navigation)
+      if ((text.includes("kembali") || text.includes("sebelumnya")) && !text.includes("materi")) {
         speak("Kembali.");
         showFeedback("← Kembali");
         router.back();

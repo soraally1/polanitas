@@ -15,6 +15,9 @@ export type VoiceFormAction =
   | { type: "toggle-platform"; platform: string }
   | { type: "set-platforms"; platforms: string[] }
   | { type: "set-focus"; focusId: string }
+  | { type: "set-lesson"; index: number }
+  | { type: "next-lesson" }
+  | { type: "prev-lesson" }
   | { type: "submit-form" };
 
 /** Dispatch a form action to any listening page component */
