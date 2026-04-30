@@ -10,7 +10,9 @@ import {
   Lightbulb,
   RefreshCw,
   TrendingUp,
+  Zap,
 } from "lucide-react";
+import { AILab } from "@/components/Chatbot";
 
 // ═══════════════════════════════════════════════════════
 // TYPE
@@ -425,6 +427,7 @@ export default function StatistikaDasarPage() {
   const [quizSelected, setQuizSelected] = useState<number | null>(null);
   const [quizAnswered, setQuizAnswered] = useState(false);
   const [completedLessons, setCompletedLessons] = useState<Set<number>>(new Set());
+  const [showAILab, setShowAILab] = useState(false);
 
   const lesson = LESSONS[currentLesson];
 
@@ -724,7 +727,46 @@ export default function StatistikaDasarPage() {
             )}
           </div>
 
-          {/* Quiz */}
+          {/* AI Lab Toggle */}
+          <div style={{ marginBottom: 10 }}>
+            <button
+              onClick={() => setShowAILab(!showAILab)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "12px 18px",
+                borderRadius: "var(--radius-md)",
+                background: showAILab
+                  ? "linear-gradient(135deg, var(--color-accent), #3B82F6)"
+                  : "var(--color-surface-3)",
+                border: "1px solid",
+                borderColor: showAILab ? "transparent" : "var(--color-border)",
+                color: showAILab ? "#12200A" : "var(--color-text-secondary)",
+                fontSize: "0.875rem",
+                fontWeight: 700,
+                cursor: "pointer",
+                width: "100%",
+                justifyContent: "center",
+                marginBottom: showAILab ? 20 : 0,
+                fontFamily: "var(--font-sans)",
+                transition: "all 0.3s ease",
+              }}
+            >
+              <Zap size={15} />
+              {showAILab ? "Tutup AI Tutor Lab" : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+            </button>
+            {showAILab && (
+              <AILab
+                moduleId="statistika-dasar"
+                moduleName="Statistika Dasar"
+                initialMessage="Halo! Saya AI Tutor Lab. Ingin bertanya lebih lanjut tentang Mean, Median, Standar Deviasi, atau Korelasi? Tanyakan saja!"
+                themeColor="var(--color-accent)"
+                themeGradient="linear-gradient(135deg, var(--color-accent), #3B82F6)"
+              />
+            )}
+          </div>
+
           <QuizBlock
             quiz={lesson.quiz}
             answered={quizAnswered}
