@@ -136,16 +136,19 @@ export function EyeTrackingNavigation() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[10000] bg-surface/90 backdrop-blur-sm flex flex-col items-center justify-center"
+            className="fixed inset-0 z-[10000] bg-surface/90 backdrop-blur-md flex flex-col items-center justify-center"
           >
-            <div className="bg-surface border border-border p-6 rounded-2xl shadow-xl max-w-md text-center relative z-10">
-              <h2 className="text-xl font-bold text-primary mb-2">Kalibrasi Eye Tracking</h2>
-              <p className="text-sm text-secondary leading-relaxed mb-6">
+            <div className="bg-surface border border-border p-8 rounded-3xl shadow-2xl max-w-lg text-center relative z-10 flex flex-col items-center">
+              <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6 shadow-inner">
+                <Target size={32} />
+              </div>
+              <h2 className="text-2xl font-bold text-foreground mb-3">Kalibrasi Eye Tracking</h2>
+              <p className="text-base text-muted-foreground leading-relaxed mb-8">
                 Untuk hasil terbaik, minta bantuan pendamping untuk mengklik 9 titik merah yang muncul di layar, sambil Anda <b>terus menatap titik tersebut</b> saat diklik.
               </p>
               <button 
                 onClick={() => setIsCalibrating(false)}
-                className="btn btn-primary w-full justify-center"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-3 px-8 rounded-xl shadow-lg shadow-primary/20 transition-all border-none cursor-pointer outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-surface"
               >
                 Selesai Kalibrasi
               </button>
@@ -209,79 +212,82 @@ export function EyeTrackingNavigation() {
         </div>
       )}
 
-      {/* Widget UI (Placed slightly above the bottom-right so it doesn't overlap SpeechToAction) */}
-      <div className="fixed bottom-36 right-6 z-[9999] flex flex-col items-end gap-2">
+      {/* Widget UI */}
+      <div className="flex flex-col items-end gap-3 pointer-events-none">
         <AnimatePresence>
           {feedback && (
             <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 4 }}
-              className="bg-[color:var(--color-bg)] border border-border rounded-xl px-4 py-2.5 shadow-lg pointer-events-none"
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -5, scale: 0.95 }}
+              className="bg-surface border border-border rounded-xl px-4 py-3 shadow-xl max-w-[280px] pointer-events-auto backdrop-blur-xl bg-opacity-95"
             >
-              <p className="text-xs font-bold text-primary">{feedback}</p>
+              <p className="text-sm font-semibold text-primary leading-snug">{feedback}</p>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="bg-[color:var(--color-bg)] border border-border rounded-2xl shadow-lg overflow-hidden min-w-[190px]">
+        <div className="bg-surface border border-border rounded-2xl shadow-2xl overflow-hidden w-[100px] md:w-[260px] pointer-events-auto backdrop-blur-xl bg-opacity-95 transition-all duration-300">
           {/* Header */}
-          <div className="flex items-center gap-2 px-3 py-2.5">
-            <div className="flex items-center gap-1.5 flex-1 min-w-0">
+          <div className="flex items-center justify-between px-4 py-3 bg-muted/20">
+            <div className="flex items-center gap-2.5 flex-1 min-w-0 hidden md:block">
               {!isReady ? (
-                <Loader2 size={10} className="text-primary animate-spin shrink-0" />
+                <Loader2 size={14} className="text-primary animate-spin shrink-0" />
               ) : isTracking ? (
-                <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0 shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse" />
               ) : (
-                <span className="w-2 h-2 rounded-full bg-border shrink-0" />
+                <span className="w-2.5 h-2.5 rounded-full bg-muted shrink-0" />
               )}
-              <span className="text-[10px] font-bold text-secondary truncate">
-                {!isReady ? "Memuat Tracker..." : isTracking ? "Merekam Mata" : "Eye Tracker Mati"}
+              <span className="text-xs font-semibold text-foreground truncate">
+                {!isReady ? "Memuat Tracker..." : isTracking ? "Merekam Mata" : "Tracker Nonaktif"}
               </span>
             </div>
 
-            {/* Toggle */}
-            <button
-              onClick={() => setEnabled(!enabled)}
-              disabled={!isReady}
-              className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer border-none disabled:opacity-50
-                ${enabled ? "bg-primary text-[color:var(--color-bg)]" : "bg-surface-2 text-muted hover:bg-surface"}`}
-              title={enabled ? "Matikan Tracker" : "Aktifkan Tracker"}
-            >
-              {enabled ? <Eye size={12} /> : <EyeOff size={12} />}
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Toggle */}
+              <button
+                onClick={() => setEnabled(!enabled)}
+                disabled={!isReady}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer border-none outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed
+                  ${enabled ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" : "bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}
+                title={enabled ? "Matikan Tracker" : "Aktifkan Tracker"}
+              >
+                {enabled ? <Eye size={14} /> : <EyeOff size={14} />}
+              </button>
 
-            {/* Collapse */}
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              className="w-7 h-7 rounded-full bg-surface-2 text-muted hover:bg-surface flex items-center justify-center cursor-pointer border-none transition-colors"
-            >
-              {collapsed ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-            </button>
+              {/* Collapse */}
+              <button
+                onClick={() => setCollapsed(!collapsed)}
+                className="w-8 h-8 rounded-full bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex items-center justify-center cursor-pointer border-none outline-none transition-colors"
+              >
+                {collapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+            </div>
           </div>
 
           {/* Expandable Body */}
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {!collapsed && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden border-t border-border"
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="overflow-hidden border-t border-border bg-surface"
               >
-                <div className="px-3 py-3 flex flex-col gap-2">
-                  <p className="text-[10px] text-muted leading-relaxed">
-                    Tatap sebuah tombol selama 1.5 detik, <b>atau kedipkan mata Anda (0.5 - 1.5 detik)</b> untuk mengkliknya otomatis.
+                <div className="px-4 py-4 flex flex-col gap-3">
+                  <p className="text-xs text-muted-foreground leading-relaxed text-center">
+                    Tatap sebuah area selama <b>1.5 detik</b>, atau <b>kedipkan mata</b> untuk klik otomatis.
                   </p>
                   <button
                     onClick={() => setIsCalibrating(true)}
-                    className="btn btn-secondary btn-sm w-full justify-center flex items-center gap-1.5"
+                    className="w-full flex items-center justify-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-semibold py-2.5 px-4 rounded-lg transition-colors border-none cursor-pointer outline-none focus:ring-2 focus:ring-primary/50"
                   >
-                    <Target size={12} /> Kalibrasi Akurasi
+                    <Target size={14} /> Kalibrasi Akurasi
                   </button>
                 </div>
                 {error && (
-                  <div className="mx-3 mb-3 text-[10px] text-error bg-error/10 rounded-lg p-2 leading-relaxed">
+                  <div className="mx-4 mb-4 text-xs font-medium text-destructive bg-destructive/10 rounded-lg p-2.5 leading-relaxed">
                     {error}
                   </div>
                 )}
