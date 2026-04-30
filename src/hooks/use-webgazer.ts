@@ -75,7 +75,8 @@ export function useWebGazer() {
   const startTracking = useCallback(async (
     targetElementId?: string, 
     showPoints = false, 
-    onGaze?: (x: number, y: number) => void
+    onGaze?: (x: number, y: number) => void,
+    onBlink?: () => void
   ) => {
     if (!isReady || !window.webgazer) {
       setError("WebGazer is not ready yet.");
@@ -87,15 +88,38 @@ export function useWebGazer() {
     setError(null);
 
     try {
+      let lastValidTime = Date.now();
+      let isBlinking = false;
+
       await window.webgazer
         .setGazeListener((data, _elapsed) => {
-          if (!data) return;
+          const now = Date.now();
+          
+          if (!data) {
+            // Mata hilang/tertutup
+            if (!isBlinking && (now - lastValidTime) < 1000) {
+              isBlinking = true;
+            }
+            return;
+          }
+
+          // Mata terdeteksi lagi
+          if (isBlinking) {
+            const blinkDuration = now - lastValidTime;
+            // Blink disengaja biasanya sedikit lebih lama dari blink biasa (sekitar 300ms - 1500ms)
+            if (blinkDuration >= 150 && blinkDuration <= 1500) {
+              if (onBlink) onBlink();
+            }
+            isBlinking = false;
+          }
+          lastValidTime = now;
+
           const x = Math.round(data.x);
           const y = Math.round(data.y);
           gazeBufferRef.current.push({
             x,
             y,
-            timestamp: Date.now(),
+            timestamp: now,
             elementId: targetElementId,
             viewport: viewportRef.current,
           });

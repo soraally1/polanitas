@@ -21,9 +21,10 @@ export function EyeTrackingNavigation() {
   const [collapsed, setCollapsed] = useState(false);
   const [isCalibrating, setIsCalibrating] = useState(false);
 
-  // Dwell state
+  // Dwell & Position state
   const [dwellProgress, setDwellProgress] = useState(0);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const latestCursorPos = useRef({ x: 0, y: 0 });
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const dwellCenter = useRef<{ x: number; y: number } | null>(null);
@@ -38,6 +39,7 @@ export function EyeTrackingNavigation() {
 
   // ── Gaze Handler (Dwell Click Logic) ─────────────────────────────────────────
   const handleGaze = useCallback((x: number, y: number) => {
+    latestCursorPos.current = { x, y };
     setCursorPos({ x, y });
 
     const now = Date.now();
@@ -83,6 +85,28 @@ export function EyeTrackingNavigation() {
     }
   }, []);
 
+  // ── Blink Handler (Blink to Click) ───────────────────────────────────────────
+  const handleBlink = useCallback(() => {
+    const { x, y } = latestCursorPos.current;
+    
+    const el = document.elementFromPoint(x, y);
+    if (el && el.tagName !== "BODY" && el.tagName !== "HTML") {
+      const htmlEl = el as HTMLElement;
+      const oldOutline = htmlEl.style.outline;
+      htmlEl.style.outline = "3px solid var(--color-primary)";
+      setTimeout(() => {
+        htmlEl.style.outline = oldOutline;
+      }, 300);
+
+      htmlEl.click();
+      showFeedback("👁️ Blink Click");
+    }
+    
+    // Reset dwell progress as click has happened
+    dwellCenter.current = null;
+    setDwellProgress(0);
+  }, []);
+
   const { isReady, isTracking, error, startTracking, stopTracking } = useWebGazer();
 
   useEffect(() => {
@@ -91,8 +115,8 @@ export function EyeTrackingNavigation() {
 
   useEffect(() => {
     if (enabled && isReady && !isTracking) {
-      // Start with prediction points ON for navigation
-      startTracking(undefined, true, handleGaze);
+      // Start with prediction points ON for navigation, pass both gaze and blink handlers
+      startTracking(undefined, true, handleGaze, handleBlink);
     } else if (!enabled && isTracking) {
       stopTracking();
       setDwellProgress(0);
@@ -247,7 +271,7 @@ export function EyeTrackingNavigation() {
               >
                 <div className="px-3 py-3 flex flex-col gap-2">
                   <p className="text-[10px] text-muted leading-relaxed">
-                    Tatap sebuah tombol selama 1.5 detik untuk mengkliknya otomatis.
+                    Tatap sebuah tombol selama 1.5 detik, <b>atau kedipkan mata Anda (0.5 - 1.5 detik)</b> untuk mengkliknya otomatis.
                   </p>
                   <button
                     onClick={() => setIsCalibrating(true)}

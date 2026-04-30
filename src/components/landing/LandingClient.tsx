@@ -9,11 +9,11 @@ import {
   ChevronRight,
   TrendingUp,
   ArrowRight,
+  Mic,
 } from "lucide-react";
 import { ThemeLogo } from "@/components/layout/ThemeLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { motion } from "framer-motion";
-import { ParallaxBackground } from "@/components/layout/ParallaxBackground";
 
 // ── Animation variants ───────────────────────────────────────────
 import { Variants } from "framer-motion";
@@ -145,7 +145,7 @@ export default function LandingClient() {
             custom={2}
             className="max-w-[640px] text-lg text-secondary leading-[1.6]"
           >
-            POLANITAS adalah platform edukasi inovatif dan AI Agent untuk Data Analyst. Belajar dan praktik analisis data, riset tren, serta strategi konten menggunakan ekosistem 3 AI Agent spesialis yang terintegrasi.
+            POLANITAS adalah platform edukasi inovatif dan AI Agent untuk Data Analyst yang ramah bagi teman-teman disabilitas. Belajar dan praktik analisis data, riset tren, serta strategi konten menggunakan ekosistem 3 AI Agent spesialis yang terintegrasi.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -247,6 +247,46 @@ export default function LandingClient() {
           </motion.p>
         </motion.section>
 
+        {/* ── Accessibility Section ─────────────────────────────── */}
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={staggerContainer}
+          className="mt-[80px] w-full max-w-[900px] px-6 relative z-10 flex flex-col items-center text-center"
+        >
+
+          <motion.div variants={fadeUp} className="w-full flex justify-center mb-16">
+            <img src="/DisabilitasFitur.svg" alt="Ilustrasi Fitur Disabilitas" className="w-full max-w-[750px] h-auto" />
+          </motion.div>
+
+          <motion.div variants={fadeUp} className="w-full flex flex-col md:flex-row gap-12 text-left">
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-accent/20 text-accent flex items-center justify-center shrink-0">
+                  <Mic size={24} />
+                </div>
+                <h4 className="text-[1.35rem] font-bold text-primary">Voice-to-Action</h4>
+              </div>
+              <p className="text-secondary leading-relaxed text-[0.95rem]">
+                Bagi teman-teman <b>tunanetra atau yang memiliki gangguan penglihatan</b>, POLANITAS menghadirkan asisten AI suara. Cukup berbicara untuk menavigasi halaman, mengisi form riset, dan mendengarkan penjelasan materi langsung dari AI.
+              </p>
+            </div>
+
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/20 text-[#8B5CF6] flex items-center justify-center shrink-0">
+                  <Eye size={24} />
+                </div>
+                <h4 className="text-[1.35rem] font-bold text-primary">Eye Tracking Navigation</h4>
+              </div>
+              <p className="text-secondary leading-relaxed text-[0.95rem]">
+                Bagi teman-teman <b>dengan disabilitas fisik/tangan</b>, POLANITAS mendukung navigasi otomatis lewat tatapan mata (<i>Dwell Click</i>) atau kedipan mata (<i>Blink Click</i>) untuk kemudahan akses penuh tanpa menggunakan mouse atau keyboard.
+              </p>
+            </div>
+          </motion.div>
+        </motion.section>
+
         {/* ── Workflow Ecosystem Section ────────────────────────── */}
         <motion.section
           initial="hidden"
@@ -265,50 +305,9 @@ export default function LandingClient() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6 relative w-full">
-            {/* Connecting line for desktop */}
-            <div className="hidden md:block absolute top-[50px] left-[15%] right-[15%] h-[2px] bg-border z-0 overflow-hidden">
-              <motion.div
-                initial={{ x: "-100%" }}
-                whileInView={{ x: "100%" }}
-                transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                className="w-full h-full bg-[linear-gradient(90deg,transparent,var(--color-accent-text),transparent)] opacity-50"
-              />
-            </div>
-
-            {/* Step 1 */}
-            <motion.div variants={fadeUp} className="relative z-10 flex flex-col items-center text-center group">
-              <div className="w-[100px] h-[100px] rounded-2xl bg-surface border border-border shadow-lg flex items-center justify-center mb-6 group-hover:-translate-y-2 transition-transform duration-300 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[#3B82F6] opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
-                <Search size={40} className="text-[#3B82F6]" />
-                <div className="absolute top-2 right-2 w-6 h-6 rounded-md bg-[#3B82F6]/10 text-[#3B82F6] text-xs font-bold flex items-center justify-center">1</div>
-              </div>
-              <h4 className="text-xl font-semibold text-primary mb-3">Riset Data (Researcher)</h4>
-              <p className="text-[0.95rem] text-secondary leading-relaxed px-4">Belajar mengekstraksi insight dari data mentah, tren pasar, dan mengidentifikasi peluang secara real-time.</p>
-            </motion.div>
-
-            {/* Step 2 */}
-            <motion.div variants={fadeUp} className="relative z-10 flex flex-col items-center text-center group">
-              <div className="w-[100px] h-[100px] rounded-2xl bg-surface border border-border shadow-lg flex items-center justify-center mb-6 group-hover:-translate-y-2 transition-transform duration-300 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[#8B5CF6] opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
-                <Brain size={40} className="text-[#8B5CF6]" />
-                <div className="absolute top-2 right-2 w-6 h-6 rounded-md bg-[#8B5CF6]/10 text-[#8B5CF6] text-xs font-bold flex items-center justify-center">2</div>
-              </div>
-              <h4 className="text-xl font-semibold text-primary mb-3">Formulasi Strategi (Strategist)</h4>
-              <p className="text-[0.95rem] text-secondary leading-relaxed px-4">Gunakan data dari Researcher untuk merancang angle promosi, copywriting, dan kerangka kampanye.</p>
-            </motion.div>
-
-            {/* Step 3 */}
-            <motion.div variants={fadeUp} className="relative z-10 flex flex-col items-center text-center group">
-              <div className="w-[100px] h-[100px] rounded-2xl bg-surface border border-border shadow-lg flex items-center justify-center mb-6 group-hover:-translate-y-2 transition-transform duration-300 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[#22C55E] opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
-                <Eye size={40} className="text-[#22C55E]" />
-                <div className="absolute top-2 right-2 w-6 h-6 rounded-md bg-[#22C55E]/10 text-[#22C55E] text-xs font-bold flex items-center justify-center">3</div>
-              </div>
-              <h4 className="text-xl font-semibold text-primary mb-3">Sintesis & Analisis (Analyst)</h4>
-              <p className="text-[0.95rem] text-secondary leading-relaxed px-4">Menganalisis hasil data dari 2 agen sebelumnya secara holistik dan melakukan evaluasi menggunakan simulasi heatmap visual.</p>
-            </motion.div>
-          </div>
+          <motion.div variants={fadeUp} className="w-full flex justify-center mt-4 mb-8">
+            <img src="/Sistem.svg" alt="Sistem Edukasi Terpadu" className="w-full max-w-[1000px] h-auto drop-shadow-sm" />
+          </motion.div>
         </motion.section>
       </main>
 
@@ -330,9 +329,6 @@ export default function LandingClient() {
           <a href="#" className="text-muted no-underline hover:text-primary transition-colors">Ketentuan</a>
         </div>
       </motion.footer>
-
-      {/* ── Background ────────────────────────────────────────── */}
-      <ParallaxBackground />
     </div>
   );
 }
