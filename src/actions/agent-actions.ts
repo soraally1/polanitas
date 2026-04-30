@@ -53,7 +53,7 @@ const StartResearchSchema = z.object({
   targetAudience: z.string().max(200).optional(),
 });
 
-export async function startResearchSession(formData: FormData) {
+export async function startResearchSession(formData: FormData): Promise<{ sessionId?: string; error?: any }> {
   const uid = await requireAuth();
 
   const platformsRaw = formData.get("platforms");

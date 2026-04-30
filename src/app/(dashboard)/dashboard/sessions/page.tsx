@@ -149,12 +149,13 @@ export default function SessionsPage() {
     startTransition(async () => {
       try {
         const res = await startResearchSession(fd);
-        if (res?.error) {
-          setSubmitError(typeof res.error === 'string' ? res.error : (res.error._ || "Gagal memulai sesi. Periksa inputmu."));
-        } else if (res?.sessionId) {
+        if (res && 'error' in res) {
+          const err = res.error as any;
+          setSubmitError(typeof err === 'string' ? err : (err._ || "Gagal memulai sesi. Periksa inputmu."));
+        } else if (res && 'sessionId' in res) {
           setTopic("");
           setTargetAudience("");
-          setSuccessId(res.sessionId);
+          setSuccessId(res.sessionId as string);
         }
       } catch (err: any) {
         setSubmitError(err.message || "Terjadi kesalahan");
