@@ -72,7 +72,11 @@ export function useWebGazer() {
     };
   }, []);
 
-  const startTracking = useCallback(async (targetElementId?: string) => {
+  const startTracking = useCallback(async (
+    targetElementId?: string, 
+    showPoints = false, 
+    onGaze?: (x: number, y: number) => void
+  ) => {
     if (!isReady || !window.webgazer) {
       setError("WebGazer is not ready yet.");
       return;
@@ -86,19 +90,24 @@ export function useWebGazer() {
       await window.webgazer
         .setGazeListener((data, _elapsed) => {
           if (!data) return;
+          const x = Math.round(data.x);
+          const y = Math.round(data.y);
           gazeBufferRef.current.push({
-            x: Math.round(data.x),
-            y: Math.round(data.y),
+            x,
+            y,
             timestamp: Date.now(),
             elementId: targetElementId,
             viewport: viewportRef.current,
           });
+          if (onGaze) {
+            onGaze(x, y);
+          }
         })
         .begin();
 
-      // Hide default WebGazer UI elements
+      // Configure WebGazer UI elements
       window.webgazer
-        .showPredictionPoints(false)
+        .showPredictionPoints(showPoints)
         .showVideoPreview(true)
         .showFaceOverlay(false)
         .showFaceFeedbackBox(false);

@@ -61,10 +61,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-// Max audio size: 25 MB (Groq Whisper limit)
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};

@@ -138,7 +138,8 @@ Topik yang dibahas:
 // (isQuestion is exported from @/lib/speech-utils for client-side use)
 export async function askAboutPage(
   pathname: string,
-  question: string
+  question: string,
+  history: { role: 'user' | 'assistant', content: string }[] = []
 ): Promise<{ answer: string }> {
   // Find the most specific matching context
   const context =
@@ -149,20 +150,47 @@ export async function askAboutPage(
 
   const groq = getGeneralClient();
 
+  const GLOBAL_MODULES = `
+DAFTAR LENGKAP 12 MODUL KURIKULUM POLANITAS:
+1. Orkestrasi AI — Menjadi dirigen jaringan agen (Fundamental)
+2. Deteksi Tren Dini — Sinyal tren TikTok sebelum viral (Menengah)
+3. Whitespace Marketplace — Celah pasar Shopee & Tokopedia (Menengah)
+4. Eye Tracking Mastery — F-Pattern, WebGazer, Heatmap (Lanjutan)
+5. Copywriting LLM — 1.000 variasi caption via Llama 3 (Menengah)
+6. Content Atomization — 1 ide menjadi Reels, TikTok, Live (Menengah)
+7. Neuromarketing — Dashboard keputusan 30 detik (Lanjutan)
+8. Manajemen Krisis — Respon sentimen otomatis (Lanjutan)
+9. Atribusi ROI — Engagement ke sales marketplace (Lanjutan)
+10. Etika AI & Brand Safety — Guardrails, UU PDP, Compliance (Fundamental)
+11. Influencer DNA Matching — Vibe matching dengan vector search (Lanjutan)
+12. A/B Testing Agresif — 50 variasi iklan, iterasi otomatis (Lanjutan)
+  `.trim();
+
   const systemPrompt = `
 Kamu adalah asisten suara POLANITAS, platform edukasi Data Analyst berbasis AI Agent.
-Tugasmu adalah menjawab pertanyaan user tentang konten halaman saat ini.
+Tugasmu adalah menjawab pertanyaan user tentang konten halaman saat ini dan modul-modul yang ada, serta menjelaskan arti dari istilah yang ditanyakan user.
 
 ATURAN PENTING:
-- Jawab dalam Bahasa Indonesia yang natural dan jelas
-- Maksimal 4 kalimat — jawaban harus ringkas agar nyaman didengar lewat text-to-speech
-- Jangan gunakan bullet points, markdown, atau format yang tidak natural diucapkan
-- Jika pertanyaan tentang modul, jelaskan topik-topiknya secara conversational
+- Jawab dalam Bahasa Indonesia yang natural, bersahabat, dan jelas
+- User mengandalkan pendengaran, jadi buat jawaban seringkas mungkin tapi bermakna (maksimal 4-5 kalimat)
+- Jangan gunakan bullet points, markdown, atau format yang tidak natural diucapkan (ucapkan koma dan titik seperti bicara biasa)
+- Jika pertanyaan tentang modul, sebutkan nama modul dari DAFTAR LENGKAP di bawah dan jelaskan topiknya secara conversational
+- Jika ditanya "modul apa yang pertama", jawablah "Modul pertama adalah Orkestrasi AI", dst.
 - Jika user minta "ajarkan", mulai dengan topik pertama dan tawarkan untuk lanjut
+- Jika user bertanya arti atau maksud suatu istilah, jelaskan dengan bahasa sederhana dan beri contoh singkat
+- Ingat konteks obrolan sebelumnya untuk menjawab pertanyaan lanjutan seperti "terus apa bedanya?"
 
-KONTEKS HALAMAN SAAT INI:
+KONTEKS HALAMAN SAAT INI (Fokus Utama Jika User Bertanya "Halaman ini tentang apa?"):
 ${context}
+
+${GLOBAL_MODULES}
   `.trim();
+
+  // Convert history to Groq chat messages
+  const historyMessages = history.map(msg => ({
+    role: msg.role,
+    content: msg.content
+  }));
 
   const response = await groq.chat.completions.create({
     model: GROQ_MODEL,
@@ -170,6 +198,7 @@ ${context}
     max_tokens: 300,
     messages: [
       { role: "system", content: systemPrompt },
+      ...historyMessages as any,
       { role: "user", content: question },
     ],
   });

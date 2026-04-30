@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useRef } from "react";
 import Link from "next/link";
 import {
   FolderOpen,
@@ -20,6 +20,7 @@ import { db } from "@/lib/firebase-client";
 import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { startResearchSession } from "@/actions/agent-actions";
 import { Session } from "@/types";
+import { useSpeechFormFill } from "@/hooks/use-speech-form-fill";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface ExtendedSession extends Session {
@@ -76,6 +77,34 @@ export default function SessionsPage() {
   const [targetAudience, setTargetAudience] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useSpeechFormFill((action) => {
+    switch (action.type) {
+      case "set-topic":
+        setTopic(action.value);
+        break;
+      case "set-audience":
+        setTargetAudience(action.value);
+        break;
+      case "set-region":
+        setRegionCode(action.code);
+        break;
+      case "toggle-platform":
+        togglePlatform(action.platform);
+        break;
+      case "set-platforms":
+        setSelectedPlatforms(action.platforms);
+        break;
+      case "set-focus":
+        setResearchFocus(action.focusId);
+        break;
+      case "submit-form":
+        formRef.current?.requestSubmit();
+        break;
+    }
+  });
 
   // Fetch sessions from Firestore
   useEffect(() => {
@@ -149,7 +178,7 @@ export default function SessionsPage() {
       </div>
 
       {/* ── Form ───────────────────────────────────────────────────── */}
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <div className="grid gap-7">
 
           {/* Block 1: Topik */}

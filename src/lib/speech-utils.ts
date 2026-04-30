@@ -9,6 +9,9 @@ export const QUESTION_INTENT_PATTERNS = [
   "ajarkan", "ajarin", "pelajari", "mulai belajar", "mulai mengajar",
   "apa isi", "isi nya", "ini halaman apa", "halaman ini berisi",
   "topik apa", "materi apa", "apa yang dipelajari",
+  "apa itu", "artinya", "arti", "maksudnya", "maksud", 
+  "kenapa", "bagaimana", "contohnya", "contoh", "apa bedanya", "bedanya",
+  "lanjut", "terus", "lagi", "tolong", "bisa bantu"
 ];
 
 /** Returns true if the normalized transcript looks like a question / explanation request */

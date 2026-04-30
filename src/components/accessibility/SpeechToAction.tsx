@@ -12,7 +12,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useGroqSpeech } from "@/hooks/use-groq-speech";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { askAboutPage } from "@/actions/page-context-action";
-import { isQuestion } from "@/lib/speech-utils";
+import { parseFormIntent } from "@/actions/form-intent-action";
+import { dispatchVoiceFormAction } from "@/lib/voice-form-filler";
+import { useAccessibility } from "@/hooks/use-accessibility";
 
 // ── Command map ────────────────────────────────────────────────────────────────
 const ROUTE_COMMANDS: { patterns: string[]; path: string; announce: string }[] = [
@@ -67,6 +69,10 @@ const INTENT_WORDS = [
   "apa", "ada", "bisa", "jelaskan", "ceritakan",
   "ajarkan", "ajarin", "pelajari", "beritahu", "info",
   "topik", "isi", "mulai belajar", "mulai mengajar",
+  "arti", "maksud", "kenapa", "bagaimana", "contoh", "beda",
+  "lanjut", "terus", "lagi", "tolong",
+  // Form intents
+  "pilih", "centang", "target", "fokus", "submit", "ubah", "ganti", "region", "negara"
 ];
 
 function isNoise(raw: string): boolean {
@@ -94,9 +100,11 @@ function speak(text: string) {
 export function SpeechToAction() {
   const router = useRouter();
   const pathname = usePathname();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
+  const { prefs } = useAccessibility(user?.uid);
 
-  const [isBlindUser, setIsBlindUser] = useState(false);
+  const isBlindUser = prefs?.isBlind ?? false;
+
   const [enabled, setEnabled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -104,36 +112,39 @@ export function SpeechToAction() {
 
   const [liveTranscript, setLiveTranscript] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'assistant', content: string }[]>([]);
+  const chatHistoryRef = useRef<{ role: 'user' | 'assistant', content: string }[]>([]);
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasAutoEnabled = useRef(false);
 
   function showFeedback(msg: string) {
     setFeedback(msg);
     if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
-    feedbackTimer.current = setTimeout(() => setFeedback(null), 4000);
+    feedbackTimer.current = setTimeout(() => setFeedback(null), 6000);
   }
 
   // Read prefs after mount
   useEffect(() => {
     setMounted(true);
-    try {
-      const raw = localStorage.getItem("polanitas_accessibility");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed.isBlind === true) {
-          setIsBlindUser(true);
-          setEnabled(true);
-        }
-      }
-    } catch {}
   }, []);
 
-  // Announce page on navigation
+  // Auto-enable when we detect the user is blind for the first time
   useEffect(() => {
-    if (!enabled) return;
+    if (isBlindUser && !hasAutoEnabled.current) {
+      setEnabled(true);
+      hasAutoEnabled.current = true;
+    }
+  }, [isBlindUser]);
+
+  // Announce page on navigation — also reset chat history on page change
+  useEffect(() => {
+    chatHistoryRef.current = [];
+    setChatHistory([]);
+    if (!enabled || !isBlindUser) return;
     const name = PATH_NAMES[pathname] ?? pathname;
     const t = setTimeout(() => speak(`Halaman ${name}. Ucapkan perintah.`), 700);
     return () => clearTimeout(t);
-  }, [pathname, enabled]);
+  }, [pathname, enabled, isBlindUser]);
 
   // ── Command handler (called after Groq returns transcript) ────────────────
   const handleTranscript = useCallback(
@@ -187,6 +198,10 @@ export function SpeechToAction() {
       // Routes
       for (const { patterns, path, announce } of ROUTE_COMMANDS) {
         if (patterns.some((p) => text.includes(p))) {
+          // Jika user sudah berada di halaman tersebut, abaikan perintah navigasi
+          // agar ucapan bisa diteruskan ke Form Intent atau Chat Assistant (misal "mulai riset" saat di form)
+          if (pathname === path) continue;
+
           speak(announce);
           showFeedback(`→ ${announce}`);
           router.push(path);
@@ -194,26 +209,42 @@ export function SpeechToAction() {
         }
       }
 
-      // ── Conversational AI question ─────────────────────────────────────
-      if (isQuestion(text)) {
-        setIsAsking(true);
-        showFeedback("🤔 Sedang mencari jawaban...");
-        speak("Sebentar, saya carikan jawabannya.");
-        askAboutPage(pathname, raw)
-          .then(({ answer }) => {
-            showFeedback(answer.slice(0, 80) + (answer.length > 80 ? "..." : ""));
-            speak(answer);
-          })
-          .catch(() => {
-            speak("Maaf, tidak bisa menjawab saat ini.");
-            showFeedback("❌ Gagal menjawab");
-          })
-          .finally(() => setIsAsking(false));
-        return;
-      }
+      // ── Form Intent Check & AI Assistant ──────────────────────────────────
+      setIsAsking(true);
+      showFeedback("🤔 Sedang memproses...");
 
-      // Has intent but no match → show feedback, no TTS spam
-      showFeedback(`❓ "${raw}"`);
+      // Coba parse intent form dulu
+      parseFormIntent(pathname, raw)
+        .then((intent) => {
+          if (intent.isFormAction && intent.action) {
+            dispatchVoiceFormAction(intent.action);
+            if (intent.reply) {
+              speak(intent.reply);
+              showFeedback(`📝 ${intent.reply}`);
+            }
+            setIsAsking(false);
+          } else {
+            // Kalau bukan aksi form, kirim ke asisten tanya-jawab
+            speak("Sebentar...");
+            return askAboutPage(pathname, raw, chatHistoryRef.current)
+              .then(({ answer }) => {
+                const updated = [
+                  ...chatHistoryRef.current,
+                  { role: 'user' as const, content: raw },
+                  { role: 'assistant' as const, content: answer },
+                ].slice(-10);
+                chatHistoryRef.current = updated;
+                setChatHistory(updated);
+                showFeedback(answer.slice(0, 100) + (answer.length > 100 ? "..." : ""));
+                speak(answer);
+              });
+          }
+        })
+        .catch(() => {
+          speak("Maaf, terjadi kesalahan.");
+          showFeedback("❌ Error memproses ucapan");
+        })
+        .finally(() => setIsAsking(false));
     },
     [pathname, router, signOut]
   );
@@ -225,6 +256,7 @@ export function SpeechToAction() {
   });
 
   if (!mounted) return null;
+  if (!isBlindUser) return null;
 
   const isListening = status === "listening";
   const isProcessing = status === "processing";
@@ -349,13 +381,6 @@ export function SpeechToAction() {
                   {errorMsg}
                 </div>
               )}
-
-              {/* Footer */}
-              <div className="px-3 py-2 border-t border-border">
-                <p className="text-[9px] text-muted text-center">
-                  Powered by Groq Whisper ⚡
-                </p>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>

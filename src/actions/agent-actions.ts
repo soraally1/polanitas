@@ -1,8 +1,9 @@
 /**
  * POLANITAS — Server Actions: Agent Orchestration
  *
- * All API keys (Groq, Firebase Admin, YouTube, Apify) stay on the server.
- * Client components call these actions via React's Server Function mechanism.
+ * Fully removed firebase-admin dependency.
+ * Auth: reads UID from the __session cookie (set by createSession).
+ * DB: uses Firebase Client SDK (REST via firebase/firestore).
  *
  * Security note (from Next.js docs): Server Functions are reachable via direct POST
  * requests. Always verify authentication inside every Server Function.
@@ -10,33 +11,34 @@
 
 "use server";
 
-import { adminAuth, adminDb } from "@/lib/firebase-admin";
 import { runMarketResearch } from "@/services/market-research-service";
 import { runContentStrategy } from "@/services/content-strategy-service";
 import { runFinalAnalysis } from "@/services/analytics-orchestrator";
 import { GazePoint, ResearchOutput, Session, StrategyOutput } from "@/types";
-import { FieldValue } from "firebase-admin/firestore";
 import { cookies } from "next/headers";
 import { z } from "zod/v4";
+import {
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase-server";
 
 // ============================================================
-// Auth Helper
+// Auth Helper — reads UID from cookie (no Admin SDK needed)
 // ============================================================
 
 async function requireAuth(): Promise<string> {
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("__session")?.value;
-
-  if (!sessionCookie) {
+  const uid = cookieStore.get("__session")?.value;
+  if (!uid) {
     throw new Error("Unauthorized: No session cookie found.");
   }
-
-  try {
-    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
-    return decoded.uid;
-  } catch {
-    throw new Error("Unauthorized: Invalid or expired session.");
-  }
+  return uid;
 }
 
 // ============================================================
@@ -70,7 +72,8 @@ export async function startResearchSession(formData: FormData) {
   const { topic, regionCode, platforms, researchFocus, targetAudience } = parsed.data;
 
   // 1. Create session in Firestore
-  const sessionRef = adminDb.collection("sessions").doc();
+  const sessionsRef = collection(db, "sessions");
+  const sessionRef = doc(sessionsRef);
   const sessionId = sessionRef.id;
   const now = Date.now();
 
@@ -88,8 +91,7 @@ export async function startResearchSession(formData: FormData) {
     },
   };
 
-  // Store extra context as metadata alongside the session
-  await sessionRef.set({
+  await setDoc(sessionRef, {
     ...initialSession,
     platforms,
     researchFocus,
@@ -104,25 +106,28 @@ export async function startResearchSession(formData: FormData) {
     const research = await runMarketResearch(sessionId, enrichedTopic, regionCode);
 
     // 3. Store research output and hand off to Strategist
-    await sessionRef.update({
+    await updateDoc(sessionRef, {
       "agents.researcher.status": "done",
       "agents.researcher.finishedAt": Date.now(),
       "agents.strategist.status": "running",
       "agents.strategist.startedAt": Date.now(),
-      updatedAt: FieldValue.serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
 
-    await adminDb.collection("sessions").doc(sessionId).collection("research").doc("output").set(research);
+    await setDoc(
+      doc(db, "sessions", sessionId, "research", "output"),
+      research
+    );
 
-    // 4. Hand off to Strategist (which then chains to Analyst with research context)
+    // 4. Hand off to Strategist → Analyst chain
     await runStrategyAgent(sessionId, research, enrichedTopic, platforms);
 
     return { sessionId };
   } catch (err: any) {
-    await sessionRef.update({
+    await updateDoc(sessionRef, {
       "agents.researcher.status": "error",
       "agents.researcher.errorMessage": err.message ?? "Unknown error",
-      updatedAt: FieldValue.serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
     return { error: { _: err.message } };
   }
@@ -136,29 +141,30 @@ async function runStrategyAgent(
   topic: string,
   platforms: string[]
 ): Promise<void> {
-  const sessionRef = adminDb.collection("sessions").doc(sessionId);
+  const sessionRef = doc(db, "sessions", sessionId);
 
   try {
     const strategy = await runContentStrategy(sessionId, research);
 
-    await sessionRef.update({
+    await updateDoc(sessionRef, {
       "agents.strategist.status": "done",
       "agents.strategist.finishedAt": Date.now(),
       "agents.analyst.status": "running",
       "agents.analyst.startedAt": Date.now(),
-      updatedAt: FieldValue.serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
 
-    await adminDb.collection("sessions").doc(sessionId).collection("strategy").doc("output").set(strategy);
+    await setDoc(
+      doc(db, "sessions", sessionId, "strategy", "output"),
+      strategy
+    );
 
-    // ── Chain to Analyst Agent automatically ─────────────────────────────────
     await runAnalystAgent(sessionId, topic, research, strategy, platforms);
-
   } catch (err: any) {
-    await sessionRef.update({
+    await updateDoc(sessionRef, {
       "agents.strategist.status": "error",
       "agents.strategist.errorMessage": err.message ?? "Unknown error",
-      updatedAt: FieldValue.serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
     throw err;
   }
@@ -171,30 +177,33 @@ async function runAnalystAgent(
   strategy: StrategyOutput,
   platforms: string[]
 ): Promise<void> {
-  const sessionRef = adminDb.collection("sessions").doc(sessionId);
+  const sessionRef = doc(db, "sessions", sessionId);
 
   try {
     const report = await runFinalAnalysis(sessionId, topic, research, strategy, platforms);
 
-    await adminDb.collection("sessions").doc(sessionId).collection("analysis").doc("output").set(report);
+    await setDoc(
+      doc(db, "sessions", sessionId, "analysis", "output"),
+      report
+    );
 
-    await sessionRef.update({
+    await updateDoc(sessionRef, {
       "agents.analyst.status": "done",
       "agents.analyst.finishedAt": Date.now(),
-      updatedAt: FieldValue.serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
   } catch (err: any) {
-    await sessionRef.update({
+    await updateDoc(sessionRef, {
       "agents.analyst.status": "error",
       "agents.analyst.errorMessage": err.message ?? "Unknown error",
-      updatedAt: FieldValue.serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
     throw err;
   }
 }
 
 // ============================================================
-// Action 3: Submit Eye Tracking Data → Trigger Analyst Agent
+// Action 2: Submit Eye Tracking Data
 // ============================================================
 
 const SubmitGazeSchema = z.object({
@@ -217,45 +226,37 @@ export async function submitGazeData(
   const { sessionId, scriptIndex, scriptContent } = parsed.data;
 
   // Verify session belongs to this user
-  const sessionSnap = await adminDb.collection("sessions").doc(sessionId).get();
-  if (!sessionSnap.exists || sessionSnap.data()?.userId !== uid) {
+  const sessionSnap = await getDoc(doc(db, "sessions", sessionId));
+  if (!sessionSnap.exists() || sessionSnap.data()?.userId !== uid) {
     return { error: { _: "Session not found or unauthorized." } };
   }
 
-  const sessionRef = adminDb.collection("sessions").doc(sessionId);
+  const sessionRef = doc(db, "sessions", sessionId);
 
-  await sessionRef.update({
+  await updateDoc(sessionRef, {
     "agents.analyst.status": "running",
     "agents.analyst.startedAt": Date.now(),
-    updatedAt: FieldValue.serverTimestamp(),
+    updatedAt: serverTimestamp(),
   });
 
   try {
-    const report = await runAttentionAnalysis(
-      sessionId,
-      scriptIndex,
-      gazePoints,
-      scriptContent
-    );
+    // runAttentionAnalysis is not yet wired — placeholder
+    const report = { sessionId, scriptIndex, gazePoints, scriptContent, recordedAt: Date.now() };
 
-    await adminDb
-      .collection("sessions")
-      .doc(sessionId)
-      .collection("analytics")
-      .add(report);
+    await addDoc(collection(db, "sessions", sessionId, "analytics"), report);
 
-    await sessionRef.update({
+    await updateDoc(sessionRef, {
       "agents.analyst.status": "done",
       "agents.analyst.finishedAt": Date.now(),
-      updatedAt: FieldValue.serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
 
     return { report };
   } catch (err: any) {
-    await sessionRef.update({
+    await updateDoc(sessionRef, {
       "agents.analyst.status": "error",
       "agents.analyst.errorMessage": err.message,
-      updatedAt: FieldValue.serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
     return { error: { _: err.message } };
   }

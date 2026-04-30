@@ -9,6 +9,7 @@ import "../globals.css";
 
 import { BottomNav } from "@/components/layout/BottomNav";
 import { SpeechToAction } from "@/components/accessibility/SpeechToAction";
+import { EyeTrackingNavigation } from "@/components/accessibility/EyeTrackingNavigation";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -45,6 +46,9 @@ export default function DashboardLayout({
 
       {/* Speech-to-Action (only active when user has isBlind: true) */}
       <SpeechToAction />
+
+      {/* Eye Tracking Navigation (only active when user has hasHandDisability: true) */}
+      <EyeTrackingNavigation />
     </div>
   );
 }
