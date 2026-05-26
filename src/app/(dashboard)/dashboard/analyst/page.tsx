@@ -44,11 +44,11 @@ const OUTPUTS = [
 ];
 
 const PROCESS_STEPS = [
-  { num: "01", title: "Baca Output Researcher", desc: "Ambil ResearchOutput dari Firestore (/research/output): YouTube trends, social trends, marketplace products + AI keywords yang telah disintesis." },
-  { num: "02", title: "Baca Output Strategist", desc: "Ambil StrategyOutput dari Firestore (/strategy/output): 3 skrip lengkap dengan viral hook, CTA, dan visual instructions." },
-  { num: "03", title: "Bangun Konteks Gabungan", desc: "Kedua output dirangkum menjadi satu briefing komprehensif yang dikirim ke Llama 3.3 70B sebagai input analisis." },
-  { num: "04", title: "AI Synthesis & Blueprint", desc: "Analyst AI (GROQ_API_KEY_DATA_ANALYTICS) menganalisis semua data dan menghasilkan FinalAnalysisReport lengkap dalam satu response JSON." },
-  { num: "05", title: "Simpan & Selesai", desc: "Report disimpan ke Firestore (/analysis/output). Status semua agen berubah menjadi 'done' dan user dapat mengakses hasil riset penuh." },
+  { num: "01", title: "Mengambil Data Riset", desc: "Membaca data tren terpopuler di YouTube, media sosial, dan marketplace pada fase riset pasar sebelumnya." },
+  { num: "02", title: "Membaca Draf Skrip", desc: "Mengambil 3 naskah skrip kreatif beserta hook dan petunjuk visual dari fase strategi konten." },
+  { num: "03", title: "Penggabungan Konteks", desc: "Menyatukan data tren aktual dan naskah skrip kreatif menjadi satu kesatuan analisis yang padu." },
+  { num: "04", title: "Analisis & Pembuatan Cetak Biru", desc: "Kecerdasan Buatan (AI) mengevaluasi seluruh data untuk menyusun laporan analisis kelayakan pasar dan cetak biru visual." },
+  { num: "05", title: "Penyajian Laporan Final", desc: "Menyajikan laporan analisis final secara utuh untuk mempermudah Anda merilis konten di media sosial secara terukur." },
 ];
 
 export default function AnalystPage() {
@@ -68,7 +68,7 @@ export default function AnalystPage() {
             The Analyst
           </h1>
           <p style={{ color: "var(--color-text-secondary)", maxWidth: 580, lineHeight: 1.7, fontSize: "1rem" }}>
-            Membaca output dari Researcher dan Strategist, lalu mensintesisnya menjadi laporan analisis menyeluruh: market opportunity score, visual blueprint per platform, priority matrix, dan action plan siap eksekusi.
+            Menghubungkan data tren pasar dan naskah kreatif menjadi laporan analisis strategis menyeluruh: skor peluang pasar, panduan gaya visual per platform, matriks prioritas rilis, dan rencana aksi konkret.
           </p>
         </div>
         <Link href="/dashboard/sessions" style={{ textDecoration: "none" }}>
@@ -81,9 +81,9 @@ export default function AnalystPage() {
       {/* ── Capabilities ──────────────────────────────────────── */}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         {[
-          { icon: Zap, label: "Groq Llama 3.3 70B — GROQ_API_KEY_DATA_ANALYTICS" },
-          { icon: Database, label: "Baca 2 Output Sebelumnya + Syntax Analysis" },
-          { icon: Database, label: "Output ke Firestore /analysis/output" },
+          { icon: Zap, label: "Skoring Peluang Pasar Pintar" },
+          { icon: Database, label: "Analisis Lintas Platform Terpadu" },
+          { icon: Database, label: "Penyusunan Rencana Aksi" },
         ].map(({ icon: Icon, label }) => (
           <div key={label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 14px", borderRadius: 100, background: "var(--color-surface)", border: "1px solid var(--color-border)", fontSize: "0.8rem", fontWeight: 600, color: "var(--color-text-secondary)" }}>
             <Icon size={13} color="#6366F1" />

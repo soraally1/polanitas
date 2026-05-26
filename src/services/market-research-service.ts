@@ -132,6 +132,50 @@ export async function fetchTokopediaProducts(
   }));
 }
 
+// ============================================================
+// Shopee Products via Apify
+// ============================================================
+
+export async function fetchShopeeProducts(
+  keyword: string,
+  limit = 10
+): Promise<MarketplaceProduct[]> {
+  try {
+    const run = await apify.actor("jupri/shopee").call({
+      keyword,
+      limit,
+    });
+
+    const { items } = await apify.dataset(run.defaultDatasetId).listItems();
+
+    return (items ?? []).map((item: any): MarketplaceProduct => {
+      const name = item.name || item.title || item.product_name || "";
+      const priceRaw = item.price || item.price_min || item.price_max || 0;
+      const price = typeof priceRaw === "string" 
+        ? Number(priceRaw.replace(/\D/g, "")) 
+        : Number(priceRaw);
+      
+      const sold = item.historical_sold || item.sold || item.sold_count || 0;
+      const shop = item.shop_name || item.shopName || item.shop_location || "";
+      const url = item.url || item.link || (item.itemid ? `https://shopee.co.id/product/${item.shopid}/${item.itemid}` : "");
+
+      return {
+        platform: "shopee",
+        productName: name,
+        price: price,
+        soldCount: Number(sold),
+        shopName: shop,
+        category: keyword,
+        url: url,
+        scrapedAt: Date.now(),
+      };
+    });
+  } catch (error) {
+    console.error("[Researcher] Shopee fetch error:", error);
+    return [];
+  }
+}
+
 // ── AI Synthesis Prompt ──────────────────────────────────────────────────────
 
 const RESEARCHER_SYSTEM_PROMPT = `
@@ -218,12 +262,13 @@ export async function runMarketResearch(
 ): Promise<ResearchOutput> {
   console.log(`[Researcher] Starting research for topic: "${topic}"`);
 
-  const [youtubeTrends, socialTikTok, socialIG, marketplaceProducts] =
+  const [youtubeTrends, socialTikTok, socialIG, tokopediaProducts, shopeeProducts] =
     await Promise.allSettled([
       fetchYouTubeTrends(topic, regionCode),
       fetchTikTokTrends(topic),
       fetchInstagramTrends(topic),
       fetchTokopediaProducts(topic),
+      fetchShopeeProducts(topic),
     ]);
 
   const rawOutput = {
@@ -234,10 +279,10 @@ export async function runMarketResearch(
       ...(socialTikTok.status === "fulfilled" ? socialTikTok.value : []),
       ...(socialIG.status === "fulfilled" ? socialIG.value : []),
     ],
-    marketplaceProducts:
-      marketplaceProducts.status === "fulfilled"
-        ? marketplaceProducts.value
-        : [],
+    marketplaceProducts: [
+      ...(tokopediaProducts.status === "fulfilled" ? tokopediaProducts.value : []),
+      ...(shopeeProducts.status === "fulfilled" ? shopeeProducts.value : []),
+    ],
   };
 
   // ── AI Synthesis: Researcher Agent distills raw data into insights ──────────

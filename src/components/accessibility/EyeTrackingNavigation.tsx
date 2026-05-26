@@ -57,6 +57,14 @@ const PREVIEW_CSS = `
   display: block !important;
   background: #000 !important;
 }
+@media (max-width: 768px) {
+  #ftPreviewVideo {
+    width: 120px !important;
+    bottom: 80px !important;
+    right: 12px !important;
+    border-radius: 10px !important;
+  }
+}
 `;
 
 export function EyeTrackingNavigation() {
@@ -420,15 +428,17 @@ export function EyeTrackingNavigation() {
             )}
           </AnimatePresence>
 
-          <div className="bg-surface border border-border rounded-2xl shadow-2xl overflow-hidden
-                          w-[110px] md:w-[260px] backdrop-blur-xl transition-all duration-300">
+          <div className={`bg-surface border border-border rounded-2xl shadow-2xl overflow-hidden
+                          backdrop-blur-xl transition-all duration-300 ${
+                            collapsed ? "w-[110px] md:w-[260px]" : "w-[280px] md:w-[280px]"
+                          }`}>
 
             {/* Header / drag handle */}
             <div
               {...dragHandleProps}
               className="flex items-center justify-between px-4 py-3 bg-muted/20 select-none"
             >
-              <div className="items-center gap-2.5 flex-1 min-w-0 hidden md:flex">
+              <div className={`items-center gap-2.5 flex-1 min-w-0 ${collapsed ? "hidden md:flex" : "flex"}`}>
                 <GripVertical size={12} className="text-muted shrink-0 opacity-50" />
                 {!isReady ? (
                   <Loader2 size={14} className="text-primary animate-spin shrink-0" />

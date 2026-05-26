@@ -125,7 +125,7 @@ export function useFaceTracker(
     s.onload      = () => setIsReady(true);
     s.onerror     = () => setError("Gagal memuat FaceMesh. Periksa koneksi internet.");
     document.head.appendChild(s);
-    return () => { document.head.contains(s) && document.head.removeChild(s); };
+    return () => { s.remove(); };
   }, []);
 
   // ── Per-frame result processor ────────────────────────────────────────────
@@ -214,14 +214,40 @@ export function useFaceTracker(
   const loop = useCallback(() => {
     if (!runningRef.current) return;
 
-    // Throttle: only call send() when FaceMesh is not already processing
     const vid = videoRef.current;
+
+    // Auto-resume video stream if paused by mobile OS (e.g., energy saving / backgrounding)
+    if (vid && vid.paused && !vid.ended) {
+      vid.play().catch(() => {});
+    }
+    const prevVid = document.getElementById("ftPreviewVideo") as HTMLVideoElement | null;
+    if (prevVid && prevVid.paused && !prevVid.ended) {
+      prevVid.play().catch(() => {});
+    }
+
+    // Throttle: only call send() when FaceMesh is not already processing
     if (!processingRef.current && fmRef.current && vid && vid.readyState >= 2) {
       processingRef.current = true;
+
+      // Watchdog timeout: reset processing flag if MediaPipe hangs on mobile (e.g. WebGL context loss)
+      const watchdogId = setTimeout(() => {
+        if (processingRef.current) {
+          console.warn("[FaceTracker] MediaPipe send timed out. Force resetting processing flag.");
+          processingRef.current = false;
+        }
+      }, 1200);
+
       fmRef.current
         .send({ image: vid })
-        .catch(() => {})
-        .finally(() => { processingRef.current = false; });
+        .then(() => {
+          clearTimeout(watchdogId);
+          processingRef.current = false;
+        })
+        .catch((err) => {
+          clearTimeout(watchdogId);
+          console.error("[FaceTracker] MediaPipe frame send error:", err);
+          processingRef.current = false;
+        });
     }
 
     rafRef.current = requestAnimationFrame(loop);

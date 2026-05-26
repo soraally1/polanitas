@@ -19,13 +19,14 @@ import {
   DocumentData,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase-client";
-import { AttentionReport, ResearchOutput, Session, StrategyOutput } from "@/types";
+import { AttentionReport, ResearchOutput, Session, StrategyOutput, FinalAnalysisReport } from "@/types";
 
 interface AgentSyncState {
   session: Session | null;
   research: ResearchOutput | null;
   strategy: StrategyOutput | null;
   analytics: AttentionReport[];
+  analysis: FinalAnalysisReport | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -36,6 +37,7 @@ export function useAgentSync(sessionId: string | null): AgentSyncState {
     research: null,
     strategy: null,
     analytics: [],
+    analysis: null,
     isLoading: !!sessionId,
     error: null,
   });
@@ -99,6 +101,17 @@ export function useAgentSync(sessionId: string | null): AgentSyncState {
       }
     );
     unsubscribers.push(analyticsUnsub);
+
+    // 5. Listen to final analysis output
+    const analysisUnsub = onSnapshot(
+      doc(db, "sessions", sessionId, "analysis", "output"),
+      (snap) => {
+        if (snap.exists()) {
+          setState((s) => ({ ...s, analysis: snap.data() as FinalAnalysisReport }));
+        }
+      }
+    );
+    unsubscribers.push(analysisUnsub);
 
     return () => {
       unsubscribers.forEach((unsub) => unsub());

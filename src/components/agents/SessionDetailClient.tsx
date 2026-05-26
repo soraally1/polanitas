@@ -12,6 +12,11 @@ import {
   Megaphone,
   Clock,
   Tag,
+  TrendingUp,
+  Map,
+  CheckSquare,
+  FileText,
+  Target,
 } from "lucide-react";
 
 interface SessionDetailClientProps {
@@ -19,7 +24,7 @@ interface SessionDetailClientProps {
 }
 
 export default function SessionDetailClient({ sessionId }: SessionDetailClientProps) {
-  const { session, research, strategy, analytics, isLoading } = useAgentSync(sessionId);
+  const { session, research, strategy, analytics, analysis, isLoading } = useAgentSync(sessionId);
 
   if (isLoading) {
     return (
@@ -175,6 +180,181 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
               <ScriptCard key={i} script={script} index={i} />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Laporan Analisis Final */}
+      {analysis && (
+        <div className="bento-card animate-fade-in-up">
+          <div className="flex items-center gap-2 mb-5">
+            <BarChart2 size={18} strokeWidth={1.75} className="text-accent-text" />
+            <h3 className="m-0">Laporan Analisis Final (The Analyst)</h3>
+          </div>
+
+          {/* Executive Summary */}
+          <div className="bg-surface-2 border border-border rounded-[var(--radius-md)] p-[18px] mb-6">
+            <div className="caption mb-2 text-accent-text">Executive Summary</div>
+            <p className="text-sm leading-[1.75] text-secondary m-0">{analysis.executiveSummary}</p>
+          </div>
+
+          {/* Market Opportunity & Key Insights */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            {/* Opportunity sizing */}
+            <div className="bg-surface-2 border border-border rounded-[var(--radius-md)] p-[18px] flex flex-col justify-between">
+              <div>
+                <div className="caption mb-3 text-accent-text">Peluang Pasar (Opportunity Sizing)</div>
+                <div className="flex items-center gap-4 mb-3.5">
+                  <div className="relative w-16 h-16 rounded-full border-[3px] border-accent flex items-center justify-center font-extrabold text-lg text-accent-text shadow-[0_0_12px_var(--color-accent-glow)] shrink-0">
+                    {analysis.marketOpportunity.score}
+                  </div>
+                  <div>
+                    <h4 className="m-0 text-primary font-bold text-base leading-tight">{analysis.marketOpportunity.label}</h4>
+                    <p className="text-[10px] text-muted-foreground m-0 mt-0.5 font-semibold">Skor Potensi Keberhasilan</p>
+                  </div>
+                </div>
+                <p className="text-xs text-secondary leading-[1.65] m-0 mb-3">{analysis.marketOpportunity.rationale}</p>
+              </div>
+              <div className="text-xs text-primary leading-[1.6] pt-3 border-t border-border/60">
+                <span className="font-extrabold text-accent-text">Whitespace (Celah Pasar):</span> {analysis.marketOpportunity.whitespaceGap}
+              </div>
+            </div>
+
+            {/* Key Insights */}
+            <div className="bg-surface-2 border border-border rounded-[var(--radius-md)] p-[18px]">
+              <div className="caption mb-3.5 text-accent-text">Insight Utama (Key Insights)</div>
+              <div className="flex flex-col gap-2.5">
+                {analysis.keyInsights.map((insight, i) => (
+                  <div key={i} className="flex gap-2 text-xs text-secondary leading-relaxed">
+                    <span className="text-accent-text font-bold shrink-0">•</span>
+                    <span>{insight}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Visual Blueprints */}
+          {analysis.visualBlueprints && analysis.visualBlueprints.length > 0 && (
+            <div className="mb-6">
+              <div className="caption mb-3.5 text-accent-text">Cetak Biru Gaya Visual (Visual Blueprint)</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {analysis.visualBlueprints.map((bp, i) => (
+                  <div key={i} className="bg-surface-2 border border-border rounded-[var(--radius-md)] p-[18px] flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-3 border-b border-border/40 pb-2">
+                        <h4 className="m-0 text-primary uppercase text-xs tracking-wider font-extrabold">{bp.platform}</h4>
+                        <span className="text-[10px] font-bold text-accent-text py-0.5 px-2 bg-accent-subtle border border-accent/25 rounded-full">
+                          CTR: {bp.estimatedCTR}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-2.5 mb-4">
+                        <div className="text-xs leading-normal">
+                          <span className="text-muted-foreground block font-semibold mb-0.5">Format Video:</span>
+                          <span className="text-primary font-medium">{bp.format}</span>
+                        </div>
+                        <div className="text-xs leading-normal">
+                          <span className="text-muted-foreground block font-semibold mb-0.5">Frame Pembuka (3 detik):</span>
+                          <span className="text-primary font-medium">{bp.openingFrame}</span>
+                        </div>
+                        <div className="text-xs leading-normal">
+                          <span className="text-muted-foreground block font-semibold mb-0.5">Tipografi & Gaya:</span>
+                          <span className="text-primary font-medium">{bp.typographyStyle}</span>
+                        </div>
+                        <div className="text-xs leading-normal">
+                          <span className="text-muted-foreground block font-semibold mb-0.5">Elemen Visual Kunci:</span>
+                          <span className="text-primary font-medium">{bp.keyVisualElements.join(" · ")}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="pt-3 border-t border-border/40">
+                      <div className="text-[10px] text-muted-foreground font-semibold mb-1.5 uppercase tracking-wider">Palet Warna Konten</div>
+                      <div className="flex gap-1.5">
+                        {bp.colorPalette.map((color, idx) => (
+                          <div
+                            key={idx}
+                            className="w-5 h-5 rounded-full border border-border shadow-sm shrink-0"
+                            style={{ backgroundColor: color }}
+                            title={color}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Priority Matrix */}
+          {analysis.priorityMatrix && analysis.priorityMatrix.length > 0 && (
+            <div className="mb-6">
+              <div className="caption mb-3 text-accent-text">Matriks Prioritas Publikasi (Priority Matrix)</div>
+              <div className="table-wrapper">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Platform</th>
+                      <th>Skala Prioritas</th>
+                      <th>Estimasi Jangkauan</th>
+                      <th>Tingkat Usaha (Effort)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analysis.priorityMatrix.map((item, i) => (
+                      <tr key={i}>
+                        <td className="font-bold text-primary capitalize">{item.platform}</td>
+                        <td>
+                          <span className={`status-badge ${
+                            item.priorityLevel === "Segera" ? "status-running" : "status-idle"
+                          }`}>
+                            {item.priorityLevel}
+                          </span>
+                        </td>
+                        <td className="font-bold text-accent-text">{item.expectedReach}</td>
+                        <td className="caption font-semibold">{item.effort}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Action Plan */}
+          {analysis.actionPlan && analysis.actionPlan.length > 0 && (
+            <div>
+              <div className="caption mb-3.5 text-accent-text">Rencana Kerja Rilis Konten (Action Plan)</div>
+              <div className="flex flex-col gap-3">
+                {analysis.actionPlan.map((step, i) => (
+                  <div key={i} className="flex gap-4 p-4 bg-surface-2 border border-border rounded-[var(--radius-md)]">
+                    <div className="w-8 h-8 rounded-full bg-accent-subtle border border-[color-mix(in_srgb,var(--color-accent)_20%,transparent)] flex items-center justify-center font-extrabold text-accent-text shrink-0 text-sm shadow-sm">
+                      {step.order}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                        <h4 className="m-0 text-primary text-sm font-bold">{step.title}</h4>
+                        <div className="flex gap-2">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted py-0.5 px-2 bg-surface-3 rounded-full border border-border">
+                            {step.platform}
+                          </span>
+                          <span className="text-[10px] font-bold text-accent-text py-0.5 px-2 bg-accent-subtle border border-accent/20 rounded-full">
+                            {step.deadline}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-secondary leading-relaxed m-0 mb-2.5">{step.description}</p>
+                      {step.scripts && step.scripts.length > 0 && (
+                        <div className="text-[10px] text-muted-foreground font-medium italic border-t border-border/40 pt-2">
+                          Referensi Hook: &ldquo;{step.scripts.join(", ")}&rdquo;
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       )}
 

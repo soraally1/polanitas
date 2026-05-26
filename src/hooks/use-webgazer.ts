@@ -71,9 +71,38 @@ export function useWebGazer() {
 
     viewportRef.current = { w: window.innerWidth, h: window.innerHeight };
 
+    // Set up MutationObserver to catch the dynamically created video element from WebGazer
+    // and apply mobile compatibility attributes before they cause issues (e.g. fullscreen on iOS)
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of Array.from(mutation.addedNodes)) {
+          if (node instanceof HTMLElement) {
+            const videoFeed = node.id === "webgazerVideoFeed"
+              ? node
+              : node.querySelector("#webgazerVideoFeed");
+
+            if (videoFeed && videoFeed instanceof HTMLVideoElement) {
+              videoFeed.setAttribute("playsinline", "true");
+              videoFeed.setAttribute("webkit-playsinline", "true");
+              videoFeed.muted = true;
+              videoFeed.autoplay = true;
+
+              videoFeed.play().catch((err) => {
+                console.warn("[WebGazer Mobile] Failed to auto-play video feed:", err);
+              });
+            }
+          }
+        }
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
     if (window.webgazer) {
       setIsReady(true);
-      return;
+      return () => {
+        observer.disconnect();
+      };
     }
 
     const script = document.createElement("script");
@@ -84,7 +113,8 @@ export function useWebGazer() {
     document.head.appendChild(script);
 
     return () => {
-      if (document.head.contains(script)) document.head.removeChild(script);
+      observer.disconnect();
+      script.remove();
     };
   }, []);
 
@@ -218,6 +248,18 @@ export function useWebGazer() {
 
       await window.webgazer.begin();
 
+      // Double-check / force mobile compatibility attributes immediately after begin
+      const videoFeed = document.getElementById("webgazerVideoFeed") as HTMLVideoElement | null;
+      if (videoFeed) {
+        videoFeed.setAttribute("playsinline", "true");
+        videoFeed.setAttribute("webkit-playsinline", "true");
+        videoFeed.muted = true;
+        videoFeed.autoplay = true;
+        videoFeed.play().catch((err) => {
+          console.warn("[WebGazer Mobile] Failed to force play video feed:", err);
+        });
+      }
+
       isStartedRef.current = true;
       setIsTracking(true);
 
@@ -268,6 +310,13 @@ export function useWebGazer() {
     setIsFaceDetected(false);
     return [...gazeBufferRef.current];
   }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopTracking();
+    };
+  }, [stopTracking]);
 
   const getGazePoints = useCallback((): GazePoint[] => {
     return [...gazeBufferRef.current];

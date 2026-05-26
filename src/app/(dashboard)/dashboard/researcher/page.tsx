@@ -37,17 +37,17 @@ const ShopeeIcon = ({ size = 16 }: { size?: number }) => (
 );
 
 const DATA_SOURCES = [
-  { platform: "YouTube", icon: YoutubeIcon, color: "#FF0000", desc: "Tren video populer berdasarkan region", tag: "YouTube Data API v3" },
-  { platform: "TikTok", icon: TiktokIcon, color: "#010101", desc: "Hashtag viral dan volume penggunaan", tag: "Apify Scraper" },
-  { platform: "Instagram", icon: InstagramIcon, color: "#E1306C", desc: "Reels & hashtag berbasis topik", tag: "Apify Scraper" },
-  { platform: "Tokopedia", icon: TokopediaIcon, color: "#00AA5B", desc: "Produk terlaris dan analisis harga", tag: "Lexis Solutions" },
-  { platform: "Shopee", icon: ShopeeIcon, color: "#EE4D2D", desc: "Kompetitor produk & whitespace gap", tag: "Apify Scraper" },
+  { platform: "YouTube", icon: YoutubeIcon, color: "#FF0000", desc: "Tren video populer dan topik yang paling banyak ditonton", tag: "Analisis Video Tren" },
+  { platform: "TikTok", icon: TiktokIcon, color: "#010101", desc: "Hashtag viral dan volume interaksi audiens terkini", tag: "Pemantau Tag Viral" },
+  { platform: "Instagram", icon: InstagramIcon, color: "#E1306C", desc: "Tren Reels terpopuler dan hashtag berbasis topik", tag: "Tren Reels Populer" },
+  { platform: "Tokopedia", icon: TokopediaIcon, color: "#00AA5B", desc: "Produk terlaris dan analisis harga pasaran secara detail", tag: "Riset Harga Pasar" },
+  { platform: "Shopee", icon: ShopeeIcon, color: "#EE4D2D", desc: "Analisis produk kompetitor terlaris dan celah peluang pasar", tag: "Analisis Celah Peluang" },
 ];
 
 const PROCESS_STEPS = [
-  { num: "01", title: "Scraping Paralel", desc: "Semua sumber data di-scrape secara simultan menggunakan Promise.allSettled — kecepatan maksimal tanpa blocking." },
-  { num: "02", title: "AI Synthesis", desc: "Data mentah dirangkum dan dianalisis oleh Llama 3.3 70B (GROQ_API_KEY_MARKET_RESEARCH) untuk menghasilkan 5 trending keyword yang paling relevan." },
-  { num: "03", title: "Handoff ke Strategist", desc: "Output disimpan ke Firestore (/research/output) dan Agen Strategist langsung diaktifkan untuk lanjut ke fase konten." },
+  { num: "01", title: "Pengumpulan Data Cepat", desc: "Sistem memindai berbagai platform media sosial dan e-commerce secara bersamaan untuk menangkap tren terbaru." },
+  { num: "02", title: "Penyaringan & Sintesis AI", desc: "Kecerdasan Buatan menyaring data mentah untuk merangkum 5 kata kunci (keyword) viral yang paling relevan bagi Anda." },
+  { num: "03", title: "Penerusan ke Strategist", desc: "Kata kunci pilihan otomatis dikirim ke Agen Strategist untuk mulai dirancang menjadi konsep skrip konten." },
 ];
 
 export default function ResearcherPage() {
@@ -67,7 +67,7 @@ export default function ResearcherPage() {
             The Researcher
           </h1>
           <p style={{ color: "var(--color-text-secondary)", maxWidth: 560, lineHeight: 1.7, fontSize: "1rem" }}>
-            Mengumpulkan data tren secara real-time dari 5 sumber, lalu menggunakan AI untuk menyintesis sinyal pasar paling relevan sebelum dikirim ke Agen Strategist.
+            Menjelajahi tren pasar digital secara real-time dari berbagai platform media sosial dan e-commerce ternama untuk menemukan kata kunci viral potensial bagi konten Anda.
           </p>
         </div>
         <Link href="/dashboard/sessions" style={{ textDecoration: "none" }}>
@@ -80,9 +80,9 @@ export default function ResearcherPage() {
       {/* ── Capabilities banner ─────────────────────────────────── */}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         {[
-          { icon: Zap, label: "Groq Llama 3.3 70B — GROQ_API_KEY_MARKET_RESEARCH" },
-          { icon: Globe, label: "5 Platform Simultan" },
-          { icon: Database, label: "Output ke Firestore /research/output" },
+          { icon: Zap, label: "Analisis Tren Cerdas (AI)" },
+          { icon: Globe, label: "Multi-Platform Real-time" },
+          { icon: Database, label: "Sinkronisasi Tren Otomatis" },
         ].map(({ icon: Icon, label }) => (
           <div key={label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 14px", borderRadius: 100, background: "var(--color-surface)", border: "1px solid var(--color-border)", fontSize: "0.8rem", fontWeight: 600, color: "var(--color-text-secondary)" }}>
             <Icon size={13} color="var(--color-accent-text)" />
@@ -147,7 +147,7 @@ export default function ResearcherPage() {
           ))}
         </div>
         <div style={{ padding: "12px 24px", background: "var(--color-surface-2)", borderTop: "1px solid var(--color-border)", fontSize: "0.78rem", color: "var(--color-text-muted)" }}>
-          Keywords ini di-generate dari sintesis data mentah seluruh platform oleh Llama 3.3 70B, bukan sekadar hasil scraping mentah.
+          Kumpulan kata kunci (keywords) ini dihasilkan khusus per topik berdasarkan sintesis pintar data tren aktual dari seluruh platform, bukan sekadar rangkuman mentah.
         </div>
       </div>
 

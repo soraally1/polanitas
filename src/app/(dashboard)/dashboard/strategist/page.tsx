@@ -5,23 +5,23 @@ import { Brain, Hash, Tag, FileText, ArrowUpRight, Zap, Database, Layers } from 
 export const metadata: Metadata = { title: "Strategist Agent — POLANITAS" };
 
 const FRAMEWORKS = [
-  { label: "Chain-of-Thought", desc: "AI berpikir keras sebelum menulis — setiap skrip diawali <think> block untuk merencanakan struktur" },
-  { label: "AIDA Framework", desc: "Attention → Interest → Desire → Action, diterapkan pada skrip 30 dan 60 detik" },
-  { label: "PAS Framework", desc: "Problem → Agitate → Solution, efektif untuk konten emosional dan transformasi" },
-  { label: "Hook-Story-Offer", desc: "Format TikTok creator terbukti viral: 3 detik pertama menentukan segalanya" },
+  { label: "Analisis Logika Konten", desc: "Kecerdasan Buatan merancang alur cerita dan struktur pesan yang logis sebelum menulis draf skrip Anda." },
+  { label: "Formula AIDA", desc: "Menarik Perhatian (Attention) → Memicu Minat (Interest) → Membangkitkan Keinginan (Desire) → Ajakan Bertindak (Action) untuk efektivitas promosi." },
+  { label: "Formula PAS", desc: "Mengidentifikasi Masalah (Problem) → Memperjelas Dampak (Agitate) → Menawarkan Solusi (Solution) untuk konten yang emosional." },
+  { label: "Hook-Story-Offer", desc: "Format teruji pembuat konten viral: 3 detik pertama memikat perhatian penonton secara instan." },
 ];
 
 const SCRIPT_VARIANTS = [
-  { dur: "15s", color: "#F59E0B", words: "±30 kata", note: "Ideal untuk TikTok Ads & Instagram Reels hook" },
-  { dur: "30s", color: "#8B5CF6", words: "±70 kata", note: "Format standar konten viral organik" },
-  { dur: "60s", color: "#3B82F6", words: "±150 kata", note: "YouTube Shorts & penjelasan produk mendalam" },
+  { dur: "15s", color: "#F59E0B", words: "±30 kata", note: "Ideal untuk Iklan (Ads) & Instagram Reels hook cepat" },
+  { dur: "30s", color: "#8B5CF6", words: "±70 kata", note: "Format standar untuk konten viral organik yang dinamis" },
+  { dur: "60s", color: "#3B82F6", words: "±150 kata", note: "Sangat baik untuk penjelasan produk mendalam & video informatif" },
 ];
 
 const PROCESS_STEPS = [
-  { num: "01", title: "Terima Data Riset", desc: "Baca ResearchOutput dari Firestore (/research/output) — YouTube trends, social trends, produk marketplace + AI keywords." },
-  { num: "02", title: "Rangkum Konteks", desc: "Semua data diringkas menjadi briefing komprehensif: top 5 YouTube, 6 trending hashtag, 5 produk hot marketplace." },
-  { num: "03", title: "Generate 3 Skrip Paralel", desc: "Llama 3.3 70B (GROQ_API_KEY_STARTEGIST_CONTENT) membuat 3 versi skrip (15s/30s/60s) secara paralel dengan viral hook, CTA, visual instruction, dan hashtag." },
-  { num: "04", title: "Handoff ke Analyst", desc: "Semua skrip disimpan ke /strategy/output, lalu Agen Analyst segera diaktifkan untuk sintesis akhir." },
+  { num: "01", title: "Membaca Hasil Riset", desc: "Menerima kata kunci populer dan tren pasar terbaru yang telah dikumpulkan di fase riset sebelumnya." },
+  { num: "02", title: "Penyusunan Briefing Konten", desc: "Merangkum seluruh informasi tren menjadi draf panduan kreatif yang siap dituangkan ke dalam naskah." },
+  { num: "03", title: "Penulisan 3 Versi Skrip", desc: "Membuat 3 variasi naskah (15s, 30s, 60s) lengkap dengan hook penarik perhatian, petunjuk visual, ajakan bertindak (CTA), dan hashtag relevan secara instan." },
+  { num: "04", title: "Penerusan ke Agen Analyst", desc: "Menyerahkan naskah skrip konten kepada Agen Analyst untuk mulai dievaluasi kelayakan visual dan pasarnya." },
 ];
 
 export default function StrategistPage() {
@@ -41,7 +41,7 @@ export default function StrategistPage() {
             The Strategist
           </h1>
           <p style={{ color: "var(--color-text-secondary)", maxWidth: 560, lineHeight: 1.7, fontSize: "1rem" }}>
-            Mengubah data riset mentah menjadi 3 versi skrip konten siap pakai menggunakan Chain-of-Thought prompting — viral hook, skrip video, visual instructions, CTA, dan hashtag.
+            Mengubah data riset pasar menjadi 3 variasi naskah skrip video siap pakai lengkap dengan hook pembuka yang menarik, petunjuk visual adegan, ajakan bertindak (CTA), dan hashtag populer.
           </p>
         </div>
         <Link href="/dashboard/sessions" style={{ textDecoration: "none" }}>
@@ -54,9 +54,9 @@ export default function StrategistPage() {
       {/* ── Capabilities ──────────────────────────────────────── */}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         {[
-          { icon: Zap, label: "Groq Llama 3.3 70B — GROQ_API_KEY_STARTEGIST_CONTENT" },
-          { icon: Layers, label: "3 Skrip Paralel (15s / 30s / 60s)" },
-          { icon: Database, label: "Output ke Firestore /strategy/output" },
+          { icon: Zap, label: "Perencanaan Konten Kreatif" },
+          { icon: Layers, label: "3 Durasi Skrip Terpadu" },
+          { icon: Database, label: "Penyusunan Alur Otomatis" },
         ].map(({ icon: Icon, label }) => (
           <div key={label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 14px", borderRadius: 100, background: "var(--color-surface)", border: "1px solid var(--color-border)", fontSize: "0.8rem", fontWeight: 600, color: "var(--color-text-secondary)" }}>
             <Icon size={13} color="#8B5CF6" />

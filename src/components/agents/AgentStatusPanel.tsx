@@ -9,9 +9,9 @@ interface AgentStatusPanelProps {
 }
 
 const AGENT_CONFIG: { id: AgentId; Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>; label: string; desc: string }[] = [
-  { id: "researcher", Icon: Search, label: "The Researcher", desc: "YouTube · TikTok · Instagram · Marketplace" },
-  { id: "strategist", Icon: Brain, label: "The Strategist",  desc: "CoT Copywriting · Viral Hook · Skrip Video" },
-  { id: "analyst",    Icon: Eye,   label: "The Analyst",     desc: "Eye Tracking · Heatmap · F-Pattern Analysis" },
+  { id: "researcher", Icon: Search, label: "The Researcher", desc: "Riset Tren · Kata Kunci Viral · Sinyal Pasar" },
+  { id: "strategist", Icon: Brain, label: "The Strategist",  desc: "Formula Copywriting · Viral Hook · Skrip Video" },
+  { id: "analyst",    Icon: Eye,   label: "The Analyst",     desc: "Laporan Peluang · Analisis Visual · Rencana Aksi" },
 ];
 
 function getStatusClass(status: AgentStatus) {

@@ -938,6 +938,24 @@
   .app-main {
     padding: 16px 16px 100px;
   }
+
+  /* WebGazer Mobile Constraints */
+  #webgazerVideoFeed,
+  #webgazerVideoCanvas,
+  #webgazerFaceOverlay,
+  #webgazerFaceFeedbackBox {
+    position: fixed !important;
+    bottom: 16px !important;
+    right: 16px !important;
+    top: auto !important;
+    left: auto !important;
+    width: 140px !important;
+    height: 105px !important;
+    border-radius: 10px !important;
+    border: 1.5px solid rgba(99, 102, 241, 0.4) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+    z-index: 9980 !important;
+  }
 }
 
 @media (max-width: 900px) {
