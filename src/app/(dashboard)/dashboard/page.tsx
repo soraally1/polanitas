@@ -379,7 +379,7 @@ export default function DashboardPage() {
             <div className="font-bold text-[0.84rem] text-primary mb-0.5">Simulasi Agen AI</div>
             <div className="text-[0.72rem] text-muted leading-[1.4]">Selesaikan Modul 1 untuk membuka akses penuh.</div>
           </div>
-          <Link href="/dashboard/sessions" className="btn btn-primary btn-sm shrink-0 gap-1 py-[7px] px-3 text-[0.72rem]">
+          <Link href="/dashboard/sessions/new" className="btn btn-primary btn-sm shrink-0 gap-1 py-[7px] px-3 text-[0.72rem]">
             Mulai <ChevronRight size={12} />
           </Link>
         </div>

@@ -70,7 +70,7 @@ export default function ResearcherPage() {
             Menjelajahi tren pasar digital secara real-time dari berbagai platform media sosial dan e-commerce ternama untuk menemukan kata kunci viral potensial bagi konten Anda.
           </p>
         </div>
-        <Link href="/dashboard/sessions" style={{ textDecoration: "none" }}>
+        <Link href="/dashboard/sessions/new" style={{ textDecoration: "none" }}>
           <div className="btn btn-primary" style={{ gap: 6, fontSize: "0.875rem" }}>
             Mulai Riset <ArrowUpRight size={15} />
           </div>

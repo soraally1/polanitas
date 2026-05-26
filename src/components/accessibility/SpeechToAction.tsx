@@ -22,7 +22,8 @@ import { speak } from "@/lib/speech-utils";
 const ROUTE_COMMANDS: { patterns: string[]; path: string; announce: string }[] = [
   { patterns: ["buka dashboard", "ke dashboard", "halaman utama", "home"], path: "/dashboard", announce: "Membuka Dashboard." },
   { patterns: ["buka materi", "lihat materi", "buka modul", "kurikulum", "semua materi"], path: "/dashboard/learn", announce: "Membuka Materi." },
-  { patterns: ["buka sesi", "sesi riset", "mulai riset", "buka riset"], path: "/dashboard/sessions", announce: "Membuka Sesi Riset." },
+  { patterns: ["mulai riset", "riset baru", "buka riset baru", "buat riset"], path: "/dashboard/sessions/new", announce: "Membuka halaman Mulai Riset Baru." },
+  { patterns: ["buka sesi", "sesi riset", "daftar sesi", "riwayat riset", "hasil riset", "lihat hasil"], path: "/dashboard/sessions", announce: "Membuka Hasil Riset." },
   { patterns: ["buka heatmap", "eye tracking", "heatmap"], path: "/dashboard/heatmaps", announce: "Membuka Heatmap." },
   { patterns: ["buka researcher", "researcher"], path: "/dashboard/researcher", announce: "Membuka Researcher." },
   { patterns: ["buka strategist", "strategist"], path: "/dashboard/strategist", announce: "Membuka Strategist." },
@@ -46,7 +47,8 @@ const ROUTE_COMMANDS: { patterns: string[]; path: string; announce: string }[] =
 const PATH_NAMES: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/dashboard/learn": "Materi",
-  "/dashboard/sessions": "Sesi Riset",
+  "/dashboard/sessions/new": "Mulai Riset Baru",
+  "/dashboard/sessions": "Hasil Riset",
   "/dashboard/heatmaps": "Heatmap",
   "/dashboard/researcher": "Researcher",
   "/dashboard/strategist": "Strategist",
@@ -92,9 +94,13 @@ const PAGE_NAV_INFO: Record<string, { items: string[]; hint?: string }> = {
     ],
     hint: "Ucapkan 'modul' diikuti nomornya, misalnya 'modul satu'. Atau ucapkan 'kembali' untuk ke Dashboard.",
   },
+  "/dashboard/sessions/new": {
+    items: ["Mengisi form riset", "Mulai riset AI"],
+    hint: "Ucapkan 'isi topik' diikuti topik riset Anda untuk mengisi form. Atau ucapkan 'kembali' untuk ke halaman sebelumnya.",
+  },
   "/dashboard/sessions": {
-    items: ["Buat sesi riset baru", "Lihat daftar sesi"],
-    hint: "Ucapkan 'mulai riset' untuk membuat sesi baru. Atau 'kembali' untuk ke halaman sebelumnya.",
+    items: ["Lihat daftar hasil riset", "Buka detail sesi riset"],
+    hint: "Sebutkan nama topik atau klik sesi untuk membuka detail. Atau ucapkan 'kembali' untuk ke Dashboard.",
   },
   "/dashboard/heatmaps": {
     items: ["Lihat data heatmap", "Analisis eye tracking"],

@@ -24,7 +24,7 @@ Contoh: "Buka materi 5" -> isFormAction: true. "Apa isi materi 5?" -> isFormActi
 
 Halaman saat ini: ${pathname}
 
-DAFTAR AKSI FORM YANG DIDUKUNG UNTUK HALAMAN /dashboard/sessions:
+DAFTAR AKSI FORM YANG DIDUKUNG UNTUK HALAMAN /dashboard/sessions ATAU /dashboard/sessions/new:
 1. set-topic: Mengisi input "Topik / Produk / Bisnis" (contoh: "isi topik jualan kopi susu")
 2. set-audience: Mengisi input "Target Audiens" (contoh: "target audiensnya anak muda 20 tahun")
 3. set-region: Mengubah dropdown Region. Kode yang valid: "ID" (Indonesia), "MY" (Malaysia), "SG" (Singapura), "US" (Amerika Serikat).

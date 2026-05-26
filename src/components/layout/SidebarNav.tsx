@@ -11,14 +11,16 @@ import {
   Thermometer,
   BarChart2,
   BookOpen,
+  PlusCircle,
 } from "lucide-react";
 
 const NAV_SECTIONS = [
   {
     label: "Utama",
     items: [
-      { href: "/dashboard",          label: "Dashboard",  Icon: Zap        },
-      { href: "/dashboard/sessions", label: "Sesi Riset", Icon: FolderOpen },
+      { href: "/dashboard",              label: "Dashboard",   Icon: Zap        },
+      { href: "/dashboard/sessions/new",  label: "Mulai Riset",  Icon: PlusCircle },
+      { href: "/dashboard/sessions",      label: "Hasil Riset", Icon: FolderOpen },
     ],
   },
   {

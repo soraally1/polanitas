@@ -14,16 +14,18 @@ import {
   BarChart2,
   BookOpen,
   ChevronUp,
+  PlusCircle,
 } from "lucide-react";
 
 const PRIMARY_ITEMS = [
-  { href: "/dashboard",          label: "Home",      Icon: Zap        },
-  { href: "/dashboard/sessions", label: "Sessions",   Icon: FolderOpen },
-  { href: "/dashboard/learn",    label: "Courses",    Icon: BookOpen   },
-  { href: "/dashboard/researcher", label: "Research",  Icon: Search    },
+  { href: "/dashboard",              label: "Home",      Icon: Zap        },
+  { href: "/dashboard/sessions/new",  label: "Riset Baru", Icon: PlusCircle },
+  { href: "/dashboard/sessions",      label: "Hasil Riset", Icon: FolderOpen },
+  { href: "/dashboard/learn",        label: "Courses",    Icon: BookOpen   },
 ];
 
 const SECONDARY_ITEMS = [
+  { href: "/dashboard/researcher", label: "Research",  Icon: Search    },
   { href: "/dashboard/strategist", label: "Strategy",  Icon: Brain     },
   { href: "/dashboard/analyst",    label: "Analyst",    Icon: Eye       },
   { href: "/dashboard/heatmaps",   label: "Heatmaps",   Icon: Thermometer},

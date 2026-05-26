@@ -35,12 +35,19 @@ Semua 12 modul pembelajaran tersedia di sini:
 User bisa membuka modul mana saja dengan menyebut nomornya.
   `.trim(),
 
-  "/dashboard/sessions": `
-Ini adalah halaman Sesi Riset POLANITAS.
+  "/dashboard/sessions/new": `
+Ini adalah halaman Mulai Riset Baru POLANITAS.
 Di sini user bisa memulai sesi riset baru menggunakan 3 AI Agent (Researcher, Strategist, Analyst).
 User perlu mengisi: topik atau produk yang ingin diriset, memilih platform (TikTok, YouTube, Instagram, Shopee, Tokopedia), memilih fokus riset (Tren Konten, Whitespace Produk, Analisis Kompetitor, Strategi Hashtag, atau Segmentasi Audiens), memilih region (Indonesia, Malaysia, Singapura, Amerika), dan opsional mengisi deskripsi target audiens.
-Setelah memulai, tiga agen AI akan berjalan secara berurutan dan hasilnya bisa dipantau secara real-time.
-Di bawah form ada riwayat semua sesi riset sebelumnya.
+Setelah memulai, tiga agen AI akan berjalan secara berurutan dan hasilnya bisa dipantau secara real-time di halaman detail sesi.
+  `.trim(),
+
+  "/dashboard/sessions": `
+Ini adalah halaman Hasil Riset POLANITAS.
+Di sini user bisa melihat daftar riwayat semua sesi riset sebelumnya yang dijalankan oleh agen AI.
+Tiap sesi menampilkan statusnya (Selesai, Berjalan, atau Menunggu), platform yang dianalisis, fokus riset, dan waktu pembuatan sesi.
+User bisa mengklik salah satu sesi untuk melihat detail hasil riset dan analisis lengkap.
+Di bagian atas kanan ada tombol "Mulai Riset Baru" untuk berpindah ke halaman pengisian form analisis riset baru.
   `.trim(),
 
   "/dashboard/heatmaps": `
