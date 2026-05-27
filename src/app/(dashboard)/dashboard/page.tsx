@@ -2,7 +2,9 @@
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase-client";
 import {
   Search,
   Brain,
@@ -27,6 +29,7 @@ import {
   Users,
   FlaskConical,
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 // ── Types ────────────────────────────────────────────────────────────
 interface Course {
@@ -44,17 +47,6 @@ interface Course {
   available: boolean;
 }
 
-interface ActiveCourse {
-  id: string;
-  title: string;
-  desc: string;
-  progress: number;
-  gradient: string;
-  href: string;
-  Icon: React.FC<any>;
-}
-
-// ── All 12 modules ───────────────────────────────────────────────────
 const COURSES: Course[] = [
   { id: "ai-orchestration", num: 1, title: "Orkestrasi AI", subtitle: "Menjadi Dirigen jaringan agen", level: "Fundamental", gradient: "linear-gradient(140deg, #818CF8 0%, #6366F1 100%)", Icon: Brain, lessons: 6, duration: "3 jam", tag: "Populer", href: "/dashboard/learn/ai-orchestration", available: true },
   { id: "trend-signal", num: 2, title: "Deteksi Tren Dini", subtitle: "Sinyal tren TikTok sebelum viral", level: "Menengah", gradient: "linear-gradient(140deg, #F97316 0%, #EA580C 100%)", Icon: TrendingUp, lessons: 6, duration: "2.5 jam", tag: "Terbaru", href: "/dashboard/learn/trend-signal", available: true },
@@ -68,11 +60,6 @@ const COURSES: Course[] = [
   { id: "ai-ethics", num: 10, title: "Etika AI & Brand Safety", subtitle: "Guardrails · UU PDP · Compliance", level: "Fundamental", gradient: "linear-gradient(140deg, #94A3B8 0%, #475569 100%)", Icon: Lock, lessons: 5, duration: "2 jam", tag: "Fundamental", href: "/dashboard/learn/ai-ethics", available: true },
   { id: "influencer-dna", num: 11, title: "Influencer DNA Matching", subtitle: "Vibe matching dengan vector search", level: "Lanjutan", gradient: "linear-gradient(140deg, #D946EF 0%, #9333EA 100%)", Icon: Users, lessons: 6, duration: "2.5 jam", tag: "Lanjutan", href: "/dashboard/learn/influencer-dna", available: true },
   { id: "ab-testing", num: 12, title: "A/B Testing Agresif", subtitle: "50 variasi iklan · iterasi otomatis", level: "Lanjutan", gradient: "linear-gradient(140deg, #22D3EE 0%, #0891B2 100%)", Icon: FlaskConical, lessons: 7, duration: "3 jam", tag: "Lanjutan", href: "/dashboard/learn/ab-testing", available: true },
-];
-
-const ACTIVE_COURSES: ActiveCourse[] = [
-  { id: "ai-orchestration", title: "Orkestrasi AI", desc: "Selesaikan teori Dirigen AI sebelum simulasi agen", progress: 33, gradient: "linear-gradient(135deg, #818CF8 0%, #6366F1 100%)", href: "/dashboard/learn/ai-orchestration", Icon: Brain },
-  { id: "trend-signal", title: "Deteksi Tren Dini", desc: "Mulai deteksi noise vs. sinyal tren nyata", progress: 0, gradient: "linear-gradient(135deg, #FB923C 0%, #EA580C 100%)", href: "/dashboard/learn/trend-signal", Icon: TrendingUp },
 ];
 
 const FILTERS = ["Semua", "Populer", "Terbaru", "Fundamental", "Menengah", "Lanjutan"];
@@ -149,6 +136,75 @@ export default function DashboardPage() {
   const { user, loading } = useAuth();
   const [activeFilter, setActiveFilter] = useState("Semua");
   const [search, setSearch] = useState("");
+  const [completedCount, setCompletedCount] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<"Semua" | "Berlangsung" | "Selesai">("Semua");
+  const [progressMap, setProgressMap] = useState<Record<string, { completed: number; total: number; percent: number }>>({});
+
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    const colRef = collection(db, "users", user.uid, "moduleProgress");
+    getDocs(colRef)
+      .then((querySnapshot) => {
+        let count = 0;
+        const newMap: Record<string, { completed: number; total: number; percent: number }> = {};
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const moduleId = docSnap.id;
+
+          const course = COURSES.find((c) => c.id === moduleId);
+          if (course) {
+            const completedCountLessons = data.completedLessons?.length || 0;
+            const total = course.lessons;
+            const percent = total > 0 ? Math.round((completedCountLessons / total) * 100) : 0;
+
+            newMap[moduleId] = {
+              completed: completedCountLessons,
+              total,
+              percent,
+            };
+
+            if (completedCountLessons >= total) {
+              count++;
+            }
+          }
+        });
+        setProgressMap(newMap);
+        setCompletedCount(count);
+      })
+      .catch((err) => {
+        console.error("Error fetching module progress:", err);
+      });
+  }, [user?.uid]);
+
+  const userCourses = COURSES.map((course) => {
+    const prog = progressMap[course.id] || { completed: 0, total: course.lessons, percent: 0 };
+    return {
+      id: course.id,
+      title: course.title,
+      desc: course.subtitle,
+      progress: prog.percent,
+      gradient: course.gradient,
+      href: course.href,
+      Icon: course.Icon,
+    };
+  });
+
+  const displayedCourses = userCourses
+    .filter((c) => {
+      const hasProgress = c.progress > 0;
+      const isCompleted = c.progress === 100;
+
+      if (activeTab === "Semua") {
+        return hasProgress;
+      } else if (activeTab === "Berlangsung") {
+        return hasProgress && !isCompleted;
+      } else {
+        return isCompleted;
+      }
+    })
+    .sort((a, b) => b.progress - a.progress);
 
   if (loading) return <SkeletonDashboard />;
 
@@ -187,8 +243,8 @@ export default function DashboardPage() {
         {/* Quick Stats */}
         <div className="animate-fade-in-up grid grid-cols-1 md:grid-cols-3 gap-3 [animation-delay:60ms]">
           {[
-            { label: "Modul Tersedia", value: "12", Icon: BookOpen, color: "#6366F1" },
-            { label: "Sedang Belajar", value: String(ACTIVE_COURSES.filter(c => c.progress > 0).length), Icon: Flame, color: "#F59E0B" },
+            { label: "Modul Tersedia", value: "13", Icon: BookOpen, color: "#6366F1" },
+            { label: "Modul Terselesaikan", value: String(completedCount), Icon: CheckCircle, color: "#6EE12B" },
             { label: "AI Tutor Lab", value: "Aktif", Icon: Zap, color: "#10B981" },
           ].map(({ label, value, Icon: I, color }) => (
             <div key={label} className="bg-surface border border-border rounded-[var(--radius-lg)] py-4 px-[18px] shadow-sm flex md:flex-col items-center md:items-start gap-4 md:gap-0">
@@ -302,85 +358,109 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="font-extrabold text-[1.05rem]">Modul Saya</h2>
-          <Link href="/dashboard/learn" className="flex items-center gap-1 text-[0.78rem] font-semibold text-muted no-underline">
+          {/* <Link href="/dashboard/learn" className="flex items-center gap-1 text-[0.78rem] font-semibold text-muted no-underline">
             Lihat Semua <ChevronRight size={13} />
-          </Link>
+          </Link> */}
         </div>
 
         {/* Tab pills */}
-        <div className="flex p-1 rounded-full gap-[3px] bg-surface-2 border border-border">
-          {[{ i: BookOpen, l: "Semua" }, { i: Zap, l: "Berlangsung" }, { i: CheckCircle, l: "Selesai" }].map(({ i: Ti, l }, idx) => (
+        <div className="flex p-1 rounded-full gap-[3px] bg-surface-2 border border-border relative">
+          {[{ i: BookOpen, l: "Semua" }, { i: Zap, l: "Berlangsung" }, { i: CheckCircle, l: "Selesai" }].map(({ i: Ti, l }) => (
             <button
               key={l}
-              className={`flex-1 py-[7px] px-2 rounded-full border-none text-[0.72rem] flex justify-center items-center gap-[5px] cursor-pointer font-sans ${idx === 0
-                ? "bg-accent text-[#12200A] font-bold shadow-[0_3px_8px_var(--color-accent-glow)]"
-                : "bg-transparent text-muted font-medium"
+              type="button"
+              onClick={() => setActiveTab(l as any)}
+              className={`flex-1 py-[7px] px-2 rounded-full border-none text-[0.72rem] flex justify-center items-center gap-[5px] cursor-pointer font-sans relative z-10 transition-colors duration-200 ${activeTab === l
+                  ? "text-[#12200A] font-bold"
+                  : "bg-transparent text-muted font-medium hover:text-primary"
                 }`}
             >
+              {activeTab === l && (
+                <motion.div
+                  layoutId="activeTabPill"
+                  className="absolute inset-0 bg-accent rounded-full shadow-[0_3px_8px_var(--color-accent-glow)] z-[-1]"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
               <Ti size={12} /> {l}
             </button>
           ))}
         </div>
 
         {/* Promo banner */}
-        <div className="bg-[linear-gradient(135deg,#3B82F6_0%,#1D4ED8_100%)] rounded-[18px] p-5 relative overflow-hidden">
-          <div className="absolute -right-4 -top-4 w-[100px] h-[100px] rounded-full bg-white/[0.08]" />
-          <div className="absolute right-4 top-4 w-[52px] h-[52px] rounded-full bg-white/10 flex items-center justify-center">
-            <Target size={24} className="text-white/65" />
-          </div>
-          <div className="relative z-[1] max-w-[72%]">
-            <div className="font-extrabold text-[0.9375rem] text-white leading-[1.4] mb-3">
-              Mulai jalur belajar barumu!
+        {activeTab === "Semua" && (
+          <div className="bg-[linear-gradient(135deg,#3B82F6_0%,#1D4ED8_100%)] rounded-[18px] p-5 relative overflow-hidden animate-fade-in-up">
+            <div className="absolute -right-4 -top-4 w-[100px] h-[100px] rounded-full bg-white/[0.08]" />
+            <div className="absolute right-4 top-4 w-[52px] h-[52px] rounded-full bg-white/10 flex items-center justify-center">
+              <Target size={24} className="text-white/65" />
             </div>
-            <Link
-              href="/dashboard/learn"
-              className="inline-flex items-center gap-[5px] bg-white text-[#1D4ED8] font-bold text-xs py-[7px] px-3.5 rounded-full no-underline shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition-transform duration-150 hover:-translate-y-0.5"
-            >
-              Cek Kurikulum <ArrowUpRight size={13} />
-            </Link>
+            <div className="relative z-[1] max-w-[72%]">
+              <div className="font-extrabold text-[0.9375rem] text-white leading-[1.4] mb-3">
+                Mulai jalur belajar barumu!
+              </div>
+              <Link
+                href="/dashboard/learn"
+                className="inline-flex items-center gap-[5px] bg-white text-[#1D4ED8] font-bold text-xs py-[7px] px-3.5 rounded-full no-underline shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition-transform duration-150 hover:-translate-y-0.5"
+              >
+                Cek Kurikulum <ArrowUpRight size={13} />
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Active modules */}
         <div className="flex flex-col gap-3">
-          {ACTIVE_COURSES.map(({ id, title, desc, progress, gradient, href, Icon: CourseIcon }) => (
-            <Link key={id} href={href} className="no-underline">
-              <div
-                className="rounded-[18px] py-4 px-[18px] flex items-center gap-3.5 relative overflow-hidden transition-[transform,filter] duration-200 cursor-pointer hover:-translate-y-0.5 hover:brightness-[1.06]"
-                style={{ background: gradient }}
-              >
-                <div className="absolute -left-4 -top-4 w-16 h-16 rounded-full bg-white/[0.08]" />
+          {displayedCourses.length === 0 ? (
+            <div className="text-center py-6 text-xs text-muted">
+              Tidak ada modul dalam kategori ini.
+            </div>
+          ) : (
+            displayedCourses.map(({ id, title, desc, progress, gradient, href }) => (
+              <Link key={id} href={href} className="no-underline">
+                <div
+                  className="rounded-[18px] py-4 px-[18px] flex items-center gap-3.5 relative overflow-hidden transition-[transform,filter] duration-200 cursor-pointer hover:-translate-y-0.5 hover:brightness-[1.06]"
+                  style={{ background: gradient }}
+                >
+                  <div className="absolute -left-4 -top-4 w-16 h-16 rounded-full bg-white/[0.08]" />
 
-                <div className="flex-1 z-[1] min-w-0">
-                  <div className="font-extrabold text-sm text-white mb-[3px]">{title}</div>
-                  <div className="text-[0.72rem] text-white/[0.72] mb-2.5 overflow-hidden line-clamp-2 leading-[1.4]">{desc}</div>
-                  <div className="h-1 bg-white/20 rounded-full overflow-hidden mb-1">
-                    <div className="h-full bg-white rounded-full transition-[width] duration-[800ms] ease-out" style={{ width: `${progress}%` }} />
+                  <div className="flex-1 z-[1] min-w-0">
+                    <div className="font-extrabold text-sm text-white mb-[3px]">{title}</div>
+                    <div className="text-[0.72rem] text-white/[0.72] mb-2.5 overflow-hidden line-clamp-2 leading-[1.4]">{desc}</div>
+                    <div className="h-1 bg-white/20 rounded-full overflow-hidden mb-1">
+                      <div className="h-full bg-white rounded-full transition-[width] duration-[800ms] ease-out" style={{ width: `${progress}%` }} />
+                    </div>
+                    <div className="text-[0.65rem] text-white/65 font-bold flex items-center gap-1">
+                      {progress === 0
+                        ? "Belum dimulai"
+                        : progress >= 100
+                          ? <><CheckCircle size={11} className="text-white" /> <span className="text-white">Selesai</span></>
+                          : `Selesai ${progress}%`
+                      }
+                    </div>
                   </div>
-                  <div className="text-[0.65rem] text-white/65 font-bold">
-                    {progress === 0 ? "Belum dimulai" : `Selesai ${progress}%`}
-                  </div>
+
+                  <Ring pct={progress} size={48} />
                 </div>
-
-                <Ring pct={progress} size={48} />
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))
+          )}
         </div>
 
         {/* AI Agents CTA */}
-        <div className="border-[1.5px] border-dashed border-border rounded-[18px] py-4 px-[18px] flex items-center gap-3.5 bg-surface">
-          <div className="w-10 h-10 rounded-[var(--radius-md)] bg-accent-subtle border border-border flex items-center justify-center shrink-0">
-            <PlayCircle size={20} className="text-accent-text" />
+        {activeTab === "Semua" && (
+          <div className="border-[1.5px] border-dashed border-border rounded-[18px] py-4 px-[18px] flex items-center gap-3.5 bg-surface animate-fade-in-up">
+            <div className="w-10 h-10 rounded-[var(--radius-md)] bg-accent-subtle border border-border flex items-center justify-center shrink-0">
+              <PlayCircle size={20} className="text-accent-text" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-bold text-[0.84rem] text-primary mb-0.5">Simulasi Agen AI</div>
+              <div className="text-[0.72rem] text-muted leading-[1.4]">Selesaikan Modul 1 untuk membuka akses penuh.</div>
+            </div>
+            <Link href="/dashboard/sessions/new" className="btn btn-primary btn-sm shrink-0 gap-1 py-[7px] px-3 text-[0.72rem]">
+              Mulai <ChevronRight size={12} />
+            </Link>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="font-bold text-[0.84rem] text-primary mb-0.5">Simulasi Agen AI</div>
-            <div className="text-[0.72rem] text-muted leading-[1.4]">Selesaikan Modul 1 untuk membuka akses penuh.</div>
-          </div>
-          <Link href="/dashboard/sessions/new" className="btn btn-primary btn-sm shrink-0 gap-1 py-[7px] px-3 text-[0.72rem]">
-            Mulai <ChevronRight size={12} />
-          </Link>
-        </div>
+        )}
       </div>
     </div>
   );

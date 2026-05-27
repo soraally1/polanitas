@@ -119,6 +119,29 @@ export function useModuleProgress(
     setIsSaving(false);
   }, [uid, moduleId, totalLessons]);
 
+  const resetAnswer = useCallback(async (lessonIndex: number) => {
+    if (!uid) return;
+    setIsSaving(true);
+    const ref = doc(db, "users", uid, "moduleProgress", moduleId);
+    const existing = await getDoc(ref);
+    if (existing.exists()) {
+      const prev = existing.data();
+      const quizAnswers = { ...(prev.quizAnswers ?? {}) };
+      delete quizAnswers[lessonIndex];
+      
+      // Also remove from completedLessons if it was there
+      const prevCompleted: number[] = prev.completedLessons ?? [];
+      const newCompleted = prevCompleted.filter((idx) => idx !== lessonIndex);
+      
+      await setDoc(ref, {
+        quizAnswers,
+        completedLessons: newCompleted,
+        completedAt: null, // Reset completedAt if an answer is reset
+      }, { merge: true });
+    }
+    setIsSaving(false);
+  }, [uid, moduleId]);
+
   const completedLessons = new Set<number>(progress?.completedLessons ?? []);
   const quizAnswers      = progress?.quizAnswers ?? {};
   const isModuleComplete = completedLessons.size >= totalLessons && totalLessons > 0;
@@ -131,5 +154,6 @@ export function useModuleProgress(
     isModuleComplete,
     completedAt: progress?.completedAt ?? null,
     saveAnswer,
+    resetAnswer,
   };
 }

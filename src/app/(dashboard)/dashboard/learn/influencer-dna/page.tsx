@@ -1,132 +1,132 @@
-﻿"use client";
+"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 import {
-  Users,
-  ArrowLeft,
-  ChevronRight,
-  ChevronLeft,
-  CheckCircle,
-  Circle,
-  Zap,
-  Lightbulb,
-  Target,
-  BookOpen,
-  Clock,
+ Users,
+ ArrowLeft,
+ ChevronRight,
+ ChevronLeft,
+ CheckCircle,
+ Circle,
+ Zap,
+ Lightbulb,
+ Target,
+ BookOpen,
+ Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
-  questionIndex: number;
-  selected: number;
-  correct: boolean;
+ questionIndex: number;
+ selected: number;
+ correct: boolean;
 }
 const C = "#D946EF";
 const CL = "rgba(217,70,239,";
 
 const BRAND_TAGS = [
-  "Luxury",
-  "Eco-Friendly",
-  "Youth",
-  "Tech",
-  "Minimalist",
-  "Bold",
-  "Playful",
-  "Professional",
-  "Local",
-  "Global",
+ "Luxury",
+ "Eco-Friendly",
+ "Youth",
+ "Tech",
+ "Minimalist",
+ "Bold",
+ "Playful",
+ "Professional",
+ "Local",
+ "Global",
 ];
 const INFLUENCER_TAGS = [
-  "Luxury",
-  "Eco-Friendly",
-  "Youth",
-  "Tech",
-  "Minimalist",
-  "Bold",
-  "Playful",
-  "Professional",
-  "Local",
-  "Global",
+ "Luxury",
+ "Eco-Friendly",
+ "Youth",
+ "Tech",
+ "Minimalist",
+ "Bold",
+ "Playful",
+ "Professional",
+ "Local",
+ "Global",
 ];
 
 const LESSONS = [
-  {
-    id: "evolusi-influencer",
-    title: "Evolusi Influencer Marketing",
-    concept: "Dari Endorsement ke DNA Matching",
-    body: `Influencer marketing telah berevolusi dari sekadar **endorsement selebriti** menjadi ekosistem kompleks yang membutuhkan pendekatan data-driven. Era "kirim produk gratis ke influencer terkenal" sudah berakhir.
+ {
+ id: "evolusi-influencer",
+ title: "Evolusi Influencer Marketing",
+ concept: "Dari Endorsement ke DNA Matching",
+ body: `Influencer marketing telah berevolusi dari sekadar **endorsement selebriti** menjadi ekosistem kompleks yang membutuhkan pendekatan data-driven. Era "kirim produk gratis ke influencer terkenal" sudah berakhir.
 
 **3 Era Influencer Marketing:**
 
-**Era 1 â€” Celebrity Endorsement (2010-2016):** Bayar selebriti mahal, harapkan exposure. Metrik: followers count. Masalah: ROI tidak terukur, audiens tidak targeted.
+**Era 1 — Celebrity Endorsement (2010-2016):** Bayar selebriti mahal, harapkan exposure. Metrik: followers count. Masalah: ROI tidak terukur, audiens tidak targeted.
 
-**Era 2 â€” Micro-Influencer Rise (2017-2022):** Fokus ke influencer kecil (10K-100K followers) dengan engagement rate tinggi. Metrik: engagement rate. Masalah: masih tebak-tebak vibes matching.
+**Era 2 — Micro-Influencer Rise (2017-2022):** Fokus ke influencer kecil (10K-100K followers) dengan engagement rate tinggi. Metrik: engagement rate. Masalah: masih tebak-tebak vibes matching.
 
-**Era 3 â€” DNA Matching (2023+):** Menggunakan AI dan vector search untuk mencocokkan "DNA brand" dengan "DNA influencer" secara multidimensional â€” bukan hanya followers atau engagement, tapi values, audiens overlap, content style, dan brand safety score.
+**Era 3 — DNA Matching (2023+):** Menggunakan AI dan vector search untuk mencocokkan "DNA brand" dengan "DNA influencer" secara multidimensional — bukan hanya followers atau engagement, tapi values, audiens overlap, content style, dan brand safety score.
 
 Di Era 3, pertanyaannya bukan "influencer mana yang paling terkenal?" tapi **"influencer mana yang paling ALIGNED dengan brand DNA kita?"**`,
-    insight:
-      "Kolaborasi dengan influencer yang memiliki DNA match >80% menghasilkan conversion 5.2x lebih tinggi dari kolaborasi berbasis followers count saja",
-    challenge:
-      "**BRAND DNA MAP:** Definisikan 5 atribut DNA brand kamu (values, tone, audiens demographic, aesthetic, price positioning). Ini akan menjadi basis matching!",
-    quiz: {
-      question:
-        "Brand skincare premium natural ingin kolaborasi influencer. Pilihan: (A) Beauty influencer 500K followers, konten agresif/hard sell. (B) Lifestyle influencer 50K followers, konten mindful living & sustainability. Mana yang lebih aligned?",
-      options: [
-        "A karena followers 10x lebih banyak",
-        "B â€” DNA 'mindful living & sustainability' match dengan brand skincare natural premium, meskipun followers lebih kecil",
-        "Gabungkan keduanya untuk coverage maksimal",
-        "Tidak bisa ditentukan tanpa data engagement rate",
-      ],
-      correct: 1,
-      explanation:
-        "DNA matching memprioritaskan alignment values dan audiens overlap di atas followers count. Influencer B memiliki audiens yang secara natural tertarik dengan produk skincare premium natural, sehingga conversion potential jauh lebih tinggi.",
-    },
-  },
-  {
-    id: "vector-search",
-    title: "Vector Search & Semantic Matching",
-    concept: "Teknologi di Balik DNA Matching",
-    body: `**Vector search** adalah teknologi AI yang mengubah teks, gambar, dan konten menjadi representasi numerik multidimensional (vectors). Dua vector yang "dekat" di ruang multidimensi berarti kontennya secara semantik mirip.
+ insight:
+ "Kolaborasi dengan influencer yang memiliki DNA match >80% menghasilkan conversion 5.2x lebih tinggi dari kolaborasi berbasis followers count saja",
+ challenge:
+ "**BRAND DNA MAP:** Definisikan 5 atribut DNA brand kamu (values, tone, audiens demographic, aesthetic, price positioning). Ini akan menjadi basis matching!",
+ quiz: {
+ question:
+ "Brand skincare premium natural ingin kolaborasi influencer. Pilihan: (A) Beauty influencer 500K followers, konten agresif/hard sell. (B) Lifestyle influencer 50K followers, konten mindful living & sustainability. Mana yang lebih aligned?",
+ options: [
+ "A karena followers 10x lebih banyak",
+ "B — DNA 'mindful living & sustainability' match dengan brand skincare natural premium, meskipun followers lebih kecil",
+ "Gabungkan keduanya untuk coverage maksimal",
+ "Tidak bisa ditentukan tanpa data engagement rate",
+ ],
+ correct: 1,
+ explanation:
+ "DNA matching memprioritaskan alignment values dan audiens overlap di atas followers count. Influencer B memiliki audiens yang secara natural tertarik dengan produk skincare premium natural, sehingga conversion potential jauh lebih tinggi.",
+ },
+ },
+ {
+ id: "vector-search",
+ title: "Vector Search & Semantic Matching",
+ concept: "Teknologi di Balik DNA Matching",
+ body: `**Vector search** adalah teknologi AI yang mengubah teks, gambar, dan konten menjadi representasi numerik multidimensional (vectors). Dua vector yang "dekat" di ruang multidimensi berarti kontennya secara semantik mirip.
 
 **Cara kerja untuk Influencer Matching:**
 
-**Step 1 â€” Vectorize Brand DNA:** Konversi brand guidelines, past content, dan values statement menjadi vector menggunakan embedding model (misal: OpenAI Ada, Sentence-BERT).
+**Step 1 — Vectorize Brand DNA:** Konversi brand guidelines, past content, dan values statement menjadi vector menggunakan embedding model (misal: OpenAI Ada, Sentence-BERT).
 
-**Step 2 â€” Vectorize Influencer DNA:** Konversi konten influencer (captions, video transcripts, bio, comments) menjadi vector.
+**Step 2 — Vectorize Influencer DNA:** Konversi konten influencer (captions, video transcripts, bio, comments) menjadi vector.
 
-**Step 3 â€” Similarity Search:** Hitung cosine similarity antara brand vector and influencer vector. Skor 0-1, semakin mendekati 1 = semakin match.
+**Step 3 — Similarity Search:** Hitung cosine similarity antara brand vector and influencer vector. Skor 0-1, semakin mendekati 1 = semakin match.
 
-**Step 4 â€” Multi-Dimensional Ranking:** Ranking influencer berdasarkan: content style match (30%), audiens overlap (25%), values alignment (25%), engagement quality (20%).
+**Step 4 — Multi-Dimensional Ranking:** Ranking influencer berdasarkan: content style match (30%), audiens overlap (25%), values alignment (25%), engagement quality (20%).
 
 Keunggulan pendekatan ini vs manual: bisa memproses ribuan influencer dalam hitungan menit dan menangkap nuansa semantik yang manusia bisa lewatkan.`,
-    insight:
-      "Vector-based matching mengurangi waktu seleksi influencer dari 2 minggu menjadi 2 jam untuk database 10.000 influencer",
-    challenge:
-      "**SEMANTIC EXERCISE:** Tulis 3 kalimat yang mendeskripsikan brand kamu dan 3 kalimat dari konten influencer favorit. Tanyakan ke AI Lab: seberapa similar secara semantik?",
-    quiz: {
-      question:
-        "Cosine similarity antara brand vector dan influencer vector = 0.92. Apa interpretasinya?",
-      options: [
-        "Match rendah, cari influencer lain",
-        "Match sangat tinggi (92%) â€” konten dan values influencer sangat aligned dengan brand DNA",
-        "Angka 0.92 tidak bermakna tanpa konteks",
-        "Perlu tambahan data engagement sebelum bisa interpretasi",
-      ],
-      correct: 1,
-      explanation:
-        "Cosine similarity 0.92 dari skala 0-1 menunjukkan alignment yang sangat kuat. Dalam praktik, skor di atas 0.8 sudah dianggap excellent match. Ini berarti konten, tone, dan values influencer secara semantik sangat mirip dengan brand.",
-    },
-  },
-  {
-    id: "dna-matching",
-    title: "DNA Matching: Vibe, Audiens, Values",
-    concept: "Framework Multi-Dimensi untuk Seleksi",
-    body: `DNA Matching melampaui similarity score tunggal â€” ia melihat **keselarasan di multiple dimensi** untuk memastikan kolaborasi yang authentic dan efektif.
+ insight:
+ "Vector-based matching mengurangi waktu seleksi influencer dari 2 minggu menjadi 2 jam untuk database 10.000 influencer",
+ challenge:
+ "**SEMANTIC EXERCISE:** Tulis 3 kalimat yang mendeskripsikan brand kamu dan 3 kalimat dari konten influencer favorit. Tanyakan ke AI Lab: seberapa similar secara semantik?",
+ quiz: {
+ question:
+ "Cosine similarity antara brand vector dan influencer vector = 0.92. Apa interpretasinya?",
+ options: [
+ "Match rendah, cari influencer lain",
+ "Match sangat tinggi (92%) — konten dan values influencer sangat aligned dengan brand DNA",
+ "Angka 0.92 tidak bermakna tanpa konteks",
+ "Perlu tambahan data engagement sebelum bisa interpretasi",
+ ],
+ correct: 1,
+ explanation:
+ "Cosine similarity 0.92 dari skala 0-1 menunjukkan alignment yang sangat kuat. Dalam praktik, skor di atas 0.8 sudah dianggap excellent match. Ini berarti konten, tone, dan values influencer secara semantik sangat mirip dengan brand.",
+ },
+ },
+ {
+ id: "dna-matching",
+ title: "DNA Matching: Vibe, Audiens, Values",
+ concept: "Framework Multi-Dimensi untuk Seleksi",
+ body: `DNA Matching melampaui similarity score tunggal — ia melihat **keselarasan di multiple dimensi** untuk memastikan kolaborasi yang authentic dan efektif.
 
 **5 Dimensi DNA Matching:**
 
@@ -136,34 +136,34 @@ Keunggulan pendekatan ini vs manual: bisa memproses ribuan influencer dalam hitu
 
 **3. Values Alignment:** Apakah values yang disuarakan influencer konsisten dengan brand values? Eco-friendly brand Ã— influencer yang promosikan fast fashion = reputational risk.
 
-**4. Engagement Quality:** Bukan hanya engagement rate, tapi KUALITAS â€” apakah komentar menunjukkan genuine interest atau hanya bot/generik?
+**4. Engagement Quality:** Bukan hanya engagement rate, tapi KUALITAS — apakah komentar menunjukkan genuine interest atau hanya bot/generik?
 
 **5. Brand Safety Score:** Riwayat kontroversi, konten sensitif, atau partnership dengan kompetitor. Satu skandal influencer bisa berdampak ke semua brand yang berasosiasi.
 
 **Scoring Model:** Setiap dimensi diberi bobot, total score menentukan tier: Tier A (>85%), Tier B (70-85%), Tier C (<70%). Hanya Tier A yang masuk shortlist final.`,
-    insight:
-      "Brand yang menggunakan 5-dimensi DNA matching mengalami 73% lebih sedikit 'brand-influencer mismatch incidents' dibanding yang hanya berdasarkan engagement rate",
-    challenge:
-      "**SCORING CARD:** Buat scoring card untuk 3 influencer di niche kamu. Beri skor 1-10 untuk setiap dimensi DNA. Siapa yang mendapat total score tertinggi?",
-    quiz: {
-      question:
-        "Influencer memiliki engagement rate 8% (sangat tinggi) tapi 40% komentar terdeteksi dari bot. Apa dampaknya pada DNA matching?",
-      options: [
-        "Tidak masalah karena engagement rate-nya tinggi",
-        "Engagement Quality score harus turun drastis â€” bot engagement menunjukkan audiens tidak genuine dan ROI kolaborasi akan rendah",
-        "Bot engagement justru bagus karena meningkatkan social proof",
-        "Hanya perlu diperhatikan jika bot percentage di atas 60%",
-      ],
-      correct: 1,
-      explanation:
-        "40% bot comments berarti hampir setengah 'engagement' itu palsu. Real engagement rate-nya sebenarnya sekitar 4.8%. Lebih penting, ini menunjukkan audiens yang tidak genuine â€” konten brand di akun ini akan ditampilkan ke banyak non-human viewers yang tidak bisa membeli.",
-    },
-  },
-  {
-    id: "roi-kolaborasi",
-    title: "Kalkulasi ROI Kolaborasi",
-    concept: "Mengukur Keberhasilan Partnership",
-    body: `Setiap kolaborasi influencer harus bisa diukur ROI-nya. Tanpa measurement, kamu tidak tahu apakah investasi menghasilkan return atau sekadar burning cash.
+ insight:
+ "Brand yang menggunakan 5-dimensi DNA matching mengalami 73% lebih sedikit 'brand-influencer mismatch incidents' dibanding yang hanya berdasarkan engagement rate",
+ challenge:
+ "**SCORING CARD:** Buat scoring card untuk 3 influencer di niche kamu. Beri skor 1-10 untuk setiap dimensi DNA. Siapa yang mendapat total score tertinggi?",
+ quiz: {
+ question:
+ "Influencer memiliki engagement rate 8% (sangat tinggi) tapi 40% komentar terdeteksi dari bot. Apa dampaknya pada DNA matching?",
+ options: [
+ "Tidak masalah karena engagement rate-nya tinggi",
+ "Engagement Quality score harus turun drastis — bot engagement menunjukkan audiens tidak genuine dan ROI kolaborasi akan rendah",
+ "Bot engagement justru bagus karena meningkatkan social proof",
+ "Hanya perlu diperhatikan jika bot percentage di atas 60%",
+ ],
+ correct: 1,
+ explanation:
+ "40% bot comments berarti hampir setengah 'engagement' itu palsu. Real engagement rate-nya sebenarnya sekitar 4.8%. Lebih penting, ini menunjukkan audiens yang tidak genuine — konten brand di akun ini akan ditampilkan ke banyak non-human viewers yang tidak bisa membeli.",
+ },
+ },
+ {
+ id: "roi-kolaborasi",
+ title: "Kalkulasi ROI Kolaborasi",
+ concept: "Mengukur Keberhasilan Partnership",
+ body: `Setiap kolaborasi influencer harus bisa diukur ROI-nya. Tanpa measurement, kamu tidak tahu apakah investasi menghasilkan return atau sekadar burning cash.
 
 **Framework ROI Influencer:**
 
@@ -183,984 +183,1058 @@ Keunggulan pendekatan ini vs manual: bisa memproses ribuan influencer dalam hitu
 - ROI < 50% = Poor, evaluasi apakah influencer match masih valid
 
 **Pro tip:** Selalu berikan kode promo unik per influencer untuk direct tracking. Supplements dengan UTM links and monitor brand mention volume 2 minggu sebelum vs selama vs 2 minggu setelah campaign.`,
-    insight:
-      "Campaign dengan kode promo unik per influencer memiliki 4x measurement accuracy dibanding campaign tanpa tracking mechanism",
-    challenge:
-      "**ROI CALCULATOR:** Estimasi biaya kolaborasi dengan 1 influencer di niche kamu. Tentukan: fee, produk, production cost. Lalu tentukan: berapa penjualan minimal yang dibutuhkan untuk ROI 200%?",
-    quiz: {
-      question:
-        "Campaign influencer menghasilkan ROI 80% dari direct sales. Tapi brand search volume naik 150% selama campaign. Bagaimana assessment-nya?",
-      options: [
-        "ROI 80% berarti campaign gagal",
-        "Direct ROI 80% marginal, tapi indirect impact (brand search +150%) menunjukkan massive awareness lift â€” total ROI kemungkinan jauh lebih tinggi dari 80% jika indirect revenue dihitung",
-        "Brand search volume tidak relevan untuk ROI calculation",
-        "Hanya direct sales yang penting, indirect metrics tidak bisa diandalkan",
-      ],
-      correct: 1,
-      explanation:
-        "ROI 80% dari direct sales SAJA sudah mendekati breakeven. Brand search volume +150% menunjukkan bahwa banyak orang yang terpapar campaign lalu melakukan research sendiri â€” sebagian dari mereka akan convert melalui channel lain (organic, Google ads). True ROI kemungkinan 200-400% jika indirect dimasukkan.",
-    },
-  },
+ insight:
+ "Campaign dengan kode promo unik per influencer memiliki 4x measurement accuracy dibanding campaign tanpa tracking mechanism",
+ challenge:
+ "**ROI CALCULATOR:** Estimasi biaya kolaborasi dengan 1 influencer di niche kamu. Tentukan: fee, produk, production cost. Lalu tentukan: berapa penjualan minimal yang dibutuhkan untuk ROI 200%?",
+ quiz: {
+ question:
+ "Campaign influencer menghasilkan ROI 80% dari direct sales. Tapi brand search volume naik 150% selama campaign. Bagaimana assessment-nya?",
+ options: [
+ "ROI 80% berarti campaign gagal",
+ "Direct ROI 80% marginal, tapi indirect impact (brand search +150%) menunjukkan massive awareness lift — total ROI kemungkinan jauh lebih tinggi dari 80% jika indirect revenue dihitung",
+ "Brand search volume tidak relevan untuk ROI calculation",
+ "Hanya direct sales yang penting, indirect metrics tidak bisa diandalkan",
+ ],
+ correct: 1,
+ explanation:
+ "ROI 80% dari direct sales SAJA sudah mendekati breakeven. Brand search volume +150% menunjukkan bahwa banyak orang yang terpapar campaign lalu melakukan research sendiri — sebagian dari mereka akan convert melalui channel lain (organic, Google ads). True ROI kemungkinan 200-400% jika indirect dimasukkan.",
+ },
+ },
+ {
+ id: "influencer-brief",
+ title: "Kontrak & Brief Kolaborasi",
+ concept: "Menyeimbangkan Kebebasan Kreatif dan Guideline Brand",
+ body: `Salah satu penyebab kegagalan campaign influencer yang paling sering terjadi adalah brief yang terlalu kaku atau kontrak yang tidak jelas. **Kontrak & Brief Kolaborasi** yang efektif harus memberikan arahan yang kuat tanpa mematikan kreativitas asli sang kreator.
+
+Pilar utama dalam menyusun brief & kontrak kolaborasi:
+
+**1. Creative Freedom vs. Brand Guidelines:** Berikan batasan yang jelas mengenai apa yang *boleh* (Do's) dan *tidak boleh* (Dont's) dikatakan (misal: dilarang menyebut kompetitor, harus menyebut USP utama). Namun, biarkan gaya penyampaian, humor, dan editing tetap menggunakan gaya khas kreator tersebut.
+
+**2. Hak Cipta & Penggunaan Konten (Usage Rights):** Tentukan dengan jelas di dalam kontrak apakah Anda memiliki hak untuk menggunakan konten mereka sebagai iklan berbayar (ad whitelisting), me-repost di akun brand, dan untuk berapa lama hak tersebut berlaku.
+
+**3. Deliverables & Timeline:** Jabarkan detail tipe postingan (misal: 1x Reels, 1x TikTok, 3x Stories dengan link), format video (1080x1920), dan tanggal pasti draf harus dikirim untuk disetujui (QC) sebelum diposting.`,
+ insight:
+ "Brief yang menyertakan 'Do's & Dont's' sederhana namun memberikan kebebasan visual 70% lebih mungkin menghasilkan konten yang disukai audiens daripada brief dengan naskah kaku.",
+ challenge: `**BUAT MINI BRIEF:** Susun satu draf brief singkat (1 halaman) untuk campaign produk Anda. Tuliskan 3 USP utama yang wajib disebut, 3 larangan keras (Dont's), dan 1 arahan konsep kreatif untuk influencer!`,
+ quiz: {
+ question:
+ "Mengapa memberikan kebebasan kreatif kepada influencer dalam membuat konten itu penting?",
+ options: [
+ "Agar brand tidak perlu repot memikirkan konsep konten",
+ "Karena influencer paling memahami preferensi visual dan bahasa yang disukai oleh komunitas pengikut (follower) mereka",
+ "Agar biaya fee kolaborasi bisa ditawar lebih murah",
+ "Kebebasan kreatif sebenarnya tidak penting, naskah kaku selalu lebih aman",
+ ],
+ correct: 1,
+ explanation:
+ "Pengikut menyukai influencer karena otentisitasnya. Jika konten terasa terlalu seperti iklan buatan korporasi yang kaku, engagement akan anjlok. Influencer tahu cara terbaik membungkus pesan brand agar diterima secara alami oleh audiens mereka.",
+ },
+ },
+ {
+ id: "partnership-strategy",
+ title: "Long-term Partnership vs One-off",
+ concept: "Membangun Brand Ambassador Dibanding Sekadar Transaksi",
+ body: `Banyak brand terjebak dalam campaign satu kali tayang (**One-off Campaign**). Padahal, untuk membangun kepercayaan yang mendalam, strategi **Kemitraan Jangka Panjang (Long-term Partnership)** sering kali jauh lebih efektif.
+
+Perbandingan kedua strategi ini:
+
+**One-off Campaign (Sekali Tayang):** Cocok untuk meluncurkan produk baru atau flash sale di mana Anda butuh jangkauan (reach) yang cepat dan luas dari banyak wajah berbeda. Kelemahannya: kurang memiliki kedalaman trust.
+
+**Long-term Partnership (Brand Ambassador):** Influencer mempromosikan brand Anda secara konsisten selama 6-12 bulan. Kelebihannya: audiens melihat hubungan yang otentik antara influencer dan brand (bukan sekadar iklan berbayar). Kepercayaan terbangun secara kumulatif, menghasilkan conversion rate yang jauh lebih stabil.
+
+**Kapan memilih?** Gunakan kombinasi 80/20. Alokasikan 80% budget influencer Anda untuk 3-5 partner jangka panjang yang performanya terbukti bagus, dan 20% sisanya untuk eksperimen dengan wajah-wajah baru secara one-off.`,
+ insight:
+ "Konsumen membutuhkan rata-rata 7 kali paparan (Rule of 7) sebelum memutuskan membeli produk baru. Kemitraan jangka panjang memastikan frekuensi paparan ini tercapai.",
+ challenge: `**PILIH BRAND AMBASSADOR:** Evaluasi daftar influencer yang pernah bekerja sama dengan Anda. Pilih 1 yang paling berpotensi menjadi partner jangka panjang, dan jelaskan alasan strategis Anda!`,
+ quiz: {
+ question:
+ "Apa keuntungan utama dari menjalankan strategi Long-term Partnership dengan influencer?",
+ options: [
+ "Mengurangi biaya produksi konten menjadi nol",
+ "Membangun kredibilitas dan kepercayaan kumulatif di mata audiens melalui paparan brand yang konsisten dan otentik",
+ "Menghilangkan kebutuhan akan kontrak hukum",
+ "Memastikan influencer tidak boleh bekerja sama dengan industri apa pun selamanya",
+ ],
+ correct: 1,
+ explanation:
+ "Dengan mempromosikan produk secara berulang dalam jangka panjang, influencer menunjukkan bahwa mereka benar-benar menggunakan dan mempercayai brand tersebut. Hal ini menciptakan trust kumulatif yang sulit dicapai lewat postingan sekali tayang.",
+ },
+ },
 ];
 
 function VennDiagramViz() {
-  const [brandSelected, setBrandSelected] = useState<Set<string>>(
-    new Set(["Eco-Friendly", "Minimalist", "Youth"]),
-  );
-  const [influencerSelected, setInfluencerSelected] = useState<Set<string>>(
-    new Set(["Bold", "Youth", "Eco-Friendly"]),
-  );
-  const overlap = [...brandSelected].filter((t) => influencerSelected.has(t));
-  const matchRate =
-    brandSelected.size > 0 && influencerSelected.size > 0
-      ? Math.round(
-          (overlap.length /
-            Math.max(brandSelected.size, influencerSelected.size)) *
-            100,
-        )
-      : 0;
-  const separation = 100 - matchRate;
-  const toggle = (
-    set: Set<string>,
-    setter: React.Dispatch<React.SetStateAction<Set<string>>>,
-    tag: string,
-  ) => {
-    const n = new Set(set);
-    if (n.has(tag)) n.delete(tag);
-    else n.add(tag);
-    setter(n);
-  };
-  return (
-    <div
-      style={{
-        background: "var(--color-surface)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius-xl)",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          padding: "16px 24px",
-          borderBottom: "1px solid var(--color-border)",
-          background: "var(--color-surface-2)",
-        }}
-      >
-        <div style={{ fontWeight: 800, fontSize: "1rem" }}>
-          Venn Diagram: Brand Ã— Influencer DNA Match
-        </div>
-        <div className="caption" style={{ marginTop: 4 }}>
-          Pilih tags untuk brand dan influencer, lihat overlap berubah
-        </div>
-      </div>
-      <div style={{ padding: 24 }}>
-        <div
-          style={{
-            display: "flex",
-            gap: 20,
-            marginBottom: 20,
-            flexWrap: "wrap",
-          }}
-        >
-          <div style={{ flex: "1 1 200px" }}>
-            <div
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                color: C,
-                marginBottom: 8,
-              }}
-            >
-              ðŸ¢ Brand Tags
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {BRAND_TAGS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => toggle(brandSelected, setBrandSelected, t)}
-                  style={{
-                    padding: "4px 10px",
-                    borderRadius: 100,
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    border: brandSelected.has(t)
-                      ? `2px solid ${C}`
-                      : "1px solid var(--color-border)",
-                    background: brandSelected.has(t)
-                      ? `${CL}0.15)`
-                      : "var(--color-surface-2)",
-                    color: brandSelected.has(t) ? C : "var(--color-text-muted)",
-                    cursor: "pointer",
-                    fontFamily: "var(--font-sans)",
-                  }}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div style={{ flex: "1 1 200px" }}>
-            <div
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                color: "#22D3EE",
-                marginBottom: 8,
-              }}
-            >
-              ðŸ‘¤ Influencer Tags
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {INFLUENCER_TAGS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() =>
-                    toggle(influencerSelected, setInfluencerSelected, t)
-                  }
-                  style={{
-                    padding: "4px 10px",
-                    borderRadius: 100,
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    border: influencerSelected.has(t)
-                      ? "2px solid #22D3EE"
-                      : "1px solid var(--color-border)",
-                    background: influencerSelected.has(t)
-                      ? "rgba(34,211,238,0.15)"
-                      : "var(--color-surface-2)",
-                    color: influencerSelected.has(t)
-                      ? "#22D3EE"
-                      : "var(--color-text-muted)",
-                    cursor: "pointer",
-                    fontFamily: "var(--font-sans)",
-                  }}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-        {/* Venn Circles */}
-        <div
-          style={{
-            position: "relative",
-            height: 180,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <motion.div
-            animate={{ x: -60 + separation * 0.3 }}
-            transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            style={{
-              width: 140,
-              height: 140,
-              borderRadius: "50%",
-              background: `${CL}0.15)`,
-              border: `2px solid ${CL}0.5)`,
-              position: "absolute",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.65rem",
-                fontWeight: 700,
-                color: C,
-                position: "absolute",
-                left: 10,
-                textAlign: "center",
-              }}
-            >
-              Brand
-              <br />
-              {brandSelected.size} tags
-            </span>
-          </motion.div>
-          <motion.div
-            animate={{ x: 60 - separation * 0.3 }}
-            transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            style={{
-              width: 140,
-              height: 140,
-              borderRadius: "50%",
-              background: "rgba(34,211,238,0.15)",
-              border: "2px solid rgba(34,211,238,0.5)",
-              position: "absolute",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.65rem",
-                fontWeight: 700,
-                color: "#22D3EE",
-                position: "absolute",
-                right: 10,
-                textAlign: "center",
-              }}
-            >
-              Influencer
-              <br />
-              {influencerSelected.size} tags
-            </span>
-          </motion.div>
-          {overlap.length > 0 && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              style={{
-                position: "absolute",
-                zIndex: 2,
-                background: "rgba(255,255,255,0.9)",
-                borderRadius: 100,
-                padding: "4px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: 900,
-                  color: "#16A34A",
-                }}
-              >
-                {matchRate}%
-              </span>
-              <span
-                style={{
-                  fontSize: "0.55rem",
-                  fontWeight: 700,
-                  color: "#16A34A",
-                }}
-              >
-                MATCH
-              </span>
-            </motion.div>
-          )}
-        </div>
-        <motion.div
-          key={matchRate}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          style={{
-            marginTop: 12,
-            padding: "14px 16px",
-            background:
-              matchRate > 70
-                ? "rgba(34,197,94,0.08)"
-                : matchRate > 40
-                  ? `${CL}0.06)`
-                  : "rgba(239,68,68,0.08)",
-            border: `1px solid ${matchRate > 70 ? "rgba(34,197,94,0.3)" : matchRate > 40 ? `${CL}0.2)` : "rgba(239,68,68,0.3)"}`,
-            borderRadius: "var(--radius-sm)",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              fontWeight: 700,
-              fontSize: "0.875rem",
-              color:
-                matchRate > 70 ? "#16A34A" : matchRate > 40 ? C : "#DC2626",
-              marginBottom: 4,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-            }}
-          >
-            <Icon
-              icon={
-                matchRate > 70
-                  ? "solar:target-bold-duotone"
-                  : matchRate > 40
-                    ? "solar:bolt-bold-duotone"
-                    : "solar:danger-bold-duotone"
-              }
-              width={18}
-            />
-            {matchRate > 70
-              ? "Excellent Match!"
-              : matchRate > 40
-                ? "Moderate Match"
-                : "Low Match"}
-          </div>
-          <div
-            style={{
-              fontSize: "0.8125rem",
-              color: "var(--color-text-secondary)",
-            }}
-          >
-            {overlap.length > 0
-              ? `Overlap tags: ${overlap.join(", ")}`
-              : "Tidak ada overlap â€” influencer ini tidak cocok dengan brand DNA"}
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
+ const [brandSelected, setBrandSelected] = useState<Set<string>>(
+ new Set(["Eco-Friendly", "Minimalist", "Youth"]),
+ );
+ const [influencerSelected, setInfluencerSelected] = useState<Set<string>>(
+ new Set(["Bold", "Youth", "Eco-Friendly"]),
+ );
+ const overlap = [...brandSelected].filter((t) => influencerSelected.has(t));
+ const matchRate =
+ brandSelected.size > 0 && influencerSelected.size > 0
+ ? Math.round(
+ (overlap.length /
+ Math.max(brandSelected.size, influencerSelected.size)) *
+ 100,
+ )
+ : 0;
+ const separation = 100 - matchRate;
+ const toggle = (
+ set: Set<string>,
+ setter: React.Dispatch<React.SetStateAction<Set<string>>>,
+ tag: string,
+ ) => {
+ const n = new Set(set);
+ if (n.has(tag)) n.delete(tag);
+ else n.add(tag);
+ setter(n);
+ };
+ return (
+ <div
+ style={{
+ background: "var(--color-surface)",
+ border: "1px solid var(--color-border)",
+ borderRadius: "var(--radius-xl)",
+ overflow: "hidden",
+ }}
+ >
+ <div
+ style={{
+ padding: "16px 24px",
+ borderBottom: "1px solid var(--color-border)",
+ background: "var(--color-surface-2)",
+ }}
+ >
+ <div style={{ fontWeight: 800, fontSize: "1rem" }}>
+ Venn Diagram: Brand Ã— Influencer DNA Match
+ </div>
+ <div className="caption" style={{ marginTop: 4 }}>
+ Pilih tags untuk brand dan influencer, lihat overlap berubah
+ </div>
+ </div>
+ <div style={{ padding: 24 }}>
+ <div
+ style={{
+ display: "flex",
+ gap: 20,
+ marginBottom: 20,
+ flexWrap: "wrap",
+ }}
+ >
+ <div style={{ flex: "1 1 200px" }}>
+ <div
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: C,
+ marginBottom: 8,
+ }}
+ >
+ ðŸ¢ Brand Tags
+ </div>
+ <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+ {BRAND_TAGS.map((t) => (
+ <button
+ key={t}
+ onClick={() => toggle(brandSelected, setBrandSelected, t)}
+ style={{
+ padding: "4px 10px",
+ borderRadius: 100,
+ fontSize: "0.7rem",
+ fontWeight: 700,
+ border: brandSelected.has(t)
+ ? `2px solid ${C}`
+ : "1px solid var(--color-border)",
+ background: brandSelected.has(t)
+ ? `${CL}0.15)`
+ : "var(--color-surface-2)",
+ color: brandSelected.has(t) ? C : "var(--color-text-muted)",
+ cursor: "pointer",
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ {t}
+ </button>
+ ))}
+ </div>
+ </div>
+ <div style={{ flex: "1 1 200px" }}>
+ <div
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "#22D3EE",
+ marginBottom: 8,
+ }}
+ >
+ ðŸ‘¤ Influencer Tags
+ </div>
+ <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+ {INFLUENCER_TAGS.map((t) => (
+ <button
+ key={t}
+ onClick={() =>
+ toggle(influencerSelected, setInfluencerSelected, t)
+ }
+ style={{
+ padding: "4px 10px",
+ borderRadius: 100,
+ fontSize: "0.7rem",
+ fontWeight: 700,
+ border: influencerSelected.has(t)
+ ? "2px solid #22D3EE"
+ : "1px solid var(--color-border)",
+ background: influencerSelected.has(t)
+ ? "rgba(34,211,238,0.15)"
+ : "var(--color-surface-2)",
+ color: influencerSelected.has(t)
+ ? "#22D3EE"
+ : "var(--color-text-muted)",
+ cursor: "pointer",
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ {t}
+ </button>
+ ))}
+ </div>
+ </div>
+ </div>
+ {/* Venn Circles */}
+ <div
+ style={{
+ position: "relative",
+ height: 180,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ }}
+ >
+ <motion.div
+ animate={{ x: -60 + separation * 0.3 }}
+ transition={{ type: "spring", stiffness: 200, damping: 25 }}
+ style={{
+ width: 140,
+ height: 140,
+ borderRadius: "50%",
+ background: `${CL}0.15)`,
+ border: `2px solid ${CL}0.5)`,
+ position: "absolute",
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ }}
+ >
+ <span
+ style={{
+ fontSize: "0.65rem",
+ fontWeight: 700,
+ color: C,
+ position: "absolute",
+ left: 10,
+ textAlign: "center",
+ }}
+ >
+ Brand
+ <br />
+ {brandSelected.size} tags
+ </span>
+ </motion.div>
+ <motion.div
+ animate={{ x: 60 - separation * 0.3 }}
+ transition={{ type: "spring", stiffness: 200, damping: 25 }}
+ style={{
+ width: 140,
+ height: 140,
+ borderRadius: "50%",
+ background: "rgba(34,211,238,0.15)",
+ border: "2px solid rgba(34,211,238,0.5)",
+ position: "absolute",
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ }}
+ >
+ <span
+ style={{
+ fontSize: "0.65rem",
+ fontWeight: 700,
+ color: "#22D3EE",
+ position: "absolute",
+ right: 10,
+ textAlign: "center",
+ }}
+ >
+ Influencer
+ <br />
+ {influencerSelected.size} tags
+ </span>
+ </motion.div>
+ {overlap.length > 0 && (
+ <motion.div
+ initial={{ scale: 0 }}
+ animate={{ scale: 1 }}
+ style={{
+ position: "absolute",
+ zIndex: 2,
+ background: "rgba(255,255,255,0.9)",
+ borderRadius: 100,
+ padding: "4px 12px",
+ display: "flex",
+ flexDirection: "column",
+ alignItems: "center",
+ }}
+ >
+ <span
+ style={{
+ fontSize: "1.5rem",
+ fontWeight: 900,
+ color: "#16A34A",
+ }}
+ >
+ {matchRate}%
+ </span>
+ <span
+ style={{
+ fontSize: "0.55rem",
+ fontWeight: 700,
+ color: "#16A34A",
+ }}
+ >
+ MATCH
+ </span>
+ </motion.div>
+ )}
+ </div>
+ <motion.div
+ key={matchRate}
+ initial={{ opacity: 0, y: 10 }}
+ animate={{ opacity: 1, y: 0 }}
+ style={{
+ marginTop: 12,
+ padding: "14px 16px",
+ background:
+ matchRate > 70
+ ? "rgba(34,197,94,0.08)"
+ : matchRate > 40
+ ? `${CL}0.06)`
+ : "rgba(239,68,68,0.08)",
+ border: `1px solid ${matchRate > 70 ? "rgba(34,197,94,0.3)" : matchRate > 40 ? `${CL}0.2)` : "rgba(239,68,68,0.3)"}`,
+ borderRadius: "var(--radius-sm)",
+ textAlign: "center",
+ }}
+ >
+ <div
+ style={{
+ fontWeight: 700,
+ fontSize: "0.875rem",
+ color:
+ matchRate > 70 ? "#16A34A" : matchRate > 40 ? C : "#DC2626",
+ marginBottom: 4,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ gap: 8,
+ }}
+ >
+ <Icon
+ icon={
+ matchRate > 70
+ ? "solar:target-bold-duotone"
+ : matchRate > 40
+ ? "solar:bolt-bold-duotone"
+ : "solar:danger-bold-duotone"
+ }
+ width={18}
+ />
+ {matchRate > 70
+ ? "Excellent Match!"
+ : matchRate > 40
+ ? "Moderate Match"
+ : "Low Match"}
+ </div>
+ <div
+ style={{
+ fontSize: "0.8125rem",
+ color: "var(--color-text-secondary)",
+ }}
+ >
+ {overlap.length > 0
+ ? `Overlap tags: ${overlap.join(", ")}`
+ : "Tidak ada overlap — influencer ini tidak cocok dengan brand DNA"}
+ </div>
+ </motion.div>
+ </div>
+ </div>
+ );
 }
 
 export default function InfluencerDNAPage() {
-  const { user }   = useAuth();
-  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
-    useModuleProgress("influencer-dna", user?.uid, LESSONS.length);
+ const { user } = useAuth();
+ const { completedLessons, quizAnswers, isModuleComplete, saveAnswer, resetAnswer } =
+ useModuleProgress("influencer-dna", user?.uid, LESSONS.length);
 
-  const [currentLesson, setCurrentLesson] = useState(0);
-  const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
-  const [showAILab, setShowAILab] = useState(false);
+ const [currentLesson, setCurrentLesson] = useState(0);
+ const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
+ const [showAILab, setShowAILab] = useState(false);
 
-  // Restore quiz answer for current lesson from Firestore
-  useEffect(() => {
-    const saved = quizAnswers[currentLesson];
-    if (saved) {
-      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
-    } else {
-      setQuizAnswer(null);
-    }
-  }, [currentLesson, quizAnswers]);
-  const lesson = LESSONS[currentLesson];
-  const progress = (completedLessons.size / LESSONS.length) * 100;
-  function goToLesson(idx: number) {
-    setCurrentLesson(idx);
-    setShowAILab(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-  function handleQuizAnswer(i: number) {
-    if (quizAnswer) return;
-    const correct = i === lesson.quiz.correct;
-    setQuizAnswer({ questionIndex: currentLesson, selected: i, correct });
-    if (correct) setCompleted((p) => new Set([...p, currentLesson]));
-  }
-  return (
-    <div
-      className="animate-fade-in-up"
-      style={{ display: "flex", flexDirection: "column" }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 32,
-          flexWrap: "wrap",
-          gap: 12,
-        }}
-      >
-        <Link
-          href="/dashboard/learn"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            color: "var(--color-text-secondary)",
-            textDecoration: "none",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-          }}
-        >
-          <ArrowLeft size={16} /> Kembali ke Kurikulum
-        </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontSize: "0.875rem",
-              color: "var(--color-text-muted)",
-            }}
-          >
-            <BookOpen size={15} />
-            {completedLessons.size}/{LESSONS.length} selesai
-          </div>
-          <div
-            style={{
-              width: 120,
-              height: 6,
-              background: "var(--color-surface-3)",
-              borderRadius: 999,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                height: "100%",
-                width: `${progress}%`,
-                background: `linear-gradient(90deg,${C},#9333EA)`,
-                borderRadius: 999,
-                transition: "width 0.5s ease",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          background: "linear-gradient(135deg,#1A1D23 0%,#2D2F3A 100%)",
-          borderRadius: "var(--radius-xl)",
-          padding: "32px 36px",
-          marginBottom: 32,
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: -50,
-            right: -50,
-            width: 200,
-            height: 200,
-            borderRadius: "50%",
-            background: `radial-gradient(circle,${CL}0.3) 0%,transparent 70%)`,
-          }}
-        />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              background: `${CL}0.2)`,
-              border: `1px solid ${CL}0.4)`,
-              borderRadius: 100,
-              padding: "4px 14px",
-              marginBottom: 12,
-            }}
-          >
-            <Users size={13} color="#E879F9" />
-            <span
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                color: "#E879F9",
-                letterSpacing: "0.06em",
-              }}
-            >
-              MODUL 11 Â· INFLUENCER DNA
-            </span>
-          </div>
-          <h1
-            style={{
-              fontSize: "clamp(1.375rem,3vw,1.875rem)",
-              color: "#F8F9FA",
-              letterSpacing: "-0.04em",
-              marginBottom: 8,
-            }}
-          >
-            Influencer DNA Matching
-          </h1>
-          <p style={{ color: "#9CA3AF", maxWidth: 480 }}>
-            Pencocokan vibe brand dengan influencer menggunakan vector search
-            dan AI.
-          </p>
-          <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8125rem",
-                color: "#9CA3AF",
-              }}
-            >
-              <BookOpen size={14} /> 4 Materi
-            </span>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8125rem",
-                color: "#9CA3AF",
-              }}
-            >
-              <Clock size={14} /> 2.5 jam
-            </span>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8125rem",
-                color: "#E879F9",
-                fontWeight: 700,
-              }}
-            >
-              <Zap size={14} /> AI Tutor Lab
-            </span>
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          gap: 28,
-          alignItems: "flex-start",
-          flexWrap: "wrap",
-        }}
-      >
-        <div
-          style={{
-            flex: "0 0 260px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-            position: "sticky",
-            top: 24,
-          }}
-        >
-          <div
-            style={{
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              color: "var(--color-text-muted)",
-              letterSpacing: "0.08em",
-              marginBottom: 8,
-            }}
-          >
-            DAFTAR MATERI
-          </div>
-          {LESSONS.map((l, i) => {
-            const isDone = completedLessons.has(i);
-            const isActive = i === currentLesson;
-            return (
-              <button
-                key={l.id}
-                onClick={() => goToLesson(i)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "10px 12px",
-                  borderRadius: "var(--radius-md)",
-                  border: isActive
-                    ? `1px solid ${CL}0.5)`
-                    : "1px solid transparent",
-                  background: isActive ? `${CL}0.1)` : "transparent",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.2s",
-                  width: "100%",
-                  fontFamily: "var(--font-sans)",
-                }}
-              >
-                {isDone ? (
-                  <CheckCircle
-                    size={16}
-                    color="#6EE12B"
-                    style={{ flexShrink: 0 }}
-                  />
-                ) : (
-                  <Circle
-                    size={16}
-                    color={isActive ? C : "var(--color-border-2)"}
-                    style={{ flexShrink: 0 }}
-                  />
-                )}
-                <span
-                  style={{
-                    fontSize: "0.8125rem",
-                    fontWeight: isActive ? 700 : 500,
-                    color: isActive ? C : "var(--color-text-secondary)",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {i + 1}. {l.title}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        <div
-          style={{
-            flex: "1 1 400px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 24,
-            minWidth: 0,
-          }}
-        >
-          <div className="premium-card" style={{ padding: 0 }}>
-            <div
-              style={{
-                padding: "24px 28px",
-                borderBottom: "1px solid var(--color-border)",
-                background: `${CL}0.05)`,
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 14,
-              }}
-            >
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: "var(--radius-md)",
-                  background: `${CL}0.15)`,
-                  border: `1px solid ${CL}0.3)`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <Users size={22} color={C} strokeWidth={2} />
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: "0.6875rem",
-                    fontWeight: 700,
-                    color: C,
-                    letterSpacing: "0.08em",
-                    marginBottom: 4,
-                  }}
-                >
-                  MATERI {currentLesson + 1} DARI {LESSONS.length}
-                </div>
-                <h2
-                  style={{
-                    fontSize: "1.25rem",
-                    letterSpacing: "-0.02em",
-                    color: "var(--color-text-primary)",
-                    marginBottom: 2,
-                  }}
-                >
-                  {lesson.title}
-                </h2>
-                <div
-                  style={{
-                    fontSize: "0.8125rem",
-                    color: "var(--color-text-muted)",
-                  }}
-                >
-                  {lesson.concept}
-                </div>
-              </div>
-            </div>
-            <div style={{ padding: 28 }}>
-              <div
-                style={{
-                  fontSize: "0.9375rem",
-                  lineHeight: 1.75,
-                  color: "var(--color-text-secondary)",
-                  marginBottom: 24,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {lesson.body.replace(/\*\*(.*?)\*\*/g, "$1")}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 12,
-                  padding: "16px 18px",
-                  background: `${CL}0.06)`,
-                  border: `1px solid ${CL}0.2)`,
-                  borderRadius: "var(--radius-md)",
-                  marginBottom: 28,
-                }}
-              >
-                <Lightbulb
-                  size={18}
-                  color={C}
-                  style={{ flexShrink: 0, marginTop: 1 }}
-                />
-                <p
-                  style={{
-                    fontSize: "0.875rem",
-                    color: "var(--color-text-primary)",
-                    fontStyle: "italic",
-                    fontWeight: 600,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {lesson.insight}
-                </p>
-              </div>
-              <div style={{ marginBottom: 28 }}>
-                <VennDiagramViz />
-              </div>
-              <div
-                style={{
-                  padding: "20px 22px",
-                  background: "var(--color-surface-2)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  marginBottom: 28,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginBottom: 12,
-                  }}
-                >
-                  <Target size={15} color="var(--color-accent-text)" />
-                  <span
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                      color: "var(--color-accent-text)",
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    TANTANGAN PRAKTIK
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.875rem",
-                    lineHeight: 1.7,
-                    color: "var(--color-text-secondary)",
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {lesson.challenge.replace(/\*\*(.*?)\*\*/g, "$1")}
-                </div>
-              </div>
-              <button
-                onClick={() => setShowAILab((v) => !v)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "12px 18px",
-                  borderRadius: "var(--radius-md)",
-                  background: showAILab
-                    ? `linear-gradient(135deg,${C},#9333EA)`
-                    : "var(--color-surface-3)",
-                  border: "1px solid",
-                  borderColor: showAILab
-                    ? "transparent"
-                    : "var(--color-border)",
-                  color: showAILab ? "#FFF" : "var(--color-text-secondary)",
-                  fontSize: "0.875rem",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  width: "100%",
-                  justifyContent: "center",
-                  marginBottom: showAILab ? 20 : 0,
-                  fontFamily: "var(--font-sans)",
-                }}
-              >
-                <Zap size={15} />{" "}
-                {showAILab
-                  ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
-              </button>
-              {showAILab && (
-                <AILab
-                  moduleId="influencer-dna"
-                  moduleName="Influencer DNA"
-                  initialMessage="Halo! Aku AI Tutor untuk modul Influencer DNA Matching. Tanyakan tentang vector search, DNA scoring, atau ROI kolaborasi!"
-                  themeColor={C}
-                  themeGradient={`linear-gradient(135deg, ${C}, #9333EA)`}
-                />
-              )}
-            </div>
-          </div>
-          <div className="premium-card" style={{ padding: 0 }}>
-            <div
-              style={{
-                padding: "20px 24px",
-                borderBottom: "1px solid var(--color-border)",
-                background: "var(--color-surface-2)",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-              }}
-            >
-              <Users size={18} color="var(--color-accent-text)" />
-              <span style={{ fontWeight: 800, fontSize: "1rem" }}>
-                Cek Pemahaman
-              </span>
-              {quizAnswer && (
-                <span
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    padding: "2px 10px",
-                    borderRadius: 100,
-                    background: quizAnswer.correct
-                      ? "rgba(34,197,94,0.1)"
-                      : "rgba(239,68,68,0.1)",
-                    color: quizAnswer.correct ? "#16A34A" : "#DC2626",
-                  }}
-                >
-                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
-                </span>
-              )}
-            </div>
-            <div style={{ padding: "24px 28px" }}>
-              <p
-                style={{
-                  fontWeight: 700,
-                  fontSize: "1rem",
-                  color: "var(--color-text-primary)",
-                  marginBottom: 20,
-                  lineHeight: 1.5,
-                }}
-              >
-                {lesson.quiz.question}
-              </p>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 10 }}
-              >
-                {lesson.quiz.options.map((opt, i) => {
-                  const isS = quizAnswer?.selected === i;
-                  const isC = i === lesson.quiz.correct;
-                  const sr = !!quizAnswer;
-                  let bg = "var(--color-surface-2)";
-                  let border = "1px solid var(--color-border)";
-                  let color = "var(--color-text-secondary)";
-                  if (sr && isC) {
-                    bg = "rgba(34,197,94,0.08)";
-                    border = "1px solid rgba(34,197,94,0.4)";
-                    color = "#15803D";
-                  } else if (sr && isS && !isC) {
-                    bg = "rgba(239,68,68,0.08)";
-                    border = "1px solid rgba(239,68,68,0.4)";
-                    color = "#B91C1C";
-                  }
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => handleQuizAnswer(i)}
-                      disabled={!!quizAnswer}
-                      style={{
-                        padding: "14px 18px",
-                        borderRadius: "var(--radius-md)",
-                        background: bg,
-                        border,
-                        color,
-                        fontSize: "0.875rem",
-                        fontWeight: 500,
-                        cursor: quizAnswer ? "not-allowed" : "pointer",
-                        textAlign: "left",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        lineHeight: 1.5,
-                        fontFamily: "var(--font-sans)",
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: "50%",
-                          background:
-                            sr && isC
-                              ? "#16A34A"
-                              : sr && isS
-                                ? "#DC2626"
-                                : "var(--color-surface-3)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "0.6875rem",
-                          fontWeight: 800,
-                          color:
-                            (sr && isC) || (sr && isS)
-                              ? "#FFF"
-                              : "var(--color-text-muted)",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {String.fromCharCode(65 + i)}
-                      </span>
-                      {opt}
-                    </button>
-                  );
-                })}
-              </div>
-              {quizAnswer && (
-                <div
-                  style={{
-                    marginTop: 20,
-                    padding: "16px 18px",
-                    background: quizAnswer.correct
-                      ? "rgba(34,197,94,0.06)"
-                      : "rgba(239,68,68,0.06)",
-                    border: `1px solid ${quizAnswer.correct ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
-                    borderRadius: "var(--radius-md)",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                      color: quizAnswer.correct ? "#16A34A" : "#DC2626",
-                      marginBottom: 6,
-                    }}
-                  >
-                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
-                  </div>
-                  <p
-                    style={{
-                      fontSize: "0.875rem",
-                      lineHeight: 1.65,
-                      color: "var(--color-text-secondary)",
-                    }}
-                  >
-                    {lesson.quiz.explanation}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 12,
-            }}
-          >
-            <button
-              onClick={() => goToLesson(currentLesson - 1)}
-              disabled={currentLesson === 0}
-              className="btn btn-secondary"
-              style={{ gap: 8, opacity: currentLesson === 0 ? 0.4 : 1 }}
-            >
-              <ChevronLeft size={16} /> Sebelumnya
-            </button>
-            {currentLesson < LESSONS.length - 1 ? (
-              <button
-                onClick={() => goToLesson(currentLesson + 1)}
-                disabled={!quizAnswer}
-                className="btn btn-primary"
-                style={{ gap: 8, opacity: quizAnswer ? 1 : 0.5 }}
-              >
-                Materi Berikutnya <ChevronRight size={16} />
-              </button>
-            ) : (
-              <Link
-                href="/dashboard/learn"
-                className="btn btn-primary"
-                style={{ gap: 8 }}
-              >
-                Selesai! Kembali ke Kurikulum <CheckCircle size={16} />
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+ // Restore quiz answer for current lesson from Firestore
+ useEffect(() => {
+ const saved = quizAnswers[currentLesson];
+ if (saved) {
+ setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+ } else {
+ setQuizAnswer(null);
+ }
+ }, [currentLesson, quizAnswers]);
+ const lesson = LESSONS[currentLesson];
+ const progress = (completedLessons.size / LESSONS.length) * 100;
+ function goToLesson(idx: number) {
+ setCurrentLesson(idx);
+ setShowAILab(false);
+ window.scrollTo({ top: 0, behavior: "smooth" });
+ }
+ async function handleQuizAnswer(i: number) {
+ if (quizAnswer) return;
+ const correct = i === lesson.quiz.correct;
+ setQuizAnswer({ questionIndex: currentLesson, selected: i, correct });
+ await saveAnswer(currentLesson, i, correct);
+ }
+ return (
+ <div
+ className="animate-fade-in-up"
+ style={{ display: "flex", flexDirection: "column" }}
+ >
+ <div
+ style={{
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "space-between",
+ marginBottom: 32,
+ flexWrap: "wrap",
+ gap: 12,
+ }}
+ >
+ <Link
+ href="/dashboard/learn"
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 8,
+ color: "var(--color-text-secondary)",
+ textDecoration: "none",
+ fontSize: "0.875rem",
+ fontWeight: 600,
+ }}
+ >
+ <ArrowLeft size={16} /> Kembali ke Kurikulum
+ </Link>
+ <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+ <div
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 8,
+ fontSize: "0.875rem",
+ color: "var(--color-text-muted)",
+ }}
+ >
+ <BookOpen size={15} />
+ {completedLessons.size}/{LESSONS.length} selesai
+ </div>
+ <div
+ style={{
+ width: 120,
+ height: 6,
+ background: "var(--color-surface-3)",
+ borderRadius: 999,
+ overflow: "hidden",
+ }}
+ >
+ <div
+ style={{
+ height: "100%",
+ width: `${progress}%`,
+ background: `linear-gradient(90deg,${C},#9333EA)`,
+ borderRadius: 999,
+ transition: "width 0.5s ease",
+ }}
+ />
+ </div>
+ </div>
+ </div>
+ <div
+ style={{
+ background: "linear-gradient(135deg,#1A1D23 0%,#2D2F3A 100%)",
+ borderRadius: "var(--radius-xl)",
+ padding: "32px 36px",
+ marginBottom: 32,
+ position: "relative",
+ overflow: "hidden",
+ }}
+ >
+ <div
+ style={{
+ position: "absolute",
+ top: -50,
+ right: -50,
+ width: 200,
+ height: 200,
+ borderRadius: "50%",
+ background: `radial-gradient(circle,${CL}0.3) 0%,transparent 70%)`,
+ }}
+ />
+ <div style={{ position: "relative", zIndex: 1 }}>
+ <div
+ style={{
+ display: "inline-flex",
+ alignItems: "center",
+ gap: 8,
+ background: `${CL}0.2)`,
+ border: `1px solid ${CL}0.4)`,
+ borderRadius: 100,
+ padding: "4px 14px",
+ marginBottom: 12,
+ }}
+ >
+ <Users size={13} color="#E879F9" />
+ <span
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "#E879F9",
+ letterSpacing: "0.06em",
+ }}
+ >
+ MODUL 11 · INFLUENCER DNA
+ </span>
+ </div>
+ <h1
+ style={{
+ fontSize: "clamp(1.375rem,3vw,1.875rem)",
+ color: "#F8F9FA",
+ letterSpacing: "-0.04em",
+ marginBottom: 8,
+ }}
+ >
+ Influencer DNA Matching
+ </h1>
+ <p style={{ color: "#9CA3AF", maxWidth: 480 }}>
+ Pencocokan vibe brand dengan influencer menggunakan vector search
+ dan AI.
+ </p>
+ <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+ <span
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 6,
+ fontSize: "0.8125rem",
+ color: "#9CA3AF",
+ }}
+ >
+ <BookOpen size={14} /> 4 Materi
+ </span>
+ <span
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 6,
+ fontSize: "0.8125rem",
+ color: "#9CA3AF",
+ }}
+ >
+ <Clock size={14} /> 2.5 jam
+ </span>
+ <span
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 6,
+ fontSize: "0.8125rem",
+ color: "#E879F9",
+ fontWeight: 700,
+ }}
+ >
+ <Zap size={14} /> AI Tutor Lab
+ </span>
+ </div>
+ </div>
+ </div>
+ <div
+ style={{
+ display: "flex",
+ gap: 28,
+ alignItems: "flex-start",
+ flexWrap: "wrap",
+ }}
+ >
+ <div
+ style={{
+ flex: "0 0 260px",
+ display: "flex",
+ flexDirection: "column",
+ gap: 6,
+ position: "sticky",
+ top: 24,
+ }}
+ >
+ <div
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "var(--color-text-muted)",
+ letterSpacing: "0.08em",
+ marginBottom: 8,
+ }}
+ >
+ DAFTAR MATERI
+ </div>
+ {LESSONS.map((l, i) => {
+ const isDone = completedLessons.has(i);
+ const isActive = i === currentLesson;
+ return (
+ <button
+ key={l.id}
+ onClick={() => goToLesson(i)}
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ padding: "10px 12px",
+ borderRadius: "var(--radius-md)",
+ border: isActive
+ ? `1px solid ${CL}0.5)`
+ : "1px solid transparent",
+ background: isActive ? `${CL}0.1)` : "transparent",
+ cursor: "pointer",
+ textAlign: "left",
+ transition: "all 0.2s",
+ width: "100%",
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ {isDone ? (
+ <CheckCircle
+ size={16}
+ color="#6EE12B"
+ style={{ flexShrink: 0 }}
+ />
+ ) : (
+ <Circle
+ size={16}
+ color={isActive ? C : "var(--color-border-2)"}
+ style={{ flexShrink: 0 }}
+ />
+ )}
+ <span
+ style={{
+ fontSize: "0.8125rem",
+ fontWeight: isActive ? 700 : 500,
+ color: isActive ? C : "var(--color-text-secondary)",
+ lineHeight: 1.4,
+ }}
+ >
+ {i + 1}. {l.title}
+ </span>
+ </button>
+ );
+ })}
+ </div>
+ <div
+ style={{
+ flex: "1 1 400px",
+ display: "flex",
+ flexDirection: "column",
+ gap: 24,
+ minWidth: 0,
+ }}
+ >
+ <div className="premium-card" style={{ padding: 0 }}>
+ <div
+ style={{
+ padding: "24px 28px",
+ borderBottom: "1px solid var(--color-border)",
+ background: `${CL}0.05)`,
+ display: "flex",
+ alignItems: "flex-start",
+ gap: 14,
+ }}
+ >
+ <div
+ style={{
+ width: 48,
+ height: 48,
+ borderRadius: "var(--radius-md)",
+ background: `${CL}0.15)`,
+ border: `1px solid ${CL}0.3)`,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ flexShrink: 0,
+ }}
+ >
+ <Users size={22} color={C} strokeWidth={2} />
+ </div>
+ <div>
+ <div
+ style={{
+ fontSize: "0.6875rem",
+ fontWeight: 700,
+ color: C,
+ letterSpacing: "0.08em",
+ marginBottom: 4,
+ }}
+ >
+ MATERI {currentLesson + 1} DARI {LESSONS.length}
+ </div>
+ <h2
+ style={{
+ fontSize: "1.25rem",
+ letterSpacing: "-0.02em",
+ color: "var(--color-text-primary)",
+ marginBottom: 2,
+ }}
+ >
+ {lesson.title}
+ </h2>
+ <div
+ style={{
+ fontSize: "0.8125rem",
+ color: "var(--color-text-muted)",
+ }}
+ >
+ {lesson.concept}
+ </div>
+ </div>
+ </div>
+ <div style={{ padding: 28 }}>
+ <div
+ style={{
+ fontSize: "0.9375rem",
+ lineHeight: 1.75,
+ color: "var(--color-text-secondary)",
+ marginBottom: 24,
+ whiteSpace: "pre-wrap",
+ }}
+ >
+ {lesson.body.replace(/\*\*(.*?)\*\*/g, "$1")}
+ </div>
+ <div
+ style={{
+ display: "flex",
+ alignItems: "flex-start",
+ gap: 12,
+ padding: "16px 18px",
+ background: `${CL}0.06)`,
+ border: `1px solid ${CL}0.2)`,
+ borderRadius: "var(--radius-md)",
+ marginBottom: 28,
+ }}
+ >
+ <Lightbulb
+ size={18}
+ color={C}
+ style={{ flexShrink: 0, marginTop: 1 }}
+ />
+ <p
+ style={{
+ fontSize: "0.875rem",
+ color: "var(--color-text-primary)",
+ fontStyle: "italic",
+ fontWeight: 600,
+ lineHeight: 1.6,
+ }}
+ >
+ {lesson.insight}
+ </p>
+ </div>
+ <div style={{ marginBottom: 28 }}>
+ <VennDiagramViz />
+ </div>
+ <div
+ style={{
+ padding: "20px 22px",
+ background: "var(--color-surface-2)",
+ border: "1px solid var(--color-border)",
+ borderRadius: "var(--radius-md)",
+ marginBottom: 28,
+ }}
+ >
+ <div
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 8,
+ marginBottom: 12,
+ }}
+ >
+ <Target size={15} color="var(--color-accent-text)" />
+ <span
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "var(--color-accent-text)",
+ letterSpacing: "0.08em",
+ }}
+ >
+ TANTANGAN PRAKTIK
+ </span>
+ </div>
+ <div
+ style={{
+ fontSize: "0.875rem",
+ lineHeight: 1.7,
+ color: "var(--color-text-secondary)",
+ whiteSpace: "pre-wrap",
+ }}
+ >
+ {lesson.challenge.replace(/\*\*(.*?)\*\*/g, "$1")}
+ </div>
+ </div>
+ <button
+ onClick={() => setShowAILab((v) => !v)}
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ padding: "12px 18px",
+ borderRadius: "var(--radius-md)",
+ background: showAILab
+ ? `linear-gradient(135deg,${C},#9333EA)`
+ : "var(--color-surface-3)",
+ border: "1px solid",
+ borderColor: showAILab
+ ? "transparent"
+ : "var(--color-border)",
+ color: showAILab ? "#FFF" : "var(--color-text-secondary)",
+ fontSize: "0.875rem",
+ fontWeight: 700,
+ cursor: "pointer",
+ width: "100%",
+ justifyContent: "center",
+ marginBottom: showAILab ? 20 : 0,
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ <Zap size={15} />{" "}
+ {showAILab
+ ? "Tutup AI Tutor Lab"
+ : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+ </button>
+ {showAILab && (
+ <AILab
+ moduleId="influencer-dna"
+ moduleName="Influencer DNA"
+ initialMessage="Halo! Aku AI Tutor untuk modul Influencer DNA Matching. Tanyakan tentang vector search, DNA scoring, atau ROI kolaborasi!"
+ themeColor={C}
+ themeGradient={`linear-gradient(135deg, ${C}, #9333EA)`}
+ />
+ )}
+ </div>
+ </div>
+ <div className="premium-card" style={{ padding: 0 }}>
+ <div
+ style={{
+ padding: "20px 24px",
+ borderBottom: "1px solid var(--color-border)",
+ background: "var(--color-surface-2)",
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ }}
+ >
+ <Users size={18} color="var(--color-accent-text)" />
+ <span style={{ fontWeight: 800, fontSize: "1rem" }}>
+ Cek Pemahaman
+ </span>
+ {quizAnswer && (
+ <span
+ style={{
+ marginLeft: "auto",
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ padding: "2px 10px",
+ borderRadius: 100,
+ background: quizAnswer.correct
+ ? "rgba(34,197,94,0.1)"
+ : "rgba(239,68,68,0.1)",
+ color: quizAnswer.correct ? "#16A34A" : "#DC2626",
+ }}
+ >
+ {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+ </span>
+ )}
+ </div>
+ <div style={{ padding: "24px 28px" }}>
+ <p
+ style={{
+ fontWeight: 700,
+ fontSize: "1rem",
+ color: "var(--color-text-primary)",
+ marginBottom: 20,
+ lineHeight: 1.5,
+ }}
+ >
+ {lesson.quiz.question}
+ </p>
+ <div
+ style={{ display: "flex", flexDirection: "column", gap: 10 }}
+ >
+ {lesson.quiz.options.map((opt, i) => {
+ const isS = quizAnswer?.selected === i;
+ const isC = i === lesson.quiz.correct;
+ const sr = !!quizAnswer;
+ let bg = "var(--color-surface-2)";
+ let border = "1px solid var(--color-border)";
+ let color = "var(--color-text-secondary)";
+ if (sr && isC && quizAnswer.correct) {
+ bg = "rgba(34,197,94,0.08)";
+ border = "1px solid rgba(34,197,94,0.4)";
+ color = "#15803D";
+ } else if (sr && isS && !isC) {
+ bg = "rgba(239,68,68,0.08)";
+ border = "1px solid rgba(239,68,68,0.4)";
+ color = "#B91C1C";
+ }
+ return (
+ <button
+ key={i}
+ onClick={() => handleQuizAnswer(i)}
+ disabled={!!quizAnswer}
+ style={{
+ padding: "14px 18px",
+ borderRadius: "var(--radius-md)",
+ background: bg,
+ border,
+ color,
+ fontSize: "0.875rem",
+ fontWeight: 500,
+ cursor: quizAnswer ? "not-allowed" : "pointer",
+ textAlign: "left",
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ lineHeight: 1.5,
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ <span
+ style={{
+ width: 24,
+ height: 24,
+ borderRadius: "50%",
+ background:
+ sr && isC && quizAnswer.correct
+ ? "#16A34A"
+ : sr && isS && !isC
+ ? "#DC2626"
+ : "var(--color-surface-3)",
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ fontSize: "0.6875rem",
+ fontWeight: 800,
+ color:
+ (sr && isC && quizAnswer.correct) || (sr && isS)
+ ? "#FFF"
+ : "var(--color-text-muted)",
+ flexShrink: 0,
+ }}
+ >
+ {String.fromCharCode(65 + i)}
+ </span>
+ {opt}
+ </button>
+ );
+ })}
+ </div>
+ {quizAnswer && (
+ <div
+ style={{
+ marginTop: 20,
+ padding: "16px 18px",
+ background: quizAnswer.correct
+ ? "rgba(34,197,94,0.06)"
+ : "rgba(239,68,68,0.06)",
+ border: `1px solid ${quizAnswer.correct ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
+ borderRadius: "var(--radius-md)",
+ }}
+ >
+ <div
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: quizAnswer.correct ? "#16A34A" : "#DC2626",
+ marginBottom: 6,
+ }}
+ >
+ {quizAnswer.correct ? "✓ PENJELASAN" : "✗ JAWABAN SALAH"}
+ </div>
+ <p
+ style={{
+ fontSize: "0.875rem",
+ lineHeight: 1.65,
+ color: "var(--color-text-secondary)",
+ }}
+ >
+ {quizAnswer.correct
+ ? lesson.quiz.explanation
+ : "Jawaban Anda kurang tepat. Silakan coba lagi untuk menemukan jawaban yang benar!"}
+ </p>
+ {!quizAnswer.correct && (
+ <button
+ onClick={async () => {
+ setQuizAnswer(null);
+ await resetAnswer(currentLesson);
+ }}
+ className="btn btn-secondary"
+ style={{ marginTop: 12, fontSize: "0.8rem", padding: "6px 12px" }}
+ >
+ Coba Lagi
+ </button>
+ )}
+ </div>
+ )}
+ </div>
+ </div>
+ <div
+ style={{
+ display: "flex",
+ justifyContent: "space-between",
+ gap: 12,
+ }}
+ >
+ <button
+ onClick={() => goToLesson(currentLesson - 1)}
+ disabled={currentLesson === 0}
+ className="btn btn-secondary"
+ style={{ gap: 8, opacity: currentLesson === 0 ? 0.4 : 1 }}
+ >
+ <ChevronLeft size={16} /> Sebelumnya
+ </button>
+ {currentLesson < LESSONS.length - 1 ? (
+ <button
+ onClick={() => goToLesson(currentLesson + 1)}
+ disabled={!quizAnswer || !quizAnswer.correct}
+ className="btn btn-primary"
+ style={{ gap: 8, opacity: quizAnswer && quizAnswer.correct ? 1 : 0.5 }}
+ >
+ Materi Berikutnya <ChevronRight size={16} />
+ </button>
+ ) : (
+ <Link
+ href="/dashboard/learn"
+ className="btn btn-primary"
+ style={{ gap: 8 }}
+ >
+ Selesai! Kembali ke Kurikulum <CheckCircle size={16} />
+ </Link>
+ )}
+ </div>
+ </div>
+ </div>
+ </div>
+ );
 }

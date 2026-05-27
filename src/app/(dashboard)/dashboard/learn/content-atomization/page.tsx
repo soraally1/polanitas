@@ -1,123 +1,123 @@
-﻿"use client";
+"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import {
-  Layers,
-  ArrowLeft,
-  ChevronRight,
-  ChevronLeft,
-  CheckCircle,
-  Circle,
-  Zap,
-  Lightbulb,
-  Target,
-  BookOpen,
-  Clock,
+ Layers,
+ ArrowLeft,
+ ChevronRight,
+ ChevronLeft,
+ CheckCircle,
+ Circle,
+ Zap,
+ Lightbulb,
+ Target,
+ BookOpen,
+ Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
-  questionIndex: number;
-  selected: number;
-  correct: boolean;
+ questionIndex: number;
+ selected: number;
+ correct: boolean;
 }
 const C = "#EC4899";
 const CL = "rgba(236,72,153,";
 const PLATFORMS = [
-  { name: "TikTok", icon: "logos:tiktok-icon", color: "#000" },
-  { name: "Reels", icon: "logos:instagram-icon", color: "#E4405F" },
-  { name: "YouTube", icon: "logos:youtube-icon", color: "#FF0000" },
-  { name: "X / Twitter", icon: "logos:twitter", color: "#1DA1F2" },
-  { name: "LinkedIn", icon: "logos:linkedin-icon", color: "#0A66C2" },
-  { name: "Blog", icon: "solar:document-bold-duotone", color: "#F59E0B" },
-  {
-    name: "Carousel",
-    icon: "solar:gallery-wide-bold-duotone",
-    color: "#8B5CF6",
-  },
-  {
-    name: "Podcast",
-    icon: "solar:videocamera-record-bold-duotone",
-    color: "#1DB954",
-  },
-  { name: "Newsletter", icon: "solar:letter-bold-duotone", color: "#6366F1" },
-  {
-    name: "Infografis",
-    icon: "solar:chart-square-bold-duotone",
-    color: "#14B8A6",
-  },
-  { name: "Live", icon: "solar:play-circle-bold-duotone", color: "#EF4444" },
-  { name: "Threads", icon: "logos:threads-icon", color: "#000" },
+ { name: "TikTok", icon: "logos:tiktok-icon", color: "#000" },
+ { name: "Reels", icon: "logos:instagram-icon", color: "#E4405F" },
+ { name: "YouTube", icon: "logos:youtube-icon", color: "#FF0000" },
+ { name: "X / Twitter", icon: "logos:twitter", color: "#1DA1F2" },
+ { name: "LinkedIn", icon: "logos:linkedin-icon", color: "#0A66C2" },
+ { name: "Blog", icon: "solar:document-bold-duotone", color: "#F59E0B" },
+ {
+ name: "Carousel",
+ icon: "solar:gallery-wide-bold-duotone",
+ color: "#8B5CF6",
+ },
+ {
+ name: "Podcast",
+ icon: "solar:videocamera-record-bold-duotone",
+ color: "#1DB954",
+ },
+ { name: "Newsletter", icon: "solar:letter-bold-duotone", color: "#6366F1" },
+ {
+ name: "Infografis",
+ icon: "solar:chart-square-bold-duotone",
+ color: "#14B8A6",
+ },
+ { name: "Live", icon: "solar:play-circle-bold-duotone", color: "#EF4444" },
+ { name: "Threads", icon: "logos:threads-icon", color: "#000" },
 ];
 const LESSONS = [
-  {
-    id: "prinsip",
-    title: "Prinsip Content Atomization",
-    concept: "Memaksimalkan ROI dari Satu Ide",
-    body: `**Content Atomization** adalah strategi memecah satu ide besar (atom content) menjadi puluhan aset konten yang lebih kecil dan platform-specific. Prinsip dasarnya: satu kali effort kreatif, distribusi di belasan channel.
+ {
+ id: "prinsip",
+ title: "Prinsip Content Atomization",
+ concept: "Memaksimalkan ROI dari Satu Ide",
+ body: `**Content Atomization** adalah strategi memecah satu ide besar (atom content) menjadi puluhan aset konten yang lebih kecil dan platform-specific. Prinsip dasarnya: satu kali effort kreatif, distribusi di belasan channel.
 
 Bayangkan kamu membuat satu video YouTube berdurasi 15 menit tentang "Cara Memulai Bisnis Skincare". Dari video itu, kamu bisa menghasilkan: 5 clip TikTok (1 per tips), 3 carousel Instagram, 1 thread Twitter, 10 quote image, 1 blog post, dan 1 newsletter. Total: 21 aset konten dari 1 ide.
 
-Ini bukan sekadar repurposing â€” setiap atom konten harus di-**adapt** agar native di platformnya. Clip TikTok butuh hook 1 detik. Carousel butuh visual hierarchy. Thread butuh narasi yang bisa berdiri sendiri.`,
-    insight:
-      "Brand yang menerapkan atomization menghasilkan 11x lebih banyak konten dengan hanya 2x effort tambahan",
-    challenge:
-      "**ATOMIZATION MAP:** Pilih satu ide konten. Buat daftar minimal 10 format turunan yang bisa dihasilkan beserta platform targetnya!",
-    quiz: {
-      question: "Apa perbedaan utama antara 'repurposing' dan 'atomization'?",
-      options: [
-        "Tidak ada perbedaan, keduanya sama",
-        "Repurposing = copy-paste konten ke platform lain. Atomization = mengadaptasi setiap atom agar native di platform tujuannya",
-        "Atomization hanya untuk video, repurposing untuk semua format",
-        "Repurposing lebih efektif daripada atomization",
-      ],
-      correct: 1,
-      explanation:
-        "Repurposing often means posting the same content everywhere. Atomization is strategic: each piece is adapted to fit the platform's native format, audience behavior, and content expectations.",
-    },
-  },
-  {
-    id: "satu-ke-banyak",
-    title: "Satu Ide â†’ Puluhan Format",
-    concept: "Framework Piramida Konten",
-    body: `**Content Pyramid** adalah framework untuk mengekstrak konten secara sistematis:
+Ini bukan sekadar repurposing — setiap atom konten harus di-**adapt** agar native di platformnya. Clip TikTok butuh hook 1 detik. Carousel butuh visual hierarchy. Thread butuh narasi yang bisa berdiri sendiri.`,
+ insight:
+ "Brand yang menerapkan atomization menghasilkan 11x lebih banyak konten dengan hanya 2x effort tambahan",
+ challenge:
+ "**ATOMIZATION MAP:** Pilih satu ide konten. Buat daftar minimal 10 format turunan yang bisa dihasilkan beserta platform targetnya!",
+ quiz: {
+ question: "Apa perbedaan utama antara 'repurposing' dan 'atomization'?",
+ options: [
+ "Tidak ada perbedaan, keduanya sama",
+ "Repurposing = copy-paste konten ke platform lain. Atomization = mengadaptasi setiap atom agar native di platform tujuannya",
+ "Atomization hanya untuk video, repurposing untuk semua format",
+ "Repurposing lebih efektif daripada atomization",
+ ],
+ correct: 1,
+ explanation:
+ "Repurposing often means posting the same content everywhere. Atomization is strategic: each piece is adapted to fit the platform's native format, audience behavior, and content expectations.",
+ },
+ },
+ {
+ id: "satu-ke-banyak",
+ title: "Satu Ide → Puluhan Format",
+ concept: "Framework Piramida Konten",
+ body: `**Content Pyramid** adalah framework untuk mengekstrak konten secara sistematis:
 
-**Tier 1 â€” Pillar Content (1 aset besar):** Video panjang, webinar, ebook, atau riset original. Ini membutuhkan effort terbesar tapi menjadi sumber dari segalanya.
+**Tier 1 — Pillar Content (1 aset besar):** Video panjang, webinar, ebook, atau riset original. Ini membutuhkan effort terbesar tapi menjadi sumber dari segalanya.
 
-**Tier 2 â€” Derivative Content (3-5 aset medium):** Blog post, YouTube clip, podcast episode, carousel. Diekstrak dari angle berbeda dalam pillar content.
+**Tier 2 — Derivative Content (3-5 aset medium):** Blog post, YouTube clip, podcast episode, carousel. Diekstrak dari angle berbeda dalam pillar content.
 
-**Tier 3 â€” Micro Content (10-20 aset kecil):** Quote image, short clip, tweet, story, meme. Setiap poin kunci dalam pillar content bisa menjadi 1 micro content.
+**Tier 3 — Micro Content (10-20 aset kecil):** Quote image, short clip, tweet, story, meme. Setiap poin kunci dalam pillar content bisa menjadi 1 micro content.
 
-**Tier 4 â€” Reactive Content (âˆž aset):** Respons terhadap komentar, Q&A, behind-the-scenes tentang proses pembuatan pillar content itu sendiri.
+**Tier 4 — Reactive Content (∞ aset):** Respons terhadap komentar, Q&A, behind-the-scenes tentang proses pembuatan pillar content itu sendiri.
 
-Dengan agen AI, Tier 2-4 bisa diotomatisasi sebagian â€” kamu fokus membuat Tier 1 yang berkualitas tinggi.`,
-    insight:
-      "Content Pyramid yang baik bisa membuat 1 jam kerja pillar content bertahan menghasilkan konten selama 2-4 minggu",
-    challenge:
-      "**BUILD PYRAMID:** Pilih satu topik. Buat konten piramida lengkap: 1 pillar, 3 derivative, dan 5 micro content. Tentukan platform untuk masing-masing!",
-    quiz: {
-      question:
-        "Mengapa Tier 1 (Pillar Content) harus dibuat dengan kualitas paling tinggi?",
-      options: [
-        "Karena pillar content mendapat views paling banyak",
-        "Karena semua konten turunan bergantung pada kualitas pillar â€” jika pillar lemah, seluruh piramida collapse",
-        "Karena hanya Tier 1 yang dilihat algoritma",
-        "Pillar content sebenarnya tidak perlu berkualitas tinggi",
-      ],
-      correct: 1,
-      explanation:
-        "Pillar content is the foundation. Every derivative and micro content inherits its quality, insights, and value. A weak pillar means every derived piece will also be weak â€” garbage in, garbage out at scale.",
-    },
-  },
-  {
-    id: "platform-native",
-    title: "Platform-Native Adaptation",
-    concept: "Satu Pesan, Bahasa Berbeda",
-    body: `Setiap platform memiliki **bahasa native** yang berbeda â€” bukan hanya format, tapi juga: panjang ideal, tone, hook style, CTA, dan behavior audiens yang dominan.
+Dengan agen AI, Tier 2-4 bisa diotomatisasi sebagian — kamu fokus membuat Tier 1 yang berkualitas tinggi.`,
+ insight:
+ "Content Pyramid yang baik bisa membuat 1 jam kerja pillar content bertahan menghasilkan konten selama 2-4 minggu",
+ challenge:
+ "**BUILD PYRAMID:** Pilih satu topik. Buat konten piramida lengkap: 1 pillar, 3 derivative, dan 5 micro content. Tentukan platform untuk masing-masing!",
+ quiz: {
+ question:
+ "Mengapa Tier 1 (Pillar Content) harus dibuat dengan kualitas paling tinggi?",
+ options: [
+ "Karena pillar content mendapat views paling banyak",
+ "Karena semua konten turunan bergantung pada kualitas pillar — jika pillar lemah, seluruh piramida collapse",
+ "Karena hanya Tier 1 yang dilihat algoritma",
+ "Pillar content sebenarnya tidak perlu berkualitas tinggi",
+ ],
+ correct: 1,
+ explanation:
+ "Pillar content is the foundation. Every derivative and micro content inherits its quality, insights, and value. A weak pillar means every derived piece will also be weak — garbage in, garbage out at scale.",
+ },
+ },
+ {
+ id: "platform-native",
+ title: "Platform-Native Adaptation",
+ concept: "Satu Pesan, Bahasa Berbeda",
+ body: `Setiap platform memiliki **bahasa native** yang berbeda — bukan hanya format, tapi juga: panjang ideal, tone, hook style, CTA, dan behavior audiens yang dominan.
 
 **Platform Adaptation Matrix:**
 - **TikTok:** 15-60 detik, hook di 1 detik pertama, trend-riding, casual/authentic
@@ -127,882 +127,956 @@ Dengan agen AI, Tier 2-4 bisa diotomatisasi sebagian â€” kamu fokus membuat
 - **LinkedIn:** 1500+ karakter, professional storytelling, data-backed insight
 - **Carousel IG:** 7-10 slides, visual hierarchy per slide, swipe-worthy hook di slide 1
 
-Kesalahan fatal: membuat satu konten dan mendistribusikan verbatim ke semua platform. Audiens setiap platform punya ekspektasi berbeda â€” konten yang viral di TikTok bisa flopped di LinkedIn.`,
-    insight:
-      "Konten yang diadaptasi native mendapat 2.5x engagement dibanding konten cross-posted tanpa adaptasi",
-    challenge:
-      "**ADAPTATION DRILL:** Ambil satu paragraf dari blog kamu. Adaptasi menjadi: 1 tweet, 1 caption IG, dan 1 script TikTok 15 detik. Perhatikan perbedaan tone dan strukturnya!",
-    quiz: {
-      question:
-        "Kamu punya video YouTube 10 menit. Saat mengadaptasi ke TikTok, apa yang paling penting?",
-      options: [
-        "Upload versi pendek dari video YouTube apa adanya",
-        "Identifikasi 1 momen paling impactful, buat hook baru yang native TikTok, dan format vertikal",
-        "TikTok audience sama dengan YouTube, tidak perlu adaptasi",
-        "Tambahkan teks overlay saja sudah cukup",
-      ],
-      correct: 1,
-      explanation:
-        "TikTok has its own language: vertical format, 1-second hook, pattern interrupts, and trend audio. Simply shortening a YouTube video won't work â€” you need to create something that feels native to TikTok's culture.",
-    },
-  },
-  {
-    id: "workflow-ai",
-    title: "Workflow Atomisasi dengan AI",
-    concept: "Pipeline Otomatis dari Ide ke Distribusi",
-    body: `Dengan AI agents, proses atomization bisa diakselerasi secara dramatis. Berikut pipeline yang bisa kamu implementasikan:
+Kesalahan fatal: membuat satu konten dan mendistribusikan verbatim ke semua platform. Audiens setiap platform punya ekspektasi berbeda — konten yang viral di TikTok bisa flopped di LinkedIn.`,
+ insight:
+ "Konten yang diadaptasi native mendapat 2.5x engagement dibanding konten cross-posted tanpa adaptasi",
+ challenge:
+ "**ADAPTATION DRILL:** Ambil satu paragraf dari blog kamu. Adaptasi menjadi: 1 tweet, 1 caption IG, dan 1 script TikTok 15 detik. Perhatikan perbedaan tone dan strukturnya!",
+ quiz: {
+ question:
+ "Kamu punya video YouTube 10 menit. Saat mengadaptasi ke TikTok, apa yang paling penting?",
+ options: [
+ "Upload versi pendek dari video YouTube apa adanya",
+ "Identifikasi 1 momen paling impactful, buat hook baru yang native TikTok, dan format vertikal",
+ "TikTok audience sama dengan YouTube, tidak perlu adaptasi",
+ "Tambahkan teks overlay saja sudah cukup",
+ ],
+ correct: 1,
+ explanation:
+ "TikTok has its own language: vertical format, 1-second hook, pattern interrupts, and trend audio. Simply shortening a YouTube video won't work — you need to create something that feels native to TikTok's culture.",
+ },
+ },
+ {
+ id: "workflow-ai",
+ title: "Workflow Atomisasi dengan AI",
+ concept: "Pipeline Otomatis dari Ide ke Distribusi",
+ body: `Dengan AI agents, proses atomization bisa diakselerasi secara dramatis. Berikut pipeline yang bisa kamu implementasikan:
 
-**Step 1 â€” Input:** Kamu membuat atau mendeskripsikan pillar content (brief, transkrip video, atau draft blog post).
+**Step 1 — Input:** Kamu membuat atau mendeskripsikan pillar content (brief, transkrip video, atau draft blog post).
 
-**Step 2 â€” AI Decomposition:** Agen AI memecah konten menjadi poin-poin kunci, quote-worthy statements, dan data points yang bisa berdiri sendiri.
+**Step 2 — AI Decomposition:** Agen AI memecah konten menjadi poin-poin kunci, quote-worthy statements, dan data points yang bisa berdiri sendiri.
 
-**Step 3 â€” Platform Mapping:** Agen mencocokkan setiap atom dengan platform paling cocok berdasarkan format dan audiens.
+**Step 3 — Platform Mapping:** Agen mencocokkan setiap atom dengan platform paling cocok berdasarkan format dan audiens.
 
-**Step 4 â€” Native Adaptation:** Untuk setiap atom-platform pair, agen menulis draft yang sudah disesuaikan tone, panjang, and format platform target.
+**Step 4 — Native Adaptation:** Untuk setiap atom-platform pair, agen menulis draft yang sudah disesuaikan tone, panjang, and format platform target.
 
-**Step 5 â€” Quality Gate (Manusia):** Kamu review output, edit yang perlu, and approve untuk scheduling.
+**Step 5 — Quality Gate (Manusia):** Kamu review output, edit yang perlu, and approve untuk scheduling.
 
-**Step 6 â€” Auto-Schedule:** Konten dijadwalkan secara optimal berdasarkan peak engagement time per platform.
+**Step 6 — Auto-Schedule:** Konten dijadwalkan secara optimal berdasarkan peak engagement time per platform.
 
 Dengan pipeline ini, dari 1 pillar content, kamu bisa menghasilkan 15-20 aset siap publish dalam waktu 2-3 jam (termasuk QC manual).`,
-    insight:
-      "Pipeline AI atomization mengurangi waktu produksi konten dari 40 jam/minggu menjadi 12 jam/minggu untuk output yang sama",
-    challenge:
-      "**DESIGN PIPELINE:** Rancang pipeline atomization kamu sendiri. Tentukan: trigger input, agen apa yang dibutuhkan per step, and quality gate apa yang kamu terapkan!",
-    quiz: {
-      question:
-        "Di mana posisi quality gate manusia yang paling kritis dalam pipeline atomization AI?",
-      options: [
-        "Sebelum Step 1 â€” sebelum membuat pillar content",
-        "Antara Step 4 dan Step 5 â€” setelah AI mengadaptasi tapi sebelum publish",
-        "Setelah Step 6 â€” setelah konten sudah terposting",
-        "Quality gate tidak diperlukan jika prompt-nya sudah bagus",
-      ],
-      correct: 1,
-      explanation:
-        "Quality gate paling kritis adalah setelah AI menghasilkan output tapi sebelum publishing. Di titik ini, manusia bisa menangkap hallucination, brand voice drift, atau kesalahan adaptasi platform sebelum konten menjadi publik.",
-    },
-  },
+ insight:
+ "Pipeline AI atomization mengurangi waktu produksi konten dari 40 jam/minggu menjadi 12 jam/minggu untuk output yang sama",
+ challenge:
+ "**DESIGN PIPELINE:** Rancang pipeline atomization kamu sendiri. Tentukan: trigger input, agen apa yang dibutuhkan per step, and quality gate apa yang kamu terapkan!",
+ quiz: {
+ question:
+ "Di mana posisi quality gate manusia yang paling kritis dalam pipeline atomization AI?",
+ options: [
+ "Sebelum Step 1 — sebelum membuat pillar content",
+ "Antara Step 4 dan Step 5 — setelah AI mengadaptasi tapi sebelum publish",
+ "Setelah Step 6 — setelah konten sudah terposting",
+ "Quality gate tidak diperlukan jika prompt-nya sudah bagus",
+ ],
+ correct: 1,
+ explanation:
+ "Quality gate paling kritis adalah setelah AI menghasilkan output tapi sebelum publishing. Di titik ini, manusia bisa menangkap hallucination, brand voice drift, atau kesalahan adaptasi platform sebelum konten menjadi publik.",
+ },
+ },
+ {
+ id: "atomization-calendar",
+ title: "Content Calendar Atomisasi",
+ concept: "Merancang Distribusi Terjadwal yang Konsisten",
+ body: `Setelah pillar content didekomposisi menjadi pecahan atom yang lebih kecil, langkah krusial berikutnya adalah **Content Calendar Atomisasi**. Menjadwalkan distribusi sangat penting agar audiens tidak merasa dibombardir oleh pesan yang sama secara beruntun.
+
+Berikut adalah prinsip utama dalam menyusun kalender atomisasi:
+
+**1. Jarak Rilis (Spacing & Cadence):** Jangan memposting semua atom dari satu pillar content di hari yang sama. Berikan jarak 1-2 hari antar-posting pada platform yang sama untuk memaksimalkan reach organik.
+
+**2. Cross-Platform Sequence:** Mulai dengan mempublikasikan pillar content (misal: video YouTube penuh). Esok harinya, rilis ringkasan teks di LinkedIn, diikuti klip pendek di TikTok/Reels pada hari berikutnya, dan grafik statistik di Instagram di akhir pekan.
+
+**3. Repurposing Evergreen:** Masukkan atom-atom yang bersifat informatif tanpa batas waktu (evergreen) ke dalam pustaka konten (content library) untuk dipublikasikan kembali beberapa bulan kemudian.`,
+ insight:
+ "Strategi penjadwalan berjarak (spaced distribution) meningkatkan retensi audiens terhadap core message Anda hingga 40%.",
+ challenge: `**BUAT KALENDER 7 HARI:** Ambil 1 topik pillar content. Rancang jadwal posting 7 hari untuk menyebarkan 5 pecahan atom konten tersebut ke minimal 3 platform berbeda!`,
+ quiz: {
+ question:
+ "Mengapa kita sebaiknya tidak memposting semua pecahan atom konten di hari yang sama pada semua platform?",
+ options: [
+ "Karena algoritma akan langsung memblokir akun kita",
+ "Agar audiens tidak merasa jenuh karena melihat info yang mirip berkali-kali, serta untuk memperpanjang lifetime value dari konten tersebut",
+ "Karena server platform media sosial tidak sanggup memprosesnya",
+ "Tidak ada alasan khusus, memposting di hari yang sama justru lebih efisien",
+ ],
+ correct: 1,
+ explanation:
+ "Memposting konten dengan topik serupa secara bertubi-tubi di hari yang sama dapat memicu kejenuhan audiens (audience fatigue). Penjadwalan bertahap menjaga engagement tetap tinggi dalam jangka waktu yang lebih lama.",
+ },
+ },
+ {
+ id: "atomization-roi",
+ title: "Mengukur ROI Atomisasi",
+ concept: "Menilai Efisiensi Produksi Konten",
+ body: `Strategi atomisasi konten yang baik harus bisa dibuktikan efisiensinya. **Mengukur ROI (Return on Investment) Atomisasi** dilakukan dengan membandingkan input resource (waktu/biaya) terhadap output performa (reach, conversion, engagement).
+
+Metrik utama yang perlu diukur meliputi:
+
+**1. Multiplier Effect:** Hitung berapa banyak total view dan lead yang diperoleh dari semua atom konten gabungan, dibandingkan jika Anda hanya merilis satu pillar content saja.
+
+**2. Time-to-Asset Efficiency:** Ukur berapa banyak waktu yang dihemat tim dengan menggunakan framework atomisasi dibandingkan membuat konten baru dari nol untuk setiap platform.
+
+**3. Cost per Lead/View:** Bandingkan efektivitas biaya antara konten atom hasil daur ulang dengan konten baru. Biasanya, biaya per view konten atom jauh lebih murah karena biaya produksinya rendah.`,
+ insight:
+ "Brand yang konsisten mengukur dan mengoptimasi ROI atomisasi berhasil memangkas biaya produksi konten hingga 45% tanpa menurunkan volume traffic.",
+ challenge: `**HITUNG MULTIPLIER EFFECT:** Analisis performa postingan Anda sebelumnya. Kumpulkan data view dari video utama dan bandingkan dengan total view dari 3 video pendek potongannya. Berapa persen kenaikannya?`,
+ quiz: {
+ question:
+ "Metrik apa yang paling tepat untuk mengukur efisiensi waktu dari strategi atomisasi konten?",
+ options: [
+ "Jumlah like pada postingan utama",
+ "Time-to-Asset Efficiency — membandingkan waktu pembuatan konten daur ulang vs konten baru dari nol",
+ "Panjangnya durasi pillar video",
+ "Jumlah follower baru di Instagram",
+ ],
+ correct: 1,
+ explanation:
+ "Time-to-Asset Efficiency mengukur seberapa cepat tim dapat memproduksi aset siap tayang dari pillar content yang sudah ada. Semakin tinggi metrik ini, semakin hemat resource yang dikeluarkan perusahaan.",
+ },
+ },
 ];
 
 function AtomizationViz() {
-  const [idea, setIdea] = useState("");
-  const [exploded, setExploded] = useState(false);
-  function handleExplode() {
-    if (!idea.trim()) return;
-    setExploded(false);
-    setTimeout(() => setExploded(true), 100);
-  }
-  return (
-    <div
-      style={{
-        background: "var(--color-surface)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius-xl)",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          padding: "16px 24px",
-          borderBottom: "1px solid var(--color-border)",
-          background: "var(--color-surface-2)",
-        }}
-      >
-        <div style={{ fontWeight: 800, fontSize: "1rem" }}>
-          Content Atomization Simulator
-        </div>
-        <div className="caption" style={{ marginTop: 4 }}>
-          Masukkan ide utama dan lihat proses atomisasi
-        </div>
-      </div>
-      <div style={{ padding: 24 }}>
-        <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
-          <input
-            value={idea}
-            onChange={(e) => setIdea(e.target.value)}
-            placeholder="Masukkan ide konten utama..."
-            className="input"
-            style={{ flex: 1 }}
-            onKeyDown={(e) => e.key === "Enter" && handleExplode()}
-          />
-          <button
-            onClick={handleExplode}
-            disabled={!idea.trim()}
-            className="btn btn-primary"
-            style={{ gap: 6 }}
-          >
-            <Layers size={15} /> Atomisasi!
-          </button>
-        </div>
-        <div
-          style={{
-            position: "relative",
-            minHeight: 320,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <AnimatePresence mode="wait">
-            {!exploded ? (
-              <motion.div
-                key="core"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 2, opacity: 0, borderRadius: "50%" }}
-                transition={{ duration: 0.4 }}
-                style={{
-                  width: 180,
-                  height: 80,
-                  background: `linear-gradient(135deg, ${C}, #BE185D)`,
-                  borderRadius: "var(--radius-md)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: 16,
-                  textAlign: "center",
-                }}
-              >
-                <span
-                  style={{
-                    color: "#FFF",
-                    fontWeight: 800,
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  {idea || "Ide Utama Kamu"}
-                </span>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="atoms"
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 12,
-                  justifyContent: "center",
-                  maxWidth: 500,
-                }}
-              >
-                {PLATFORMS.map((p, i) => (
-                  <motion.div
-                    key={p.name}
-                    initial={{ scale: 0, opacity: 0, y: 0 }}
-                    animate={{ scale: 1, opacity: 1, y: 0 }}
-                    transition={{
-                      delay: i * 0.08,
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20,
-                    }}
-                    style={{
-                      width: 90,
-                      padding: "12px 8px",
-                      background: "var(--color-surface-2)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "var(--radius-md)",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 6,
-                      cursor: "default",
-                    }}
-                  >
-                    <Icon icon={p.icon} width={24} />
-                    <span
-                      style={{
-                        fontSize: "0.65rem",
-                        fontWeight: 700,
-                        color: "var(--color-text-secondary)",
-                        textAlign: "center",
-                      }}
-                    >
-                      {p.name}
-                    </span>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        {exploded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            style={{
-              marginTop: 16,
-              padding: "14px 16px",
-              background: `${CL}0.06)`,
-              border: `1px solid ${CL}0.2)`,
-              borderRadius: "var(--radius-sm)",
-              textAlign: "center",
-            }}
-          >
-            <strong style={{ color: C }}>Hasil:</strong>{" "}
-            <span style={{ color: "var(--color-text-secondary)" }}>
-              "{idea}" berhasil diatomisasi menjadi{" "}
-              <strong>{PLATFORMS.length} aset konten</strong> untuk{" "}
-              {PLATFORMS.length} platform berbeda!
-            </span>
-          </motion.div>
-        )}
-      </div>
-    </div>
-  );
+ const [idea, setIdea] = useState("");
+ const [exploded, setExploded] = useState(false);
+ function handleExplode() {
+ if (!idea.trim()) return;
+ setExploded(false);
+ setTimeout(() => setExploded(true), 100);
+ }
+ return (
+ <div
+ style={{
+ background: "var(--color-surface)",
+ border: "1px solid var(--color-border)",
+ borderRadius: "var(--radius-xl)",
+ overflow: "hidden",
+ }}
+ >
+ <div
+ style={{
+ padding: "16px 24px",
+ borderBottom: "1px solid var(--color-border)",
+ background: "var(--color-surface-2)",
+ }}
+ >
+ <div style={{ fontWeight: 800, fontSize: "1rem" }}>
+ Content Atomization Simulator
+ </div>
+ <div className="caption" style={{ marginTop: 4 }}>
+ Masukkan ide utama dan lihat proses atomisasi
+ </div>
+ </div>
+ <div style={{ padding: 24 }}>
+ <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
+ <input
+ value={idea}
+ onChange={(e) => setIdea(e.target.value)}
+ placeholder="Masukkan ide konten utama..."
+ className="input"
+ style={{ flex: 1 }}
+ onKeyDown={(e) => e.key === "Enter" && handleExplode()}
+ />
+ <button
+ onClick={handleExplode}
+ disabled={!idea.trim()}
+ className="btn btn-primary"
+ style={{ gap: 6 }}
+ >
+ <Layers size={15} /> Atomisasi!
+ </button>
+ </div>
+ <div
+ style={{
+ position: "relative",
+ minHeight: 320,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ }}
+ >
+ <AnimatePresence mode="wait">
+ {!exploded ? (
+ <motion.div
+ key="core"
+ initial={{ scale: 0.9, opacity: 0 }}
+ animate={{ scale: 1, opacity: 1 }}
+ exit={{ scale: 2, opacity: 0, borderRadius: "50%" }}
+ transition={{ duration: 0.4 }}
+ style={{
+ width: 180,
+ height: 80,
+ background: `linear-gradient(135deg, ${C}, #BE185D)`,
+ borderRadius: "var(--radius-md)",
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ padding: 16,
+ textAlign: "center",
+ }}
+ >
+ <span
+ style={{
+ color: "#FFF",
+ fontWeight: 800,
+ fontSize: "0.875rem",
+ }}
+ >
+ {idea || "Ide Utama Kamu"}
+ </span>
+ </motion.div>
+ ) : (
+ <motion.div
+ key="atoms"
+ style={{
+ display: "flex",
+ flexWrap: "wrap",
+ gap: 12,
+ justifyContent: "center",
+ maxWidth: 500,
+ }}
+ >
+ {PLATFORMS.map((p, i) => (
+ <motion.div
+ key={p.name}
+ initial={{ scale: 0, opacity: 0, y: 0 }}
+ animate={{ scale: 1, opacity: 1, y: 0 }}
+ transition={{
+ delay: i * 0.08,
+ type: "spring",
+ stiffness: 300,
+ damping: 20,
+ }}
+ style={{
+ width: 90,
+ padding: "12px 8px",
+ background: "var(--color-surface-2)",
+ border: "1px solid var(--color-border)",
+ borderRadius: "var(--radius-md)",
+ display: "flex",
+ flexDirection: "column",
+ alignItems: "center",
+ gap: 6,
+ cursor: "default",
+ }}
+ >
+ <Icon icon={p.icon} width={24} />
+ <span
+ style={{
+ fontSize: "0.65rem",
+ fontWeight: 700,
+ color: "var(--color-text-secondary)",
+ textAlign: "center",
+ }}
+ >
+ {p.name}
+ </span>
+ </motion.div>
+ ))}
+ </motion.div>
+ )}
+ </AnimatePresence>
+ </div>
+ {exploded && (
+ <motion.div
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
+ transition={{ delay: 1 }}
+ style={{
+ marginTop: 16,
+ padding: "14px 16px",
+ background: `${CL}0.06)`,
+ border: `1px solid ${CL}0.2)`,
+ borderRadius: "var(--radius-sm)",
+ textAlign: "center",
+ }}
+ >
+ <strong style={{ color: C }}>Hasil:</strong>{" "}
+ <span style={{ color: "var(--color-text-secondary)" }}>
+ "{idea}" berhasil diatomisasi menjadi{" "}
+ <strong>{PLATFORMS.length} aset konten</strong> untuk{" "}
+ {PLATFORMS.length} platform berbeda!
+ </span>
+ </motion.div>
+ )}
+ </div>
+ </div>
+ );
 }
 
 export default function ContentAtomizationPage() {
-  const { user }   = useAuth();
-  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
-    useModuleProgress("content-atomization", user?.uid, LESSONS.length);
+ const { user } = useAuth();
+ const { completedLessons, quizAnswers, isModuleComplete, saveAnswer, resetAnswer } =
+ useModuleProgress("content-atomization", user?.uid, LESSONS.length);
 
-  const [currentLesson, setCurrentLesson] = useState(0);
-  const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
-  const [showAILab, setShowAILab] = useState(false);
+ const [currentLesson, setCurrentLesson] = useState(0);
+ const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
+ const [showAILab, setShowAILab] = useState(false);
 
-  // Restore quiz answer for current lesson from Firestore
-  useEffect(() => {
-    const saved = quizAnswers[currentLesson];
-    if (saved) {
-      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
-    } else {
-      setQuizAnswer(null);
-    }
-  }, [currentLesson, quizAnswers]);
-  const lesson = LESSONS[currentLesson];
-  const progress = (completedLessons.size / LESSONS.length) * 100;
-  function goToLesson(idx: number) {
-    setCurrentLesson(idx);
-    setShowAILab(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-  function handleQuizAnswer(i: number) {
-    if (quizAnswer) return;
-    const correct = i === lesson.quiz.correct;
-    setQuizAnswer({ questionIndex: currentLesson, selected: i, correct });
-    if (correct) setCompleted((p) => new Set([...p, currentLesson]));
-  }
-  return (
-    <div
-      className="animate-fade-in-up"
-      style={{ display: "flex", flexDirection: "column" }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 32,
-          flexWrap: "wrap",
-          gap: 12,
-        }}
-      >
-        <Link
-          href="/dashboard/learn"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            color: "var(--color-text-secondary)",
-            textDecoration: "none",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-          }}
-        >
-          <ArrowLeft size={16} /> Kembali ke Kurikulum
-        </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontSize: "0.875rem",
-              color: "var(--color-text-muted)",
-            }}
-          >
-            <BookOpen size={15} />
-            {completedLessons.size}/{LESSONS.length} selesai
-          </div>
-          <div
-            style={{
-              width: 120,
-              height: 6,
-              background: "var(--color-surface-3)",
-              borderRadius: 999,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                height: "100%",
-                width: `${progress}%`,
-                background: `linear-gradient(90deg,${C},#BE185D)`,
-                borderRadius: 999,
-                transition: "width 0.5s ease",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          background: "linear-gradient(135deg,#1A1D23 0%,#2D2F3A 100%)",
-          borderRadius: "var(--radius-xl)",
-          padding: "32px 36px",
-          marginBottom: 32,
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: -50,
-            right: -50,
-            width: 200,
-            height: 200,
-            borderRadius: "50%",
-            background: `radial-gradient(circle,${CL}0.3) 0%,transparent 70%)`,
-          }}
-        />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              background: `${CL}0.2)`,
-              border: `1px solid ${CL}0.4)`,
-              borderRadius: 100,
-              padding: "4px 14px",
-              marginBottom: 12,
-            }}
-          >
-            <Layers size={13} color="#F9A8D4" />
-            <span
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                color: "#F9A8D4",
-                letterSpacing: "0.06em",
-              }}
-            >
-              MODUL 6 Â· ATOMIZATION
-            </span>
-          </div>
-          <h1
-            style={{
-              fontSize: "clamp(1.375rem,3vw,1.875rem)",
-              color: "#F8F9FA",
-              letterSpacing: "-0.04em",
-              marginBottom: 8,
-            }}
-          >
-            Content Atomization
-          </h1>
-          <p style={{ color: "#9CA3AF", maxWidth: 480 }}>
-            Memecah satu ide besar menjadi puluhan aset konten multi-platform.
-          </p>
-          <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8125rem",
-                color: "#9CA3AF",
-              }}
-            >
-              <BookOpen size={14} /> 4 Materi
-            </span>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8125rem",
-                color: "#9CA3AF",
-              }}
-            >
-              <Clock size={14} /> 2.5 jam
-            </span>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8125rem",
-                color: "#F9A8D4",
-                fontWeight: 700,
-              }}
-            >
-              <Zap size={14} /> AI Tutor Lab
-            </span>
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          gap: 28,
-          alignItems: "flex-start",
-          flexWrap: "wrap",
-        }}
-      >
-        <div
-          style={{
-            flex: "0 0 260px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-            position: "sticky",
-            top: 24,
-          }}
-        >
-          <div
-            style={{
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              color: "var(--color-text-muted)",
-              letterSpacing: "0.08em",
-              marginBottom: 8,
-            }}
-          >
-            DAFTAR MATERI
-          </div>
-          {LESSONS.map((l, i) => {
-            const isDone = completedLessons.has(i);
-            const isActive = i === currentLesson;
-            return (
-              <button
-                key={l.id}
-                onClick={() => goToLesson(i)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "10px 12px",
-                  borderRadius: "var(--radius-md)",
-                  border: isActive
-                    ? `1px solid ${CL}0.5)`
-                    : "1px solid transparent",
-                  background: isActive ? `${CL}0.1)` : "transparent",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.2s",
-                  width: "100%",
-                  fontFamily: "var(--font-sans)",
-                }}
-              >
-                {isDone ? (
-                  <CheckCircle
-                    size={16}
-                    color="#6EE12B"
-                    style={{ flexShrink: 0 }}
-                  />
-                ) : (
-                  <Circle
-                    size={16}
-                    color={isActive ? C : "var(--color-border-2)"}
-                    style={{ flexShrink: 0 }}
-                  />
-                )}
-                <span
-                  style={{
-                    fontSize: "0.8125rem",
-                    fontWeight: isActive ? 700 : 500,
-                    color: isActive ? C : "var(--color-text-secondary)",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {i + 1}. {l.title}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        <div
-          style={{
-            flex: "1 1 400px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 24,
-            minWidth: 0,
-          }}
-        >
-          <div className="premium-card" style={{ padding: 0 }}>
-            <div
-              style={{
-                padding: "24px 28px",
-                borderBottom: "1px solid var(--color-border)",
-                background: `${CL}0.05)`,
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 14,
-              }}
-            >
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: "var(--radius-md)",
-                  background: `${CL}0.15)`,
-                  border: `1px solid ${CL}0.3)`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <Layers size={22} color={C} strokeWidth={2} />
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: "0.6875rem",
-                    fontWeight: 700,
-                    color: C,
-                    letterSpacing: "0.08em",
-                    marginBottom: 4,
-                  }}
-                >
-                  MATERI {currentLesson + 1} DARI {LESSONS.length}
-                </div>
-                <h2
-                  style={{
-                    fontSize: "1.25rem",
-                    letterSpacing: "-0.02em",
-                    color: "var(--color-text-primary)",
-                    marginBottom: 2,
-                  }}
-                >
-                  {lesson.title}
-                </h2>
-                <div
-                  style={{
-                    fontSize: "0.8125rem",
-                    color: "var(--color-text-muted)",
-                  }}
-                >
-                  {lesson.concept}
-                </div>
-              </div>
-            </div>
-            <div style={{ padding: 28 }}>
-              <div
-                style={{
-                  fontSize: "0.9375rem",
-                  lineHeight: 1.75,
-                  color: "var(--color-text-secondary)",
-                  marginBottom: 24,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {lesson.body.replace(/\*\*(.*?)\*\*/g, "$1")}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 12,
-                  padding: "16px 18px",
-                  background: `${CL}0.06)`,
-                  border: `1px solid ${CL}0.2)`,
-                  borderRadius: "var(--radius-md)",
-                  marginBottom: 28,
-                }}
-              >
-                <Lightbulb
-                  size={18}
-                  color={C}
-                  style={{ flexShrink: 0, marginTop: 1 }}
-                />
-                <p
-                  style={{
-                    fontSize: "0.875rem",
-                    color: "var(--color-text-primary)",
-                    fontStyle: "italic",
-                    fontWeight: 600,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {lesson.insight}
-                </p>
-              </div>
-              <div style={{ marginBottom: 28 }}>
-                <AtomizationViz />
-              </div>
-              <div
-                style={{
-                  padding: "20px 22px",
-                  background: "var(--color-surface-2)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  marginBottom: 28,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginBottom: 12,
-                  }}
-                >
-                  <Target size={15} color="var(--color-accent-text)" />
-                  <span
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                      color: "var(--color-accent-text)",
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    TANTANGAN PRAKTIK
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.875rem",
-                    lineHeight: 1.7,
-                    color: "var(--color-text-secondary)",
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {lesson.challenge.replace(/\*\*(.*?)\*\*/g, "$1")}
-                </div>
-              </div>
-              <button
-                onClick={() => setShowAILab((v) => !v)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "12px 18px",
-                  borderRadius: "var(--radius-md)",
-                  background: showAILab
-                    ? `linear-gradient(135deg,${C},#BE185D)`
-                    : "var(--color-surface-3)",
-                  border: "1px solid",
-                  borderColor: showAILab
-                    ? "transparent"
-                    : "var(--color-border)",
-                  color: showAILab ? "#FFF" : "var(--color-text-secondary)",
-                  fontSize: "0.875rem",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  width: "100%",
-                  justifyContent: "center",
-                  marginBottom: showAILab ? 20 : 0,
-                  fontFamily: "var(--font-sans)",
-                }}
-              >
-                <Zap size={15} />{" "}
-                {showAILab
-                  ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
-              </button>
-              {showAILab && (
-                <AILab
-                  moduleId="content-atomization"
-                  moduleName="Content Atomization"
-                  initialMessage="Halo! Aku AI Tutor untuk modul Content Atomization. Tanyakan tentang cara memecah konten, adaptasi platform, atau workflow atomisasi!"
-                  themeColor={C}
-                  themeGradient={`linear-gradient(135deg, ${C}, #BE185D)`}
-                />
-              )}
-            </div>
-          </div>
-          <div className="premium-card" style={{ padding: 0 }}>
-            <div
-              style={{
-                padding: "20px 24px",
-                borderBottom: "1px solid var(--color-border)",
-                background: "var(--color-surface-2)",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-              }}
-            >
-              <Layers size={18} color="var(--color-accent-text)" />
-              <span style={{ fontWeight: 800, fontSize: "1rem" }}>
-                Cek Pemahaman
-              </span>
-              {quizAnswer && (
-                <span
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    padding: "2px 10px",
-                    borderRadius: 100,
-                    background: quizAnswer.correct
-                      ? "rgba(34,197,94,0.1)"
-                      : "rgba(239,68,68,0.1)",
-                    color: quizAnswer.correct ? "#16A34A" : "#DC2626",
-                  }}
-                >
-                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
-                </span>
-              )}
-            </div>
-            <div style={{ padding: "24px 28px" }}>
-              <p
-                style={{
-                  fontWeight: 700,
-                  fontSize: "1rem",
-                  color: "var(--color-text-primary)",
-                  marginBottom: 20,
-                  lineHeight: 1.5,
-                }}
-              >
-                {lesson.quiz.question}
-              </p>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 10 }}
-              >
-                {lesson.quiz.options.map((opt, i) => {
-                  const isS = quizAnswer?.selected === i;
-                  const isC = i === lesson.quiz.correct;
-                  const sr = !!quizAnswer;
-                  let bg = "var(--color-surface-2)";
-                  let border = "1px solid var(--color-border)";
-                  let color = "var(--color-text-secondary)";
-                  if (sr && isC) {
-                    bg = "rgba(34,197,94,0.08)";
-                    border = "1px solid rgba(34,197,94,0.4)";
-                    color = "#15803D";
-                  } else if (sr && isS && !isC) {
-                    bg = "rgba(239,68,68,0.08)";
-                    border = "1px solid rgba(239,68,68,0.4)";
-                    color = "#B91C1C";
-                  }
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => handleQuizAnswer(i)}
-                      disabled={!!quizAnswer}
-                      style={{
-                        padding: "14px 18px",
-                        borderRadius: "var(--radius-md)",
-                        background: bg,
-                        border,
-                        color,
-                        fontSize: "0.875rem",
-                        fontWeight: 500,
-                        cursor: quizAnswer ? "not-allowed" : "pointer",
-                        textAlign: "left",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        lineHeight: 1.5,
-                        fontFamily: "var(--font-sans)",
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: "50%",
-                          background:
-                            sr && isC
-                              ? "#16A34A"
-                              : sr && isS
-                                ? "#DC2626"
-                                : "var(--color-surface-3)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "0.6875rem",
-                          fontWeight: 800,
-                          color:
-                            (sr && isC) || (sr && isS)
-                              ? "#FFF"
-                              : "var(--color-text-muted)",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {String.fromCharCode(65 + i)}
-                      </span>
-                      {opt}
-                    </button>
-                  );
-                })}
-              </div>
-              {quizAnswer && (
-                <div
-                  style={{
-                    marginTop: 20,
-                    padding: "16px 18px",
-                    background: quizAnswer.correct
-                      ? "rgba(34,197,94,0.06)"
-                      : "rgba(239,68,68,0.06)",
-                    border: `1px solid ${quizAnswer.correct ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
-                    borderRadius: "var(--radius-md)",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                      color: quizAnswer.correct ? "#16A34A" : "#DC2626",
-                      marginBottom: 6,
-                    }}
-                  >
-                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
-                  </div>
-                  <p
-                    style={{
-                      fontSize: "0.875rem",
-                      lineHeight: 1.65,
-                      color: "var(--color-text-secondary)",
-                    }}
-                  >
-                    {lesson.quiz.explanation}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 12,
-            }}
-          >
-            <button
-              onClick={() => goToLesson(currentLesson - 1)}
-              disabled={currentLesson === 0}
-              className="btn btn-secondary"
-              style={{ gap: 8, opacity: currentLesson === 0 ? 0.4 : 1 }}
-            >
-              <ChevronLeft size={16} /> Sebelumnya
-            </button>
-            {currentLesson < LESSONS.length - 1 ? (
-              <button
-                onClick={() => goToLesson(currentLesson + 1)}
-                disabled={!quizAnswer}
-                className="btn btn-primary"
-                style={{ gap: 8, opacity: quizAnswer ? 1 : 0.5 }}
-              >
-                Materi Berikutnya <ChevronRight size={16} />
-              </button>
-            ) : (
-              <Link
-                href="/dashboard/learn"
-                className="btn btn-primary"
-                style={{ gap: 8 }}
-              >
-                Selesai! Kembali ke Kurikulum <CheckCircle size={16} />
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+ // Restore quiz answer for current lesson from Firestore
+ useEffect(() => {
+ const saved = quizAnswers[currentLesson];
+ if (saved) {
+ setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+ } else {
+ setQuizAnswer(null);
+ }
+ }, [currentLesson, quizAnswers]);
+ const lesson = LESSONS[currentLesson];
+ const progress = (completedLessons.size / LESSONS.length) * 100;
+ function goToLesson(idx: number) {
+ setCurrentLesson(idx);
+ setShowAILab(false);
+ window.scrollTo({ top: 0, behavior: "smooth" });
+ }
+ async function handleQuizAnswer(i: number) {
+ if (quizAnswer) return;
+ const correct = i === lesson.quiz.correct;
+ setQuizAnswer({ questionIndex: currentLesson, selected: i, correct });
+ await saveAnswer(currentLesson, i, correct);
+ }
+ return (
+ <div
+ className="animate-fade-in-up"
+ style={{ display: "flex", flexDirection: "column" }}
+ >
+ <div
+ style={{
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "space-between",
+ marginBottom: 32,
+ flexWrap: "wrap",
+ gap: 12,
+ }}
+ >
+ <Link
+ href="/dashboard/learn"
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 8,
+ color: "var(--color-text-secondary)",
+ textDecoration: "none",
+ fontSize: "0.875rem",
+ fontWeight: 600,
+ }}
+ >
+ <ArrowLeft size={16} /> Kembali ke Kurikulum
+ </Link>
+ <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+ <div
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 8,
+ fontSize: "0.875rem",
+ color: "var(--color-text-muted)",
+ }}
+ >
+ <BookOpen size={15} />
+ {completedLessons.size}/{LESSONS.length} selesai
+ </div>
+ <div
+ style={{
+ width: 120,
+ height: 6,
+ background: "var(--color-surface-3)",
+ borderRadius: 999,
+ overflow: "hidden",
+ }}
+ >
+ <div
+ style={{
+ height: "100%",
+ width: `${progress}%`,
+ background: `linear-gradient(90deg,${C},#BE185D)`,
+ borderRadius: 999,
+ transition: "width 0.5s ease",
+ }}
+ />
+ </div>
+ </div>
+ </div>
+ <div
+ style={{
+ background: "linear-gradient(135deg,#1A1D23 0%,#2D2F3A 100%)",
+ borderRadius: "var(--radius-xl)",
+ padding: "32px 36px",
+ marginBottom: 32,
+ position: "relative",
+ overflow: "hidden",
+ }}
+ >
+ <div
+ style={{
+ position: "absolute",
+ top: -50,
+ right: -50,
+ width: 200,
+ height: 200,
+ borderRadius: "50%",
+ background: `radial-gradient(circle,${CL}0.3) 0%,transparent 70%)`,
+ }}
+ />
+ <div style={{ position: "relative", zIndex: 1 }}>
+ <div
+ style={{
+ display: "inline-flex",
+ alignItems: "center",
+ gap: 8,
+ background: `${CL}0.2)`,
+ border: `1px solid ${CL}0.4)`,
+ borderRadius: 100,
+ padding: "4px 14px",
+ marginBottom: 12,
+ }}
+ >
+ <Layers size={13} color="#F9A8D4" />
+ <span
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "#F9A8D4",
+ letterSpacing: "0.06em",
+ }}
+ >
+ MODUL 6 · ATOMIZATION
+ </span>
+ </div>
+ <h1
+ style={{
+ fontSize: "clamp(1.375rem,3vw,1.875rem)",
+ color: "#F8F9FA",
+ letterSpacing: "-0.04em",
+ marginBottom: 8,
+ }}
+ >
+ Content Atomization
+ </h1>
+ <p style={{ color: "#9CA3AF", maxWidth: 480 }}>
+ Memecah satu ide besar menjadi puluhan aset konten multi-platform.
+ </p>
+ <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+ <span
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 6,
+ fontSize: "0.8125rem",
+ color: "#9CA3AF",
+ }}
+ >
+ <BookOpen size={14} /> 4 Materi
+ </span>
+ <span
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 6,
+ fontSize: "0.8125rem",
+ color: "#9CA3AF",
+ }}
+ >
+ <Clock size={14} /> 2.5 jam
+ </span>
+ <span
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 6,
+ fontSize: "0.8125rem",
+ color: "#F9A8D4",
+ fontWeight: 700,
+ }}
+ >
+ <Zap size={14} /> AI Tutor Lab
+ </span>
+ </div>
+ </div>
+ </div>
+ <div
+ style={{
+ display: "flex",
+ gap: 28,
+ alignItems: "flex-start",
+ flexWrap: "wrap",
+ }}
+ >
+ <div
+ style={{
+ flex: "0 0 260px",
+ display: "flex",
+ flexDirection: "column",
+ gap: 6,
+ position: "sticky",
+ top: 24,
+ }}
+ >
+ <div
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "var(--color-text-muted)",
+ letterSpacing: "0.08em",
+ marginBottom: 8,
+ }}
+ >
+ DAFTAR MATERI
+ </div>
+ {LESSONS.map((l, i) => {
+ const isDone = completedLessons.has(i);
+ const isActive = i === currentLesson;
+ return (
+ <button
+ key={l.id}
+ onClick={() => goToLesson(i)}
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ padding: "10px 12px",
+ borderRadius: "var(--radius-md)",
+ border: isActive
+ ? `1px solid ${CL}0.5)`
+ : "1px solid transparent",
+ background: isActive ? `${CL}0.1)` : "transparent",
+ cursor: "pointer",
+ textAlign: "left",
+ transition: "all 0.2s",
+ width: "100%",
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ {isDone ? (
+ <CheckCircle
+ size={16}
+ color="#6EE12B"
+ style={{ flexShrink: 0 }}
+ />
+ ) : (
+ <Circle
+ size={16}
+ color={isActive ? C : "var(--color-border-2)"}
+ style={{ flexShrink: 0 }}
+ />
+ )}
+ <span
+ style={{
+ fontSize: "0.8125rem",
+ fontWeight: isActive ? 700 : 500,
+ color: isActive ? C : "var(--color-text-secondary)",
+ lineHeight: 1.4,
+ }}
+ >
+ {i + 1}. {l.title}
+ </span>
+ </button>
+ );
+ })}
+ </div>
+ <div
+ style={{
+ flex: "1 1 400px",
+ display: "flex",
+ flexDirection: "column",
+ gap: 24,
+ minWidth: 0,
+ }}
+ >
+ <div className="premium-card" style={{ padding: 0 }}>
+ <div
+ style={{
+ padding: "24px 28px",
+ borderBottom: "1px solid var(--color-border)",
+ background: `${CL}0.05)`,
+ display: "flex",
+ alignItems: "flex-start",
+ gap: 14,
+ }}
+ >
+ <div
+ style={{
+ width: 48,
+ height: 48,
+ borderRadius: "var(--radius-md)",
+ background: `${CL}0.15)`,
+ border: `1px solid ${CL}0.3)`,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ flexShrink: 0,
+ }}
+ >
+ <Layers size={22} color={C} strokeWidth={2} />
+ </div>
+ <div>
+ <div
+ style={{
+ fontSize: "0.6875rem",
+ fontWeight: 700,
+ color: C,
+ letterSpacing: "0.08em",
+ marginBottom: 4,
+ }}
+ >
+ MATERI {currentLesson + 1} DARI {LESSONS.length}
+ </div>
+ <h2
+ style={{
+ fontSize: "1.25rem",
+ letterSpacing: "-0.02em",
+ color: "var(--color-text-primary)",
+ marginBottom: 2,
+ }}
+ >
+ {lesson.title}
+ </h2>
+ <div
+ style={{
+ fontSize: "0.8125rem",
+ color: "var(--color-text-muted)",
+ }}
+ >
+ {lesson.concept}
+ </div>
+ </div>
+ </div>
+ <div style={{ padding: 28 }}>
+ <div
+ style={{
+ fontSize: "0.9375rem",
+ lineHeight: 1.75,
+ color: "var(--color-text-secondary)",
+ marginBottom: 24,
+ whiteSpace: "pre-wrap",
+ }}
+ >
+ {lesson.body.replace(/\*\*(.*?)\*\*/g, "$1")}
+ </div>
+ <div
+ style={{
+ display: "flex",
+ alignItems: "flex-start",
+ gap: 12,
+ padding: "16px 18px",
+ background: `${CL}0.06)`,
+ border: `1px solid ${CL}0.2)`,
+ borderRadius: "var(--radius-md)",
+ marginBottom: 28,
+ }}
+ >
+ <Lightbulb
+ size={18}
+ color={C}
+ style={{ flexShrink: 0, marginTop: 1 }}
+ />
+ <p
+ style={{
+ fontSize: "0.875rem",
+ color: "var(--color-text-primary)",
+ fontStyle: "italic",
+ fontWeight: 600,
+ lineHeight: 1.6,
+ }}
+ >
+ {lesson.insight}
+ </p>
+ </div>
+ <div style={{ marginBottom: 28 }}>
+ <AtomizationViz />
+ </div>
+ <div
+ style={{
+ padding: "20px 22px",
+ background: "var(--color-surface-2)",
+ border: "1px solid var(--color-border)",
+ borderRadius: "var(--radius-md)",
+ marginBottom: 28,
+ }}
+ >
+ <div
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 8,
+ marginBottom: 12,
+ }}
+ >
+ <Target size={15} color="var(--color-accent-text)" />
+ <span
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "var(--color-accent-text)",
+ letterSpacing: "0.08em",
+ }}
+ >
+ TANTANGAN PRAKTIK
+ </span>
+ </div>
+ <div
+ style={{
+ fontSize: "0.875rem",
+ lineHeight: 1.7,
+ color: "var(--color-text-secondary)",
+ whiteSpace: "pre-wrap",
+ }}
+ >
+ {lesson.challenge.replace(/\*\*(.*?)\*\*/g, "$1")}
+ </div>
+ </div>
+ <button
+ onClick={() => setShowAILab((v) => !v)}
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ padding: "12px 18px",
+ borderRadius: "var(--radius-md)",
+ background: showAILab
+ ? `linear-gradient(135deg,${C},#BE185D)`
+ : "var(--color-surface-3)",
+ border: "1px solid",
+ borderColor: showAILab
+ ? "transparent"
+ : "var(--color-border)",
+ color: showAILab ? "#FFF" : "var(--color-text-secondary)",
+ fontSize: "0.875rem",
+ fontWeight: 700,
+ cursor: "pointer",
+ width: "100%",
+ justifyContent: "center",
+ marginBottom: showAILab ? 20 : 0,
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ <Zap size={15} />{" "}
+ {showAILab
+ ? "Tutup AI Tutor Lab"
+ : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+ </button>
+ {showAILab && (
+ <AILab
+ moduleId="content-atomization"
+ moduleName="Content Atomization"
+ initialMessage="Halo! Aku AI Tutor untuk modul Content Atomization. Tanyakan tentang cara memecah konten, adaptasi platform, atau workflow atomisasi!"
+ themeColor={C}
+ themeGradient={`linear-gradient(135deg, ${C}, #BE185D)`}
+ />
+ )}
+ </div>
+ </div>
+ <div className="premium-card" style={{ padding: 0 }}>
+ <div
+ style={{
+ padding: "20px 24px",
+ borderBottom: "1px solid var(--color-border)",
+ background: "var(--color-surface-2)",
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ }}
+ >
+ <Layers size={18} color="var(--color-accent-text)" />
+ <span style={{ fontWeight: 800, fontSize: "1rem" }}>
+ Cek Pemahaman
+ </span>
+ {quizAnswer && (
+ <span
+ style={{
+ marginLeft: "auto",
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ padding: "2px 10px",
+ borderRadius: 100,
+ background: quizAnswer.correct
+ ? "rgba(34,197,94,0.1)"
+ : "rgba(239,68,68,0.1)",
+ color: quizAnswer.correct ? "#16A34A" : "#DC2626",
+ }}
+ >
+ {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+ </span>
+ )}
+ </div>
+ <div style={{ padding: "24px 28px" }}>
+ <p
+ style={{
+ fontWeight: 700,
+ fontSize: "1rem",
+ color: "var(--color-text-primary)",
+ marginBottom: 20,
+ lineHeight: 1.5,
+ }}
+ >
+ {lesson.quiz.question}
+ </p>
+ <div
+ style={{ display: "flex", flexDirection: "column", gap: 10 }}
+ >
+ {lesson.quiz.options.map((opt, i) => {
+ const isS = quizAnswer?.selected === i;
+ const isC = i === lesson.quiz.correct;
+ const sr = !!quizAnswer;
+ let bg = "var(--color-surface-2)";
+ let border = "1px solid var(--color-border)";
+ let color = "var(--color-text-secondary)";
+ if (sr && isC && quizAnswer.correct) {
+ bg = "rgba(34,197,94,0.08)";
+ border = "1px solid rgba(34,197,94,0.4)";
+ color = "#15803D";
+ } else if (sr && isS && !isC) {
+ bg = "rgba(239,68,68,0.08)";
+ border = "1px solid rgba(239,68,68,0.4)";
+ color = "#B91C1C";
+ }
+ return (
+ <button
+ key={i}
+ onClick={() => handleQuizAnswer(i)}
+ disabled={!!quizAnswer}
+ style={{
+ padding: "14px 18px",
+ borderRadius: "var(--radius-md)",
+ background: bg,
+ border,
+ color,
+ fontSize: "0.875rem",
+ fontWeight: 500,
+ cursor: quizAnswer ? "not-allowed" : "pointer",
+ textAlign: "left",
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ lineHeight: 1.5,
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ <span
+ style={{
+ width: 24,
+ height: 24,
+ borderRadius: "50%",
+ background:
+ sr && isC && quizAnswer.correct
+ ? "#16A34A"
+ : sr && isS && !isC
+ ? "#DC2626"
+ : "var(--color-surface-3)",
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ fontSize: "0.6875rem",
+ fontWeight: 800,
+ color:
+ (sr && isC && quizAnswer.correct) || (sr && isS)
+ ? "#FFF"
+ : "var(--color-text-muted)",
+ flexShrink: 0,
+ }}
+ >
+ {String.fromCharCode(65 + i)}
+ </span>
+ {opt}
+ </button>
+ );
+ })}
+ </div>
+ {quizAnswer && (
+ <div
+ style={{
+ marginTop: 20,
+ padding: "16px 18px",
+ background: quizAnswer.correct
+ ? "rgba(34,197,94,0.06)"
+ : "rgba(239,68,68,0.06)",
+ border: `1px solid ${quizAnswer.correct ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
+ borderRadius: "var(--radius-md)",
+ }}
+ >
+ <div
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: quizAnswer.correct ? "#16A34A" : "#DC2626",
+ marginBottom: 6,
+ }}
+ >
+ {quizAnswer.correct ? "✓ PENJELASAN" : "✗ JAWABAN SALAH"}
+ </div>
+ <p
+ style={{
+ fontSize: "0.875rem",
+ lineHeight: 1.65,
+ color: "var(--color-text-secondary)",
+ }}
+ >
+ {quizAnswer.correct
+ ? lesson.quiz.explanation
+ : "Jawaban Anda kurang tepat. Silakan coba lagi untuk menemukan jawaban yang benar!"}
+ </p>
+ {!quizAnswer.correct && (
+ <button
+ onClick={async () => {
+ setQuizAnswer(null);
+ await resetAnswer(currentLesson);
+ }}
+ className="btn btn-secondary"
+ style={{ marginTop: 12, fontSize: "0.8rem", padding: "6px 12px" }}
+ >
+ Coba Lagi
+ </button>
+ )}
+ </div>
+ )}
+ </div>
+ </div>
+ <div
+ style={{
+ display: "flex",
+ justifyContent: "space-between",
+ gap: 12,
+ }}
+ >
+ <button
+ onClick={() => goToLesson(currentLesson - 1)}
+ disabled={currentLesson === 0}
+ className="btn btn-secondary"
+ style={{ gap: 8, opacity: currentLesson === 0 ? 0.4 : 1 }}
+ >
+ <ChevronLeft size={16} /> Sebelumnya
+ </button>
+ {currentLesson < LESSONS.length - 1 ? (
+ <button
+ onClick={() => goToLesson(currentLesson + 1)}
+ disabled={!quizAnswer || !quizAnswer.correct}
+ className="btn btn-primary"
+ style={{ gap: 8, opacity: quizAnswer && quizAnswer.correct ? 1 : 0.5 }}
+ >
+ Materi Berikutnya <ChevronRight size={16} />
+ </button>
+ ) : (
+ <Link
+ href="/dashboard/learn"
+ className="btn btn-primary"
+ style={{ gap: 8 }}
+ >
+ Selesai! Kembali ke Kurikulum <CheckCircle size={16} />
+ </Link>
+ )}
+ </div>
+ </div>
+ </div>
+ </div>
+ );
 }
