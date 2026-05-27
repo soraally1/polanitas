@@ -4,20 +4,51 @@
  * Web Speech API hook for voice-driven form filling.
  * Designed for users with hand disabilities using face tracking.
  *
- * Usage:
- *   const { isListening, transcript, startListening, stopListening } = useVoiceInput();
- *
- *   // Fill any input/textarea via voice:
- *   startListening(inputElement, { lang: "id-ID", onResult: (text) => ... });
- *
  * Works with React-controlled inputs by dispatching native input events
  * (React intercepts these via its synthetic event system).
+ *
+ * Note: SpeechRecognition is not in the default TypeScript DOM lib,
+ * so we declare the minimal types we need locally.
  */
 
 "use client";
 
 import { useCallback, useRef, useState } from "react";
 
+// ── Local Web Speech API type declarations ────────────────────────────────────
+// (Not included in TypeScript's default lib.dom.d.ts target)
+interface SpeechRecognitionResult {
+  readonly isFinal: boolean;
+  readonly length: number;
+  [index: number]: { transcript: string; confidence: number };
+}
+interface SpeechRecognitionResultList {
+  readonly length: number;
+  [index: number]: SpeechRecognitionResult;
+}
+interface ISpeechRecognitionEvent extends Event {
+  readonly resultIndex: number;
+  readonly results: SpeechRecognitionResultList;
+}
+interface ISpeechRecognitionErrorEvent extends Event {
+  readonly error: string;
+  readonly message: string;
+}
+interface ISpeechRecognition extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  maxAlternatives: number;
+  onstart:  ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onend:    ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onresult: ((this: ISpeechRecognition, ev: ISpeechRecognitionEvent) => void) | null;
+  onerror:  ((this: ISpeechRecognition, ev: ISpeechRecognitionErrorEvent) => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+// ── Public types ──────────────────────────────────────────────────────────────
 export type VoiceInputMode = "append" | "replace";
 
 export interface VoiceInputOptions {
@@ -31,24 +62,22 @@ export interface VoiceInputOptions {
   onError?: (err: string) => void;
 }
 
-// Detect API (Chrome prefixes it)
-function getSpeechRecognition(): (new () => SpeechRecognition) | null {
+// ── Detect API (Chrome prefixes it) ──────────────────────────────────────────
+function getSpeechRecognition(): (new () => ISpeechRecognition) | null {
   if (typeof window === "undefined") return null;
-  return (
-    (window as any).SpeechRecognition ??
-    (window as any).webkitSpeechRecognition ??
-    null
-  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const w = window as any;
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
 export function useVoiceInput() {
-  const [isListening,  setIsListening]  = useState(false);
-  const [transcript,   setTranscript]   = useState("");
-  const [interimText,  setInterimText]  = useState("");
-  const [error,        setError]        = useState<string | null>(null);
-  const [isSupported,  setIsSupported]  = useState<boolean | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [transcript,  setTranscript]  = useState("");
+  const [interimText, setInterimText] = useState("");
+  const [error,       setError]       = useState<string | null>(null);
+  const [isSupported, setIsSupported] = useState<boolean | null>(null);
 
-  const recRef     = useRef<SpeechRecognition | null>(null);
+  const recRef     = useRef<ISpeechRecognition | null>(null);
   const targetRef  = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const optionsRef = useRef<VoiceInputOptions>({});
 
@@ -93,10 +122,10 @@ export function useVoiceInput() {
     optionsRef.current = options;
 
     const rec = new SR();
-    rec.lang              = options.lang ?? "id-ID";
-    rec.continuous        = false;   // stop after first pause
-    rec.interimResults    = true;    // show live partial results
-    rec.maxAlternatives   = 1;
+    rec.lang            = options.lang ?? "id-ID";
+    rec.continuous      = false;  // stop after first pause
+    rec.interimResults  = true;   // show live partial results
+    rec.maxAlternatives = 1;
 
     rec.onstart = () => {
       setIsListening(true);
@@ -105,34 +134,31 @@ export function useVoiceInput() {
       setError(null);
     };
 
-    rec.onresult = (event: SpeechRecognitionEvent) => {
-      let final = "";
+    rec.onresult = (event: ISpeechRecognitionEvent) => {
+      let final   = "";
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const r = event.results[i];
-        if (r.isFinal) final += r[0].transcript;
-        else            interim += r[0].transcript;
+        if (r.isFinal) final   += r[0].transcript;
+        else           interim += r[0].transcript;
       }
       if (interim) setInterimText(interim);
       if (final) {
         const text = final.trim();
         setTranscript(text);
         setInterimText("");
-        // Inject into target element
         const el = targetRef.current;
         if (el) injectText(el, text, optionsRef.current.mode ?? "replace");
         options.onResult?.(text);
       }
     };
 
-    rec.onerror = (event: SpeechRecognitionErrorEvent) => {
-      const msg = event.error === "not-allowed"
-        ? "Akses mikrofon ditolak. Izinkan mikrofon di browser."
-        : event.error === "no-speech"
-        ? "Tidak ada suara terdeteksi. Coba lagi."
-        : event.error === "network"
-        ? "Koneksi internet diperlukan untuk Speech API."
-        : `Error: ${event.error}`;
+    rec.onerror = (event: ISpeechRecognitionErrorEvent) => {
+      const msg =
+        event.error === "not-allowed" ? "Akses mikrofon ditolak. Izinkan mikrofon di browser." :
+        event.error === "no-speech"   ? "Tidak ada suara terdeteksi. Coba lagi." :
+        event.error === "network"     ? "Koneksi internet diperlukan untuk Speech API." :
+        `Error: ${event.error}`;
       setError(msg);
       setIsListening(false);
       options.onError?.(msg);
@@ -154,7 +180,7 @@ export function useVoiceInput() {
     setInterimText("");
   }, []);
 
-  // ── Check support (call once on mount) ───────────────────────────────────────
+  // ── Check support ─────────────────────────────────────────────────────────────
   const checkSupport = useCallback(() => {
     const supported = getSpeechRecognition() !== null;
     setIsSupported(supported);
