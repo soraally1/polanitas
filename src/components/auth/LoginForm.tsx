@@ -164,9 +164,9 @@ export default function LoginForm() {
               <label htmlFor="login-password" className="label m-0">
                 Password
               </label>
-              <a href="#" className="text-[0.8125rem] text-accent-text font-medium hover:underline">
+              {/* <a href="#" className="text-[0.8125rem] text-accent-text font-medium hover:underline">
                 Lupa password?
-              </a>
+              </a> */}
             </div>
             <div className="relative">
               <Lock

@@ -123,14 +123,29 @@ export default function ProfileSetupForm({ uid, initialName = "" }: Props) {
   function handleBlindToggle() {
     const next = !isBlind;
     setIsBlind(next);
-    if (next && !hasPlayedIntro) {
-      setIsSpeaking(true);
-      setHasPlayedIntro(true);
-      speak(INTRO_SCRIPT, () => setIsSpeaking(false));
-    } else if (!next) {
+    if (next) {
+      setHasHandDisability(false);
+      if (!hasPlayedIntro) {
+        setIsSpeaking(true);
+        setHasPlayedIntro(true);
+        speak(INTRO_SCRIPT, () => setIsSpeaking(false));
+      }
+    } else {
       stopSpeaking();
       setIsSpeaking(false);
     }
+  }
+
+  function handleHandDisabilityToggle() {
+    setHasHandDisability((v) => {
+      const next = !v;
+      if (next) {
+        setIsBlind(false);
+        stopSpeaking();
+        setIsSpeaking(false);
+      }
+      return next;
+    });
   }
 
   function handleReplayIntro() {
@@ -321,7 +336,7 @@ export default function ProfileSetupForm({ uid, initialName = "" }: Props) {
               </div>
 
               {/* Hand disability toggle */}
-              <div onClick={() => setHasHandDisability((v) => !v)}
+              <div onClick={handleHandDisabilityToggle}
                 className="flex items-center justify-between p-4 rounded-xl cursor-pointer bg-surface-2 transition-opacity duration-200 hover:opacity-100"
               >
                 <div className="flex-1 pr-4">
