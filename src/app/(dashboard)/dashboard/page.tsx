@@ -84,12 +84,12 @@ function Ring({ pct, size = 52 }: { pct: number; size?: number }) {
   const dash = (pct / 100) * circ;
   return (
     <svg width={size} height={size} className="shrink-0">
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="4" />
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#fff" strokeWidth="4"
-        strokeDasharray={`${dash} ${circ-dash}`} strokeLinecap="round"
-        transform={`rotate(-90 ${size/2} ${size/2})`} className="transition-[stroke-dasharray] duration-[800ms] ease-out" />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="4" />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#fff" strokeWidth="4"
+        strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
+        transform={`rotate(-90 ${size / 2} ${size / 2})`} className="transition-[stroke-dasharray] duration-[800ms] ease-out" />
       {pct === 100
-        ? <path d={`M ${size/2-5} ${size/2+1} L ${size/2-1} ${size/2+5} L ${size/2+6} ${size/2-4}`} fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        ? <path d={`M ${size / 2 - 5} ${size / 2 + 1} L ${size / 2 - 1} ${size / 2 + 5} L ${size / 2 + 6} ${size / 2 - 4}`} fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         : <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" fill="#fff" fontSize="10" fontWeight="800" className="font-sans">{pct}%</text>
       }
     </svg>
@@ -112,7 +112,7 @@ function SkeletonDashboard() {
         </div>
         {/* stats */}
         <div className="grid grid-cols-3 gap-3">
-          {[0,1,2].map(i => (
+          {[0, 1, 2].map(i => (
             <div key={i} className="bg-surface border border-border rounded-[var(--radius-lg)] py-4 px-[18px]">
               <div className="skeleton w-[30px] h-[30px] rounded-[var(--radius-sm)] mb-2.5" />
               <div className="skeleton w-10 h-6 rounded-[6px] mb-1.5" />
@@ -124,7 +124,7 @@ function SkeletonDashboard() {
         <div className="skeleton h-11 rounded-[var(--radius-lg)]" />
         {/* cards row */}
         <div className="flex gap-3.5 overflow-x-hidden">
-          {[0,1,2].map(i => (
+          {[0, 1, 2].map(i => (
             <div key={i} className="skeleton min-w-[200px] h-[240px] rounded-[22px] shrink-0" />
           ))}
         </div>
@@ -135,7 +135,7 @@ function SkeletonDashboard() {
         <div className="skeleton w-[120px] h-6 rounded-[6px]" />
         <div className="skeleton h-11 rounded-full" />
         <div className="skeleton h-[120px] rounded-[20px]" />
-        {[0,1].map(i => (
+        {[0, 1].map(i => (
           <div key={i} className="skeleton h-[110px] rounded-[20px]" />
         ))}
         <div className="skeleton h-20 rounded-[20px]" />
@@ -188,7 +188,7 @@ export default function DashboardPage() {
         <div className="animate-fade-in-up grid grid-cols-1 md:grid-cols-3 gap-3 [animation-delay:60ms]">
           {[
             { label: "Modul Tersedia", value: "12", Icon: BookOpen, color: "#6366F1" },
-            { label: "Sedang Belajar", value: String(ACTIVE_COURSES.filter(c=>c.progress>0).length), Icon: Flame, color: "#F59E0B" },
+            { label: "Sedang Belajar", value: String(ACTIVE_COURSES.filter(c => c.progress > 0).length), Icon: Flame, color: "#F59E0B" },
             { label: "AI Tutor Lab", value: "Aktif", Icon: Zap, color: "#10B981" },
           ].map(({ label, value, Icon: I, color }) => (
             <div key={label} className="bg-surface border border-border rounded-[var(--radius-lg)] py-4 px-[18px] shadow-sm flex md:flex-col items-center md:items-start gap-4 md:gap-0">
@@ -216,9 +216,9 @@ export default function DashboardPage() {
               className="w-full border border-border rounded-[var(--radius-lg)] py-2.5 pl-[38px] pr-3.5 text-sm text-primary font-sans bg-surface outline-none shadow-sm transition-[border-color,box-shadow] duration-200 focus:border-[#6366F1] focus:shadow-[0_0_0_3px_rgba(99,102,241,0.12)]"
             />
           </div>
-          <button className="w-[42px] h-[42px] rounded-[var(--radius-md)] bg-accent border-none flex items-center justify-center cursor-pointer shrink-0 shadow-[0_4px_12px_var(--color-accent-glow)] transition-transform duration-150 hover:scale-[1.06] active:scale-100">
+          {/* <button className="w-[42px] h-[42px] rounded-[var(--radius-md)] bg-accent border-none flex items-center justify-center cursor-pointer shrink-0 shadow-[0_4px_12px_var(--color-accent-glow)] transition-transform duration-150 hover:scale-[1.06] active:scale-100">
             <SlidersHorizontal size={16} color="#1A2E0A" />
-          </button>
+          </button> */}
         </div>
 
         {/* Courses horizontal scroll */}
@@ -238,11 +238,10 @@ export default function DashboardPage() {
                 <button
                   key={f}
                   onClick={() => setActiveFilter(f)}
-                  className={`py-1.5 px-3.5 rounded-full text-[0.78rem] font-bold cursor-pointer whitespace-nowrap shrink-0 transition-all duration-200 font-sans ${
-                    active
-                      ? "border-none bg-accent text-[#12200A] shadow-[0_3px_10px_var(--color-accent-glow)]"
-                      : "border border-border bg-surface text-secondary shadow-sm"
-                  }`}
+                  className={`py-1.5 px-3.5 rounded-full text-[0.78rem] font-bold cursor-pointer whitespace-nowrap shrink-0 transition-all duration-200 font-sans ${active
+                    ? "border-none bg-accent text-[#12200A] shadow-[0_3px_10px_var(--color-accent-glow)]"
+                    : "border border-border bg-surface text-secondary shadow-sm"
+                    }`}
                 >
                   {f}
                 </button>
@@ -266,7 +265,7 @@ export default function DashboardPage() {
 
                   {/* num + level */}
                   <div className="flex items-center justify-between mb-3.5">
-                    <span className="text-[0.65rem] font-extrabold text-white/60 tracking-[0.1em]">#{String(num).padStart(2,"0")}</span>
+                    <span className="text-[0.65rem] font-extrabold text-white/60 tracking-[0.1em]">#{String(num).padStart(2, "0")}</span>
                     {!available && <span className="text-[0.6rem] font-bold text-white/70 bg-black/20 py-0.5 px-2 rounded-full">Segera</span>}
                   </div>
 
@@ -310,14 +309,13 @@ export default function DashboardPage() {
 
         {/* Tab pills */}
         <div className="flex p-1 rounded-full gap-[3px] bg-surface-2 border border-border">
-          {[{ i:BookOpen, l:"Semua" }, { i:Zap, l:"Berlangsung" }, { i:CheckCircle, l:"Selesai" }].map(({ i: Ti, l },idx) => (
+          {[{ i: BookOpen, l: "Semua" }, { i: Zap, l: "Berlangsung" }, { i: CheckCircle, l: "Selesai" }].map(({ i: Ti, l }, idx) => (
             <button
               key={l}
-              className={`flex-1 py-[7px] px-2 rounded-full border-none text-[0.72rem] flex justify-center items-center gap-[5px] cursor-pointer font-sans ${
-                idx===0
-                  ? "bg-accent text-[#12200A] font-bold shadow-[0_3px_8px_var(--color-accent-glow)]"
-                  : "bg-transparent text-muted font-medium"
-              }`}
+              className={`flex-1 py-[7px] px-2 rounded-full border-none text-[0.72rem] flex justify-center items-center gap-[5px] cursor-pointer font-sans ${idx === 0
+                ? "bg-accent text-[#12200A] font-bold shadow-[0_3px_8px_var(--color-accent-glow)]"
+                : "bg-transparent text-muted font-medium"
+                }`}
             >
               <Ti size={12} /> {l}
             </button>

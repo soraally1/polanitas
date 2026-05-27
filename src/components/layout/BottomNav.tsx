@@ -63,6 +63,8 @@ export function BottomNav() {
           const isActive =
             href === "/dashboard"
               ? pathname === "/dashboard"
+              : href === "/dashboard/sessions"
+              ? pathname.startsWith("/dashboard/sessions") && !pathname.startsWith("/dashboard/sessions/new")
               : pathname.startsWith(href);
 
           return (

@@ -61,9 +61,9 @@ export default function SessionsPage() {
       orderBy("createdAt", "desc")
     );
     const unsub = onSnapshot(q,
-      (snap) => { 
-        setSessions(snap.docs.map((d) => ({ ...d.data(), id: d.id } as ExtendedSession))); 
-        setLoadingSessions(false); 
+      (snap) => {
+        setSessions(snap.docs.map((d) => ({ ...d.data(), id: d.id } as ExtendedSession)));
+        setLoadingSessions(false);
       },
       () => setLoadingSessions(false)
     );
@@ -122,9 +122,8 @@ export default function SessionsPage() {
                   <div className="bg-surface-2 border border-border rounded-[18px] py-5 px-6 flex items-center gap-5 transition-all hover:border-border-2 hover:-translate-y-0.5 hover:shadow-md">
 
                     {/* Status dot */}
-                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                      allDone ? "bg-done" : hasRunning ? "bg-running shadow-[0_0_8px_var(--color-running)] animate-pulse" : "bg-idle"
-                    }`} />
+                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${allDone ? "bg-done" : hasRunning ? "bg-running shadow-[0_0_8px_var(--color-running)] animate-pulse" : "bg-idle"
+                      }`} />
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
