@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -18,6 +18,8 @@ import {
   Play,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -46,7 +48,7 @@ const LESSONS = [
 
 Pendekatan modern hadir untuk mengatasi semua ini: **Multi-Armed Bandit** dan **AI-Driven Creative Iteration**.`,
     insight:
-      "A/B test tradisional rata-rata membutuhkan 2-4 minggu untuk mencapai signifikansi — di era TikTok, tren bisa mati dalam 3 hari",
+      "A/B test tradisional rata-rata membutuhkan 2-4 minggu untuk mencapai signifikansi â€” di era TikTok, tren bisa mati dalam 3 hari",
     challenge:
       "**HITUNG SENDIRI:** Jika konten kamu mendapat 500 impressions/hari, berapa hari yang dibutuhkan untuk A/B test dengan confidence level 95% dan minimum detectable effect 10%? (Hint: butuh ~1.600 samples per variasi)",
     quiz: {
@@ -54,13 +56,13 @@ Pendekatan modern hadir untuk mengatasi semua ini: **Multi-Armed Bandit** dan **
         "Brand menjalankan A/B test headline untuk 5 hari, total 400 impressions. Hasilnya: A=52% CTR, B=48% CTR. Apakah hasil ini reliable?",
       options: [
         "Ya, A jelas lebih baik karena CTR-nya lebih tinggi",
-        "Tidak — 400 impressions terlalu sedikit dan perbedaan 4% tidak signifikan secara statistik",
+        "Tidak â€” 400 impressions terlalu sedikit dan perbedaan 4% tidak signifikan secara statistik",
         "Ya, karena sudah berjalan 5 hari",
         "Hanya reliable jika CTR di atas 50%",
       ],
       correct: 1,
       explanation:
-        "Dengan 400 total impressions (200 per variasi), margin of error-nya sekitar ±7%. Perbedaan 4% jauh di dalam margin of error — hasilnya essentially random noise, bukan signal yang reliable. Butuh minimal 1.600 per variasi.",
+        "Dengan 400 total impressions (200 per variasi), margin of error-nya sekitar Â±7%. Perbedaan 4% jauh di dalam margin of error â€” hasilnya essentially random noise, bukan signal yang reliable. Butuh minimal 1.600 per variasi.",
     },
   },
   {
@@ -70,16 +72,16 @@ Pendekatan modern hadir untuk mengatasi semua ini: **Multi-Armed Bandit** dan **
     body: `**Multi-Armed Bandit (MAB)** adalah pendekatan testing yang secara dinamis **mengalokasikan lebih banyak traffic ke versi yang performing lebih baik**, sambil tetap mengeksplor versi lain.
 
 **Cara Kerja MAB:**
-1. Mulai dengan distribusi traffic merata ke semua variasi (misal: 5 variasi × 20% each)
+1. Mulai dengan distribusi traffic merata ke semua variasi (misal: 5 variasi Ã— 20% each)
 2. Setelah data awal terkumpul, secara bertahap alokasikan lebih banyak traffic ke variasi top-performing
-3. Variasi yang buruk mendapat traffic semakin sedikit (tapi tidak nol — untuk memastikan tidak miss delayed signal)
+3. Variasi yang buruk mendapat traffic semakin sedikit (tapi tidak nol â€” untuk memastikan tidak miss delayed signal)
 4. Proses ini berjalan kontinyu dan otomatis
 
 **Keunggulan MAB vs A/B tradisional:**
 - <Icon icon="solar:check-circle-bold-duotone" className="inline-block mr-1" /> Bisa test 5-50 variasi sekaligus (bukan hanya 2)
-- <Icon icon="solar:check-circle-bold-duotone" className="inline-block mr-1" /> Mengurangi opportunity cost — traffic otomatis dialihkan ke variasi terbaik
+- <Icon icon="solar:check-circle-bold-duotone" className="inline-block mr-1" /> Mengurangi opportunity cost â€” traffic otomatis dialihkan ke variasi terbaik
 - <Icon icon="solar:check-circle-bold-duotone" className="inline-block mr-1" /> Lebih cepat menemukan winner
-- <Icon icon="solar:check-circle-bold-duotone" className="inline-block mr-1" /> Adaptif — bisa bereaksi jika performa variasi berubah over time
+- <Icon icon="solar:check-circle-bold-duotone" className="inline-block mr-1" /> Adaptif â€” bisa bereaksi jika performa variasi berubah over time
 
 **Kapan pakai MAB vs A/B:**
 - MAB: kesempatan singkat, banyak variasi, optimasi real-time
@@ -93,13 +95,13 @@ Pendekatan modern hadir untuk mengatasi semua ini: **Multi-Armed Bandit** dan **
         "Dalam MAB, mengapa variasi yang performing buruk tetap mendapat sedikit traffic (bukan 0%)?",
       options: [
         "Karena algoritmanya boros",
-        "Untuk memastikan tidak miss 'late bloomer' — variasi yang awalnya buruk tapi bisa improve seiring data bertambah (exploration vs exploitation tradeoff)",
+        "Untuk memastikan tidak miss 'late bloomer' â€” variasi yang awalnya buruk tapi bisa improve seiring data bertambah (exploration vs exploitation tradeoff)",
         "Karena semua variasi harus diperlakukan sama",
         "Tidak ada alasan, sebaiknya langsung 0%",
       ],
       correct: 1,
       explanation:
-        "Ini disebut exploration-exploitation tradeoff. Tanpa exploration (memberikan sedikit traffic ke variasi underperforming), kamu bisa terjebak di local optimum — ada kemungkinan variasi yang awalnya buruk sebenarnya lebih baik untuk segmen tertentu atau waktu tertentu.",
+        "Ini disebut exploration-exploitation tradeoff. Tanpa exploration (memberikan sedikit traffic ke variasi underperforming), kamu bisa terjebak di local optimum â€” ada kemungkinan variasi yang awalnya buruk sebenarnya lebih baik untuk segmen tertentu atau waktu tertentu.",
     },
   },
   {
@@ -110,17 +112,17 @@ Pendekatan modern hadir untuk mengatasi semua ini: **Multi-Armed Bandit** dan **
 
 **Pipeline AI-Driven Creative Testing:**
 
-**Step 1 — Seed Input:** Kamu memberikan brief konten, target audience, dan constraints (panjang, tone, CTA).
+**Step 1 â€” Seed Input:** Kamu memberikan brief konten, target audience, dan constraints (panjang, tone, CTA).
 
-**Step 2 — AI Generation:** LLM menghasilkan 20-50 variasi headline, caption, atau script berdasarkan brief.
+**Step 2 â€” AI Generation:** LLM menghasilkan 20-50 variasi headline, caption, atau script berdasarkan brief.
 
-**Step 3 — Initial Deploy:** Semua variasi dideploy dengan distribusi MAB (mulai merata).
+**Step 3 â€” Initial Deploy:** Semua variasi dideploy dengan distribusi MAB (mulai merata).
 
-**Step 4 — Performance Monitoring:** MAB mengoptimasi distribusi traffic berdasarkan real-time performance.
+**Step 4 â€” Performance Monitoring:** MAB mengoptimasi distribusi traffic berdasarkan real-time performance.
 
-**Step 5 — AI Learning Loop:** Setelah cukup data, analysis mengidentifikasi pattern — kata apa, format apa, hook apa yang perform terbaik.
+**Step 5 â€” AI Learning Loop:** Setelah cukup data, analysis mengidentifikasi pattern â€” kata apa, format apa, hook apa yang perform terbaik.
 
-**Step 6 — Iteration:** AI menghasilkan batch variasi baru yang di-inform oleh learnings dari batch sebelumnya.
+**Step 6 â€” Iteration:** AI menghasilkan batch variasi baru yang di-inform oleh learnings dari batch sebelumnya.
 
 Siklus ini bisa berjalan terus-menerus, menghasilkan creative improvement yang compound over time.`,
     insight:
@@ -138,33 +140,33 @@ Siklus ini bisa berjalan terus-menerus, menghasilkan creative improvement yang c
       ],
       correct: 1,
       explanation:
-        "Winning variation adalah signal, bukan endpoint. Menganalisis pattern-nya (hook style, word choice, emotional trigger) dan membuat iterasi baru yang di-inform detail tersebut menghasilkan improvement compound — setiap batch lebih baik dari sebelumnya.",
+        "Winning variation adalah signal, bukan endpoint. Menganalisis pattern-nya (hook style, word choice, emotional trigger) dan membuat iterasi baru yang di-inform detail tersebut menghasilkan improvement compound â€” setiap batch lebih baik dari sebelumnya.",
     },
   },
   {
     id: "statistical-significance",
     title: "Statistical Significance & Decision",
     concept: "Kapan Harus Berhenti Test dan Take Action",
-    body: `Secanggih apa pun tools testing, pada akhirnya kamu harus membuat **keputusan** — dan keputusan itu harus didasarkan pada **statistical significance**, bukan gut feeling.
+    body: `Secanggih apa pun tools testing, pada akhirnya kamu harus membuat **keputusan** â€” dan keputusan itu harus didasarkan pada **statistical significance**, bukan gut feeling.
 
 **Konsep Kunci:**
 
 **Statistical Significance (p-value < 0.05):** Probabilitas bahwa perbedaan yang kamu amati terjadi secara KEBETULAN kurang dari 5%. Artinya: 95% yakin bahwa perbedaan itu nyata.
 
-**Confidence Interval:** Range di mana true value kemungkinan berada. CTR 10% ± 2% berarti true CTR antara 8-12%.
+**Confidence Interval:** Range di mana true value kemungkinan berada. CTR 10% Â± 2% berarti true CTR antara 8-12%.
 
 **Minimum Detectable Effect (MDE):** Perbedaan terkecil yang secara statistik signifikan dan secara bisnis bermakna. Kenaikan CTR 0.1% mungkin signifikan tapi tidak bermakna.
 
 **Dua Jenis Error:**
-- **Type I (False Positive):** Menyimpulkan ada perbedaan padahal tidak — mengganti konten yang sebenarnya baik
-- **Type II (False Negative):** Menyimpulkan tidak ada perbedaan padahal ada — melewatkan improvement
+- **Type I (False Positive):** Menyimpulkan ada perbedaan padahal tidak â€” mengganti konten yang sebenarnya baik
+- **Type II (False Negative):** Menyimpulkan tidak ada perbedaan padahal ada â€” melewatkan improvement
 
 **Practical Decision Framework:**
-1. Statistical significance tercapai → deploy winner
-2. Significance tidak tercapai setelah batas waktu → default ke variasi yang lebih murah/mudah
-3. Terjadi external event (viral moment, algoritma change) → reset test`,
+1. Statistical significance tercapai â†’ deploy winner
+2. Significance tidak tercapai setelah batas waktu â†’ default ke variasi yang lebih murah/mudah
+3. Terjadi external event (viral moment, algoritma change) â†’ reset test`,
     insight:
-      "40% marketer membuat keputusan testing berdasarkan data yang belum mencapai significance — ini menghasilkan 'false optimization' yang sebenarnya tidak meningkatkan performa",
+      "40% marketer membuat keputusan testing berdasarkan data yang belum mencapai significance â€” ini menghasilkan 'false optimization' yang sebenarnya tidak meningkatkan performa",
     challenge:
       "**DECISION MATRIX:** Untuk 3 skenario (significant + big effect, significant + small effect, not significant), tentukan aksi yang tepat. Diskusikan trade-off dengan AI Lab!",
     quiz: {
@@ -173,12 +175,12 @@ Siklus ini bisa berjalan terus-menerus, menghasilkan creative improvement yang c
       options: [
         "Deploy B karena CTR-nya lebih tinggi",
         "Deploy A karena B belum proven",
-        "p-value 0.12 menunjukkan 88% confidence — cukup tinggi untuk campaign singkat. Deploy B dengan monitoring ketat, tapi dokumentasikan bahwa keputusan ini below standard significance threshold",
+        "p-value 0.12 menunjukkan 88% confidence â€” cukup tinggi untuk campaign singkat. Deploy B dengan monitoring ketat, tapi dokumentasikan bahwa keputusan ini below standard significance threshold",
         "Extend test period meskipun melewati deadline campaign",
       ],
       correct: 2,
       explanation:
-        "Dalam konteks time-sensitive campaign, 88% confidence (p=0.12) mungkin acceptable trade-off — lebih baik dari coin flip. Kuncinya: dokumentasikan bahwa ini bukan 'proven winner' dan lakukan full-significance test di campaign berikutnya untuk konfirmasi.",
+        "Dalam konteks time-sensitive campaign, 88% confidence (p=0.12) mungkin acceptable trade-off â€” lebih baik dari coin flip. Kuncinya: dokumentasikan bahwa ini bukan 'proven winner' dan lakukan full-significance test di campaign berikutnya untuk konfirmasi.",
     },
   },
 ];
@@ -277,7 +279,7 @@ function RacingBarsViz() {
                 }}
               >
                 <Icon icon="solar:letter-a-circle-bold-duotone" width={18} />{" "}
-                Variasi A — "Diskon 50% Hari Ini!"
+                Variasi A â€” "Diskon 50% Hari Ini!"
               </span>
               <span
                 style={{
@@ -347,7 +349,7 @@ function RacingBarsViz() {
                 }}
               >
                 <Icon icon="solar:letter-b-circle-bold-duotone" width={18} />{" "}
-                Variasi B — "Terakhir 3 Jam Lagi"
+                Variasi B â€” "Terakhir 3 Jam Lagi"
               </span>
               <span
                 style={{
@@ -433,8 +435,8 @@ function RacingBarsViz() {
               }}
             >
               {Math.max(progressA, progressB) > 80
-                ? "p < 0.05 ✓ Signifikan"
-                : `p = ${(0.5 - Math.abs(progressA - progressB) * 0.005).toFixed(2)} — Belum signifikan`}
+                ? "p < 0.05 âœ“ Signifikan"
+                : `p = ${(0.5 - Math.abs(progressA - progressB) * 0.005).toFixed(2)} â€” Belum signifikan`}
             </span>
           </div>
           <div
@@ -506,16 +508,28 @@ function RacingBarsViz() {
 }
 
 export default function ABTestingPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("ab-testing", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
 
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -567,7 +581,7 @@ export default function ABTestingPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -634,7 +648,7 @@ export default function ABTestingPage() {
                 letterSpacing: "0.06em",
               }}
             >
-              MODUL 12 · A/B TESTING
+              MODUL 12 Â· A/B TESTING
             </span>
           </div>
           <h1
@@ -720,7 +734,7 @@ export default function ABTestingPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -955,7 +969,7 @@ export default function ABTestingPage() {
                 <Zap size={15} />{" "}
                 {showAILab
                   ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
               </button>
 
               {showAILab && (
@@ -999,7 +1013,7 @@ export default function ABTestingPage() {
                     color: quizAnswer.correct ? "#16A34A" : "#DC2626",
                   }}
                 >
-                  {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
                 </span>
               )}
             </div>
@@ -1106,7 +1120,7 @@ export default function ABTestingPage() {
                       marginBottom: 6,
                     }}
                   >
-                    {quizAnswer.correct ? "✓ PENJELASAN" : "✗ PENJELASAN"}
+                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
                   </div>
                   <p
                     style={{

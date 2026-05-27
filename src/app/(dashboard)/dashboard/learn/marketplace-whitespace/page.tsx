@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -18,6 +18,8 @@ import {
   Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -33,11 +35,11 @@ const LESSONS = [
     id: "apa-whitespace",
     title: "Apa itu Whitespace Marketplace",
     concept: "Celah Pasar yang Belum Tergarap",
-    body: `**Whitespace** dalam konteks marketplace digital adalah area di mana **demand (permintaan) tinggi tapi supply konten/produk masih rendah**. Ini adalah zona emas bagi kreator dan seller — kompetisi rendah berarti biaya akuisisi murah dan organic visibility tinggi.
+    body: `**Whitespace** dalam konteks marketplace digital adalah area di mana **demand (permintaan) tinggi tapi supply konten/produk masih rendah**. Ini adalah zona emas bagi kreator dan seller â€” kompetisi rendah berarti biaya akuisisi murah dan organic visibility tinggi.
 
 Di Shopee dan Tokopedia, whitespace bisa berupa: keyword dengan search volume tinggi tapi sedikit produk yang mengoptimasi SEO-nya, kategori produk yang trending tapi belum banyak review/konten edukatif, atau niche yang belum digarap oleh seller besar.
 
-Menemukan whitespace bukan keberuntungan — ini adalah **proses analitik** yang bisa disistematiskan. Dengan tools yang tepat dan framework yang disiplin, kamu bisa secara konsisten menemukan peluang sebelum pasar menjadi ramai.`,
+Menemukan whitespace bukan keberuntungan â€” ini adalah **proses analitik** yang bisa disistematiskan. Dengan tools yang tepat dan framework yang disiplin, kamu bisa secara konsisten menemukan peluang sebelum pasar menjadi ramai.`,
     insight:
       "Seller yang masuk ke whitespace 1 bulan lebih awal rata-rata mendapat 4x organic traffic dibanding late-mover",
     challenge: `**EKSPLORASI:** Buka Shopee Keyword Tool dan cari 5 keyword di niche kamu. Catat: search volume, jumlah produk yang muncul, dan rata-rata rating produk teratas. Mana yang menunjukkan tanda whitespace?`,
@@ -46,45 +48,45 @@ Menemukan whitespace bukan keberuntungan — ini adalah **proses analitik** yang
         "Keyword 'serum bakuchiol' memiliki 12.000 pencarian/bulan di Shopee tapi hanya 45 produk yang muncul. Apa artinya?",
       options: [
         "Terlalu sedikit produk berarti tidak ada market untuk keyword ini",
-        "Ini adalah whitespace — demand tinggi tapi supply rendah, peluang besar untuk masuk",
+        "Ini adalah whitespace â€” demand tinggi tapi supply rendah, peluang besar untuk masuk",
         "Kita harus menunggu sampai lebih banyak produk muncul baru ikut berjualan",
         "12.000 pencarian terlalu kecil untuk dijadikan target",
       ],
       correct: 1,
       explanation:
-        "Rasio 12.000 pencarian vs 45 produk menunjukkan gap besar antara demand dan supply. Ini adalah sinyal whitespace klasik — peluang mendapat organic visibility tinggi dengan kompetisi rendah.",
+        "Rasio 12.000 pencarian vs 45 produk menunjukkan gap besar antara demand dan supply. Ini adalah sinyal whitespace klasik â€” peluang mendapat organic visibility tinggi dengan kompetisi rendah.",
     },
   },
   {
     id: "matriks-kompetisi",
     title: "Matriks Kompetisi vs. Demand",
     concept: "Framework Kuadran untuk Identifikasi Peluang",
-    body: `Framework paling efektif untuk menemukan whitespace adalah **Matriks 2×2 Kompetisi-Demand**:
+    body: `Framework paling efektif untuk menemukan whitespace adalah **Matriks 2Ã—2 Kompetisi-Demand**:
 
-**Kuadran 1 — Red Ocean (Kanan Atas):** Demand tinggi, Kompetisi tinggi. Contoh: "skincare Korea". Butuh budget besar untuk bersaing.
+**Kuadran 1 â€” Red Ocean (Kanan Atas):** Demand tinggi, Kompetisi tinggi. Contoh: "skincare Korea". Butuh budget besar untuk bersaing.
 
-**Kuadran 2 — Whitespace (Kiri Atas):** Demand tinggi, Kompetisi rendah. Ini target utama. Contoh: keyword long-tail yang belum dioptimasi seller besar.
+**Kuadran 2 â€” Whitespace (Kiri Atas):** Demand tinggi, Kompetisi rendah. Ini target utama. Contoh: keyword long-tail yang belum dioptimasi seller besar.
 
-**Kuadran 3 — Dead Zone (Kiri Bawah):** Demand rendah, Kompetisi rendah. Tidak layak karena pasarnya terlalu kecil.
+**Kuadran 3 â€” Dead Zone (Kiri Bawah):** Demand rendah, Kompetisi rendah. Tidak layak karena pasarnya terlalu kecil.
 
-**Kuadran 4 — Trap (Kanan Bawah):** Demand rendah, Kompetisi tinggi. Hindari — banyak seller tapi sedikit pembeli.
+**Kuadran 4 â€” Trap (Kanan Bawah):** Demand rendah, Kompetisi tinggi. Hindari â€” banyak seller tapi sedikit pembeli.
 
 Tujuan kita: **konsisten menemukan keyword dan produk di Kuadran 2**, lalu bergerak cepat sebelum kuadran itu bergeser ke Red Ocean.`,
     insight:
       "80% seller fokus di Red Ocean. Top 5% seller menghabiskan waktu 2-3 jam/minggu secara khusus mencari Whitespace",
-    challenge: `**MAPPING KUADRAN:** Ambil 10 keyword dari niche kamu. Plot masing-masing ke dalam matriks 2×2 berdasarkan volume pencarian (Y) dan jumlah kompetitor (X). Berapa yang masuk Whitespace?`,
+    challenge: `**MAPPING KUADRAN:** Ambil 10 keyword dari niche kamu. Plot masing-masing ke dalam matriks 2Ã—2 berdasarkan volume pencarian (Y) dan jumlah kompetitor (X). Berapa yang masuk Whitespace?`,
     quiz: {
       question:
         "Keyword di kuadran 'Dead Zone' (demand rendah, kompetisi rendah) apakah selalu harus dihindari?",
       options: [
         "Ya, selalu hindari karena tidak ada pasar",
-        "Tidak selalu — bisa menjadi emerging trend yang belum mainstream, perlu validasi dengan data tren",
+        "Tidak selalu â€” bisa menjadi emerging trend yang belum mainstream, perlu validasi dengan data tren",
         "Dead Zone adalah tempat terbaik karena tidak ada kompetisi",
         "Hanya hindari jika kompetisinya lebih dari 100 produk",
       ],
       correct: 1,
       explanation:
-        "Dead Zone kadang berisi keyword yang baru muncul (emerging trend) yang belum terdeteksi mainstream. Cross-check dengan data tren dari Modul 2 — jika acceleration-nya positif, ini bisa jadi whitespace masa depan.",
+        "Dead Zone kadang berisi keyword yang baru muncul (emerging trend) yang belum terdeteksi mainstream. Cross-check dengan data tren dari Modul 2 â€” jika acceleration-nya positif, ini bisa jadi whitespace masa depan.",
     },
   },
   {
@@ -93,13 +95,13 @@ Tujuan kita: **konsisten menemukan keyword dan produk di Kuadran 2**, lalu berge
     concept: "Menemukan Niche dalam Niche",
     body: `Keyword long-tail adalah **variasi spesifik dari keyword umum** yang biasanya memiliki: volume lebih kecil tapi conversion rate jauh lebih tinggi, dan kompetisi yang sangat rendah.
 
-Contoh transformasi: "serum wajah" (volume tinggi, kompetisi gila) → "serum vitamin C untuk kulit berjerawat" (volume sedang, kompetisi rendah) → "serum bakuchiol retinol alternative sensitive skin" (volume kecil tapi buyer intent sangat tinggi).
+Contoh transformasi: "serum wajah" (volume tinggi, kompetisi gila) â†’ "serum vitamin C untuk kulit berjerawat" (volume sedang, kompetisi rendah) â†’ "serum bakuchiol retinol alternative sensitive skin" (volume kecil tapi buyer intent sangat tinggi).
 
 **Teknik mining keyword long-tail:**  
-1. **Autocomplete Mining** — Ketik keyword utama di search bar Shopee/Tokopedia, catat semua saran autocomplete  
-2. **Review Mining** — Baca review produk kompetitor, catat bahasa yang digunakan buyer  
-3. **Question Mining** — Lihat pertanyaan di Q&A produk kompetitor, setiap pertanyaan = potensi keyword  
-4. **Variation Stacking** — Kombinasikan atribut: bahan + masalah kulit + tipe kulit + harga`,
+1. **Autocomplete Mining** â€” Ketik keyword utama di search bar Shopee/Tokopedia, catat semua saran autocomplete  
+2. **Review Mining** â€” Baca review produk kompetitor, catat bahasa yang digunakan buyer  
+3. **Question Mining** â€” Lihat pertanyaan di Q&A produk kompetitor, setiap pertanyaan = potensi keyword  
+4. **Variation Stacking** â€” Kombinasikan atribut: bahan + masalah kulit + tipe kulit + harga`,
     insight:
       "Keyword long-tail 4+ kata memiliki conversion rate 2.5x lebih tinggi dari keyword generic 1-2 kata",
     challenge: `**MINING CHALLENGE:** Pilih 1 keyword utama. Lakukan autocomplete mining di Shopee, temukan minimal 8 variasi long-tail. Urutkan berdasarkan potensi whitespace!`,
@@ -107,31 +109,31 @@ Contoh transformasi: "serum wajah" (volume tinggi, kompetisi gila) → "serum vi
       question:
         "Mana teknik yang PALING efektif untuk menemukan bahasa alami yang digunakan buyer?",
       options: [
-        "Autocomplete Mining — karena langsung dari search bar",
-        "Review Mining — karena buyer menulis dengan bahasa alami tentang masalah dan kebutuhan mereka",
-        "Keyword Planner — karena memberikan volume pasti",
+        "Autocomplete Mining â€” karena langsung dari search bar",
+        "Review Mining â€” karena buyer menulis dengan bahasa alami tentang masalah dan kebutuhan mereka",
+        "Keyword Planner â€” karena memberikan volume pasti",
         "Melihat judul produk kompetitor",
       ],
       correct: 1,
       explanation:
-        "Review Mining memberikan insight langsung ke bahasa alami buyer — bagaimana mereka mendeskripsikan masalah, kebutuhan, dan harapan mereka. Ini menghasilkan keyword yang sangat spesifik dan high-intent.",
+        "Review Mining memberikan insight langsung ke bahasa alami buyer â€” bagaimana mereka mendeskripsikan masalah, kebutuhan, dan harapan mereka. Ini menghasilkan keyword yang sangat spesifik dan high-intent.",
     },
   },
   {
     id: "first-mover",
     title: "Strategi First-Mover di Celah Pasar",
     concept: "Eksekusi Cepat Sebelum Window Tertutup",
-    body: `Menemukan whitespace baru setengah perjuangan. **Eksekusi cepat** adalah kunci — window of opportunity di marketplace digital biasanya hanya bertahan **4-8 minggu** sebelum kompetitor besar masuk.
+    body: `Menemukan whitespace baru setengah perjuangan. **Eksekusi cepat** adalah kunci â€” window of opportunity di marketplace digital biasanya hanya bertahan **4-8 minggu** sebelum kompetitor besar masuk.
 
 **Framework First-Mover Execution:**
 
-**Minggu 1 — Validasi & Listing:** Buat produk/konten dengan SEO yang sudah dioptimasi untuk keyword whitespace. Fokus pada kualitas foto dan deskripsi yang menjawab intent pencarian.
+**Minggu 1 â€” Validasi & Listing:** Buat produk/konten dengan SEO yang sudah dioptimasi untuk keyword whitespace. Fokus pada kualitas foto dan deskripsi yang menjawab intent pencarian.
 
-**Minggu 2-3 — Review Building:** Agresif kumpulkan review positif. Di marketplace, produk dengan 50+ review mendominasi search result. Gunakan follow-up message otomatis.
+**Minggu 2-3 â€” Review Building:** Agresif kumpulkan review positif. Di marketplace, produk dengan 50+ review mendominasi search result. Gunakan follow-up message otomatis.
 
-**Minggu 4-6 — Content Moat:** Buat konten edukatif di TikTok/Instagram tentang topik whitespace. Ini membangun authority dan membuat organic traffic dari luar marketplace.
+**Minggu 4-6 â€” Content Moat:** Buat konten edukatif di TikTok/Instagram tentang topik whitespace. Ini membangun authority dan membuat organic traffic dari luar marketplace.
 
-**Minggu 7-8 — Defendable Position:** Ketika kompetitor mulai masuk, kamu sudah punya review, rating, and content authority. Switching cost bagi buyer menjadi tinggi.`,
+**Minggu 7-8 â€” Defendable Position:** Ketika kompetitor mulai masuk, kamu sudah punya review, rating, and content authority. Switching cost bagi buyer menjadi tinggi.`,
     insight:
       "First-mover di whitespace marketplace memiliki 70% probabilitas mempertahankan posisi Top 5 meski kompetitor masuk kemudian",
     challenge: `**RANCANG TIMELINE:** Pilih satu whitespace yang kamu temukan dari latihan sebelumnya. Buat timeline 8 minggu dengan milestone spesifik untuk setiap minggu!`,
@@ -151,7 +153,7 @@ Contoh transformasi: "serum wajah" (volume tinggi, kompetisi gila) → "serum vi
   },
 ];
 
-// ── Quadrant Matrix Visualization ─────────────────────────────────────────────
+// â”€â”€ Quadrant Matrix Visualization â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function QuadrantViz() {
   const [competition, setCompetition] = useState(30);
   const [volume, setVolume] = useState(70);
@@ -165,7 +167,7 @@ function QuadrantViz() {
         name: "WHITESPACE",
         icon: "solar:target-bold-duotone",
         color: ACCENT,
-        desc: "Demand tinggi, kompetisi rendah — zona emas!",
+        desc: "Demand tinggi, kompetisi rendah â€” zona emas!",
       };
     if (volume > 50 && competition > 50)
       return {
@@ -179,13 +181,13 @@ function QuadrantViz() {
         name: "DEAD ZONE",
         icon: "solar:ghost-bold-duotone",
         color: "#6B7280",
-        desc: "Demand dan kompetisi rendah — perlu validasi tren",
+        desc: "Demand dan kompetisi rendah â€” perlu validasi tren",
       };
     return {
       name: "TRAP",
       icon: "solar:forbidden-circle-bold-duotone",
       color: "#F59E0B",
-      desc: "Kompetisi tinggi tapi demand rendah — hindari!",
+      desc: "Kompetisi tinggi tapi demand rendah â€” hindari!",
     };
   };
   const quad = getQuadrant();
@@ -348,7 +350,7 @@ function QuadrantViz() {
               fontWeight: 600,
             }}
           >
-            Kompetisi →
+            Kompetisi â†’
           </div>
           <div
             style={{
@@ -361,7 +363,7 @@ function QuadrantViz() {
               fontWeight: 600,
             }}
           >
-            Demand →
+            Demand â†’
           </div>
           {/* Dot */}
           <motion.div
@@ -424,17 +426,29 @@ function QuadrantViz() {
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
+// â”€â”€ Main Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function MarketplaceWhitespacePage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("marketplace-whitespace", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -485,7 +499,7 @@ export default function MarketplaceWhitespacePage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -552,7 +566,7 @@ export default function MarketplaceWhitespacePage() {
                 letterSpacing: "0.06em",
               }}
             >
-              MODUL 3 · MARKETPLACE
+              MODUL 3 Â· MARKETPLACE
             </span>
           </div>
           <h1
@@ -638,7 +652,7 @@ export default function MarketplaceWhitespacePage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -868,7 +882,7 @@ export default function MarketplaceWhitespacePage() {
                 <Zap size={15} />{" "}
                 {showAILab
                   ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
               </button>
               {showAILab && (
                 <AILab
@@ -911,7 +925,7 @@ export default function MarketplaceWhitespacePage() {
                     color: quizAnswer.correct ? "#16A34A" : "#DC2626",
                   }}
                 >
-                  {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
                 </span>
               )}
             </div>
@@ -1019,7 +1033,7 @@ export default function MarketplaceWhitespacePage() {
                       letterSpacing: "0.06em",
                     }}
                   >
-                    {quizAnswer.correct ? "✓ PENJELASAN" : "✗ PENJELASAN"}
+                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
                   </div>
                   <p
                     style={{

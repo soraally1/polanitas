@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -15,8 +15,11 @@ import {
   Target,
   BookOpen,
   Clock,
+  Trophy,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -358,23 +361,40 @@ function HeartbeatViz() {
 }
 
 export default function NeuromarketingPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, isLoading, saveAnswer } =
+    useModuleProgress("neuromarketing", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
-  const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
-  const [showAILab, setShowAILab] = useState(false);
-  const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const [quizAnswer,    setQuizAnswer]    = useState<QuizAnswer | null>(null);
+  const [showAILab,     setShowAILab]     = useState(false);
+
+  const lesson   = LESSONS[currentLesson];
+  const progress = (completedLessons.size / LESSONS.length) * 100;
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
+
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-  function handleQuizAnswer(i: number) {
+
+  async function handleQuizAnswer(i: number) {
     if (quizAnswer) return;
     const correct = i === lesson.quiz.correct;
-    setQuizAnswer({ questionIndex: currentLesson, selected: i, correct });
-    if (correct) setCompleted((p) => new Set([...p, currentLesson]));
+    const answer: QuizAnswer = { questionIndex: currentLesson, selected: i, correct };
+    setQuizAnswer(answer);
+    // Persist to Firestore
+    await saveAnswer(currentLesson, i, correct);
   }
   return (
     <div
@@ -406,37 +426,19 @@ export default function NeuromarketingPage() {
           <ArrowLeft size={16} /> Kembali ke Kurikulum
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontSize: "0.875rem",
-              color: "var(--color-text-muted)",
-            }}
-          >
-            <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
-          </div>
-          <div
-            style={{
-              width: 120,
-              height: 6,
-              background: "var(--color-surface-3)",
-              borderRadius: 999,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                height: "100%",
-                width: `${progress}%`,
-                background: `linear-gradient(90deg,${C},#0D9488)`,
-                borderRadius: 999,
-                transition: "width 0.5s ease",
-              }}
-            />
-          </div>
+          {isLoading ? (
+            <span style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>Memuat...</span>
+          ) : (
+            <>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
+                <BookOpen size={15} />
+                {completedLessons.size}/{LESSONS.length} selesai
+              </div>
+              <div style={{ width: 120, height: 6, background: "var(--color-surface-3)", borderRadius: 999, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${progress}%`, background: `linear-gradient(90deg,${C},#0D9488)`, borderRadius: 999, transition: "width 0.5s ease" }} />
+              </div>
+            </>
+          )}
         </div>
       </div>
       <div
@@ -567,7 +569,7 @@ export default function NeuromarketingPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone   = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -960,13 +962,37 @@ export default function NeuromarketingPage() {
               )}
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 12,
-            }}
-          >
+          {/* Module complete banner */}
+          {isModuleComplete && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              style={{
+                padding: "24px 28px",
+                background: "linear-gradient(135deg, rgba(34,197,94,0.12), rgba(20,184,166,0.12))",
+                border: "1px solid rgba(34,197,94,0.35)",
+                borderRadius: "var(--radius-xl)",
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+              }}
+            >
+              <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(34,197,94,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <Trophy size={26} color="#16A34A" />
+              </div>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: "1.0625rem", color: "#16A34A", marginBottom: 4 }}>
+                  🎉 Modul Selesai!
+                </div>
+                <div style={{ fontSize: "0.875rem", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+                  Kamu telah menyelesaikan semua {LESSONS.length} materi di modul Neuromarketing.
+                  Progress disimpan otomatis.
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
             <button
               onClick={() => goToLesson(currentLesson - 1)}
               disabled={currentLesson === 0}

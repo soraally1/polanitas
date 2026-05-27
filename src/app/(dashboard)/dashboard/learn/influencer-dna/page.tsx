@@ -1,5 +1,5 @@
-"use client";
-import { useState, useRef, useEffect } from "react";
+﻿"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -17,6 +17,8 @@ import {
   Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -60,11 +62,11 @@ const LESSONS = [
 
 **3 Era Influencer Marketing:**
 
-**Era 1 — Celebrity Endorsement (2010-2016):** Bayar selebriti mahal, harapkan exposure. Metrik: followers count. Masalah: ROI tidak terukur, audiens tidak targeted.
+**Era 1 â€” Celebrity Endorsement (2010-2016):** Bayar selebriti mahal, harapkan exposure. Metrik: followers count. Masalah: ROI tidak terukur, audiens tidak targeted.
 
-**Era 2 — Micro-Influencer Rise (2017-2022):** Fokus ke influencer kecil (10K-100K followers) dengan engagement rate tinggi. Metrik: engagement rate. Masalah: masih tebak-tebak vibes matching.
+**Era 2 â€” Micro-Influencer Rise (2017-2022):** Fokus ke influencer kecil (10K-100K followers) dengan engagement rate tinggi. Metrik: engagement rate. Masalah: masih tebak-tebak vibes matching.
 
-**Era 3 — DNA Matching (2023+):** Menggunakan AI dan vector search untuk mencocokkan "DNA brand" dengan "DNA influencer" secara multidimensional — bukan hanya followers atau engagement, tapi values, audiens overlap, content style, dan brand safety score.
+**Era 3 â€” DNA Matching (2023+):** Menggunakan AI dan vector search untuk mencocokkan "DNA brand" dengan "DNA influencer" secara multidimensional â€” bukan hanya followers atau engagement, tapi values, audiens overlap, content style, dan brand safety score.
 
 Di Era 3, pertanyaannya bukan "influencer mana yang paling terkenal?" tapi **"influencer mana yang paling ALIGNED dengan brand DNA kita?"**`,
     insight:
@@ -76,7 +78,7 @@ Di Era 3, pertanyaannya bukan "influencer mana yang paling terkenal?" tapi **"in
         "Brand skincare premium natural ingin kolaborasi influencer. Pilihan: (A) Beauty influencer 500K followers, konten agresif/hard sell. (B) Lifestyle influencer 50K followers, konten mindful living & sustainability. Mana yang lebih aligned?",
       options: [
         "A karena followers 10x lebih banyak",
-        "B — DNA 'mindful living & sustainability' match dengan brand skincare natural premium, meskipun followers lebih kecil",
+        "B â€” DNA 'mindful living & sustainability' match dengan brand skincare natural premium, meskipun followers lebih kecil",
         "Gabungkan keduanya untuk coverage maksimal",
         "Tidak bisa ditentukan tanpa data engagement rate",
       ],
@@ -93,13 +95,13 @@ Di Era 3, pertanyaannya bukan "influencer mana yang paling terkenal?" tapi **"in
 
 **Cara kerja untuk Influencer Matching:**
 
-**Step 1 — Vectorize Brand DNA:** Konversi brand guidelines, past content, dan values statement menjadi vector menggunakan embedding model (misal: OpenAI Ada, Sentence-BERT).
+**Step 1 â€” Vectorize Brand DNA:** Konversi brand guidelines, past content, dan values statement menjadi vector menggunakan embedding model (misal: OpenAI Ada, Sentence-BERT).
 
-**Step 2 — Vectorize Influencer DNA:** Konversi konten influencer (captions, video transcripts, bio, comments) menjadi vector.
+**Step 2 â€” Vectorize Influencer DNA:** Konversi konten influencer (captions, video transcripts, bio, comments) menjadi vector.
 
-**Step 3 — Similarity Search:** Hitung cosine similarity antara brand vector and influencer vector. Skor 0-1, semakin mendekati 1 = semakin match.
+**Step 3 â€” Similarity Search:** Hitung cosine similarity antara brand vector and influencer vector. Skor 0-1, semakin mendekati 1 = semakin match.
 
-**Step 4 — Multi-Dimensional Ranking:** Ranking influencer berdasarkan: content style match (30%), audiens overlap (25%), values alignment (25%), engagement quality (20%).
+**Step 4 â€” Multi-Dimensional Ranking:** Ranking influencer berdasarkan: content style match (30%), audiens overlap (25%), values alignment (25%), engagement quality (20%).
 
 Keunggulan pendekatan ini vs manual: bisa memproses ribuan influencer dalam hitungan menit dan menangkap nuansa semantik yang manusia bisa lewatkan.`,
     insight:
@@ -111,7 +113,7 @@ Keunggulan pendekatan ini vs manual: bisa memproses ribuan influencer dalam hitu
         "Cosine similarity antara brand vector dan influencer vector = 0.92. Apa interpretasinya?",
       options: [
         "Match rendah, cari influencer lain",
-        "Match sangat tinggi (92%) — konten dan values influencer sangat aligned dengan brand DNA",
+        "Match sangat tinggi (92%) â€” konten dan values influencer sangat aligned dengan brand DNA",
         "Angka 0.92 tidak bermakna tanpa konteks",
         "Perlu tambahan data engagement sebelum bisa interpretasi",
       ],
@@ -124,17 +126,17 @@ Keunggulan pendekatan ini vs manual: bisa memproses ribuan influencer dalam hitu
     id: "dna-matching",
     title: "DNA Matching: Vibe, Audiens, Values",
     concept: "Framework Multi-Dimensi untuk Seleksi",
-    body: `DNA Matching melampaui similarity score tunggal — ia melihat **keselarasan di multiple dimensi** untuk memastikan kolaborasi yang authentic dan efektif.
+    body: `DNA Matching melampaui similarity score tunggal â€” ia melihat **keselarasan di multiple dimensi** untuk memastikan kolaborasi yang authentic dan efektif.
 
 **5 Dimensi DNA Matching:**
 
-**1. Vibe Match (Content Style):** Apakah gaya visual dan narasi influencer selaras dengan brand aesthetic? Fashion minimalist brand × maximalist influencer = clash.
+**1. Vibe Match (Content Style):** Apakah gaya visual dan narasi influencer selaras dengan brand aesthetic? Fashion minimalist brand Ã— maximalist influencer = clash.
 
 **2. Audiens Overlap:** Berapa persen audiens influencer yang match dengan target market brand? Tools seperti Modash atau HypeAuditor bisa menganalisis demografi dan interest audiens.
 
-**3. Values Alignment:** Apakah values yang disuarakan influencer konsisten dengan brand values? Eco-friendly brand × influencer yang promosikan fast fashion = reputational risk.
+**3. Values Alignment:** Apakah values yang disuarakan influencer konsisten dengan brand values? Eco-friendly brand Ã— influencer yang promosikan fast fashion = reputational risk.
 
-**4. Engagement Quality:** Bukan hanya engagement rate, tapi KUALITAS — apakah komentar menunjukkan genuine interest atau hanya bot/generik?
+**4. Engagement Quality:** Bukan hanya engagement rate, tapi KUALITAS â€” apakah komentar menunjukkan genuine interest atau hanya bot/generik?
 
 **5. Brand Safety Score:** Riwayat kontroversi, konten sensitif, atau partnership dengan kompetitor. Satu skandal influencer bisa berdampak ke semua brand yang berasosiasi.
 
@@ -148,13 +150,13 @@ Keunggulan pendekatan ini vs manual: bisa memproses ribuan influencer dalam hitu
         "Influencer memiliki engagement rate 8% (sangat tinggi) tapi 40% komentar terdeteksi dari bot. Apa dampaknya pada DNA matching?",
       options: [
         "Tidak masalah karena engagement rate-nya tinggi",
-        "Engagement Quality score harus turun drastis — bot engagement menunjukkan audiens tidak genuine dan ROI kolaborasi akan rendah",
+        "Engagement Quality score harus turun drastis â€” bot engagement menunjukkan audiens tidak genuine dan ROI kolaborasi akan rendah",
         "Bot engagement justru bagus karena meningkatkan social proof",
         "Hanya perlu diperhatikan jika bot percentage di atas 60%",
       ],
       correct: 1,
       explanation:
-        "40% bot comments berarti hampir setengah 'engagement' itu palsu. Real engagement rate-nya sebenarnya sekitar 4.8%. Lebih penting, ini menunjukkan audiens yang tidak genuine — konten brand di akun ini akan ditampilkan ke banyak non-human viewers yang tidak bisa membeli.",
+        "40% bot comments berarti hampir setengah 'engagement' itu palsu. Real engagement rate-nya sebenarnya sekitar 4.8%. Lebih penting, ini menunjukkan audiens yang tidak genuine â€” konten brand di akun ini akan ditampilkan ke banyak non-human viewers yang tidak bisa membeli.",
     },
   },
   {
@@ -172,7 +174,7 @@ Keunggulan pendekatan ini vs manual: bisa memproses ribuan influencer dalam hitu
 - **Indirect:** Peningkatan brand search volume, follower growth, website traffic spike selama dan setelah campaign
 - **Long-term:** Brand awareness lift, consideration score improvement (butuh survey)
 
-**Formula ROI:** (Total Revenue Attributed - Total Cost) / Total Cost × 100%
+**Formula ROI:** (Total Revenue Attributed - Total Cost) / Total Cost Ã— 100%
 
 **Benchmarks:**
 - ROI > 300% = Excellent, perpanjang kontrak
@@ -190,13 +192,13 @@ Keunggulan pendekatan ini vs manual: bisa memproses ribuan influencer dalam hitu
         "Campaign influencer menghasilkan ROI 80% dari direct sales. Tapi brand search volume naik 150% selama campaign. Bagaimana assessment-nya?",
       options: [
         "ROI 80% berarti campaign gagal",
-        "Direct ROI 80% marginal, tapi indirect impact (brand search +150%) menunjukkan massive awareness lift — total ROI kemungkinan jauh lebih tinggi dari 80% jika indirect revenue dihitung",
+        "Direct ROI 80% marginal, tapi indirect impact (brand search +150%) menunjukkan massive awareness lift â€” total ROI kemungkinan jauh lebih tinggi dari 80% jika indirect revenue dihitung",
         "Brand search volume tidak relevan untuk ROI calculation",
         "Hanya direct sales yang penting, indirect metrics tidak bisa diandalkan",
       ],
       correct: 1,
       explanation:
-        "ROI 80% dari direct sales SAJA sudah mendekati breakeven. Brand search volume +150% menunjukkan bahwa banyak orang yang terpapar campaign lalu melakukan research sendiri — sebagian dari mereka akan convert melalui channel lain (organic, Google ads). True ROI kemungkinan 200-400% jika indirect dimasukkan.",
+        "ROI 80% dari direct sales SAJA sudah mendekati breakeven. Brand search volume +150% menunjukkan bahwa banyak orang yang terpapar campaign lalu melakukan research sendiri â€” sebagian dari mereka akan convert melalui channel lain (organic, Google ads). True ROI kemungkinan 200-400% jika indirect dimasukkan.",
     },
   },
 ];
@@ -245,7 +247,7 @@ function VennDiagramViz() {
         }}
       >
         <div style={{ fontWeight: 800, fontSize: "1rem" }}>
-          Venn Diagram: Brand × Influencer DNA Match
+          Venn Diagram: Brand Ã— Influencer DNA Match
         </div>
         <div className="caption" style={{ marginTop: 4 }}>
           Pilih tags untuk brand dan influencer, lihat overlap berubah
@@ -269,7 +271,7 @@ function VennDiagramViz() {
                 marginBottom: 8,
               }}
             >
-              🏢 Brand Tags
+              ðŸ¢ Brand Tags
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {BRAND_TAGS.map((t) => (
@@ -306,7 +308,7 @@ function VennDiagramViz() {
                 marginBottom: 8,
               }}
             >
-              👤 Influencer Tags
+              ðŸ‘¤ Influencer Tags
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {INFLUENCER_TAGS.map((t) => (
@@ -500,7 +502,7 @@ function VennDiagramViz() {
           >
             {overlap.length > 0
               ? `Overlap tags: ${overlap.join(", ")}`
-              : "Tidak ada overlap — influencer ini tidak cocok dengan brand DNA"}
+              : "Tidak ada overlap â€” influencer ini tidak cocok dengan brand DNA"}
           </div>
         </motion.div>
       </div>
@@ -509,15 +511,27 @@ function VennDiagramViz() {
 }
 
 export default function InfluencerDNAPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("influencer-dna", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -567,7 +581,7 @@ export default function InfluencerDNAPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -633,7 +647,7 @@ export default function InfluencerDNAPage() {
                 letterSpacing: "0.06em",
               }}
             >
-              MODUL 11 · INFLUENCER DNA
+              MODUL 11 Â· INFLUENCER DNA
             </span>
           </div>
           <h1
@@ -718,7 +732,7 @@ export default function InfluencerDNAPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -947,7 +961,7 @@ export default function InfluencerDNAPage() {
                 <Zap size={15} />{" "}
                 {showAILab
                   ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
               </button>
               {showAILab && (
                 <AILab
@@ -989,7 +1003,7 @@ export default function InfluencerDNAPage() {
                     color: quizAnswer.correct ? "#16A34A" : "#DC2626",
                   }}
                 >
-                  {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
                 </span>
               )}
             </div>
@@ -1096,7 +1110,7 @@ export default function InfluencerDNAPage() {
                       marginBottom: 6,
                     }}
                   >
-                    {quizAnswer.correct ? "✓ PENJELASAN" : "✗ PENJELASAN"}
+                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
                   </div>
                   <p
                     style={{

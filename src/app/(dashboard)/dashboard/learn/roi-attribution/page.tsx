@@ -1,5 +1,5 @@
-"use client";
-import { useState, useRef, useEffect } from "react";
+﻿"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -17,6 +17,8 @@ import {
   Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -31,17 +33,17 @@ const LESSONS = [
     id: "engagement-revenue",
     title: "Engagement ke Revenue",
     concept: "Mitos vs. Realita Konversi",
-    body: `Banyak marketer terjebak dalam **vanity metrics** — likes, views, followers — tanpa menghubungkannya dengan **revenue nyata**. Pertanyaan kritis yang jarang dijawab: "Berapa rupiah yang dihasilkan dari 1.000 likes?"
+    body: `Banyak marketer terjebak dalam **vanity metrics** â€” likes, views, followers â€” tanpa menghubungkannya dengan **revenue nyata**. Pertanyaan kritis yang jarang dijawab: "Berapa rupiah yang dihasilkan dari 1.000 likes?"
 
 Realita yang harus dihadapi: **tidak semua engagement sama nilainya**. Save dan share jauh lebih bernilai dari like karena menunjukkan intent yang lebih tinggi. Comment dengan pertanyaan tentang produk lebih bernilai dari comment emoji.
 
 **Hierarchy of Engagement Value:**
-1. **Purchase** (konversi langsung) → highest value
-2. **Add to Cart / Inquiry** → high commercial intent
-3. **Save / Bookmark** → consideration stage
-4. **Share** → advocacy, organic reach multiplier
-5. **Comment** → engagement, bervariasi tergantung konten komentar
-6. **Like** → awareness, lowest direct commercial value
+1. **Purchase** (konversi langsung) â†’ highest value
+2. **Add to Cart / Inquiry** â†’ high commercial intent
+3. **Save / Bookmark** â†’ consideration stage
+4. **Share** â†’ advocacy, organic reach multiplier
+5. **Comment** â†’ engagement, bervariasi tergantung konten komentar
+6. **Like** â†’ awareness, lowest direct commercial value
 
 Memahami hierarki ini membantu kamu mengalokasikan effort ke konten yang menghasilkan engagement BERNILAI TINGGI, bukan sekadar engagement BERJUMLAH BANYAK.`,
     insight:
@@ -53,13 +55,13 @@ Memahami hierarki ini membantu kamu mengalokasikan effort ke konten yang menghas
         "Post A: 10.000 likes, 20 saves. Post B: 1.000 likes, 200 saves. Mana yang lebih bernilai secara komersial?",
       options: [
         "Post A karena likes-nya 10x lebih banyak",
-        "Post B — save rate 20% menunjukkan buying consideration yang jauh lebih tinggi dari Post A (save rate 0.2%)",
+        "Post B â€” save rate 20% menunjukkan buying consideration yang jauh lebih tinggi dari Post A (save rate 0.2%)",
         "Keduanya sama nilainya",
         "Tidak bisa ditentukan tanpa data followers",
       ],
       correct: 1,
       explanation:
-        "Save menunjukkan intent untuk kembali dan membeli. Post B memiliki save rate 20% vs Post A 0.2% — artinya audiens Post B 100x lebih mungkin dalam consideration stage. Dalam perspective revenue, Post B jauh lebih bernilai.",
+        "Save menunjukkan intent untuk kembali dan membeli. Post B memiliki save rate 20% vs Post A 0.2% â€” artinya audiens Post B 100x lebih mungkin dalam consideration stage. Dalam perspective revenue, Post B jauh lebih bernilai.",
     },
   },
   {
@@ -76,16 +78,16 @@ Memahami hierarki ini membantu kamu mengalokasikan effort ke konten yang menghas
 
 **Rekomendasi untuk bisnis kecil-menengah:** Mulai dengan **U-Shaped** karena memberikan bobot yang fair ke awareness (first touch) dan conversion (last touch) tanpa mengabaikan nurturing di tengah.`,
     insight:
-      "Bisnis yang beralih dari Last-Touch ke Multi-Touch attribution mengalokasikan budget 30% lebih efisien — karena awareness channel yang sebelumnya undervalued akhirnya mendapat kredit",
+      "Bisnis yang beralih dari Last-Touch ke Multi-Touch attribution mengalokasikan budget 30% lebih efisien â€” karena awareness channel yang sebelumnya undervalued akhirnya mendapat kredit",
     challenge:
       "**MAPPING JOURNEY:** Pilih satu pembelian terakhir yang kamu lakukan secara online. Trace balik: apa touchpoint pertama? Apa yang terjadi di tengah? Apa touchpoint terakhir sebelum beli? Apply 3 model atribusi.",
     quiz: {
       question:
-        "Brand kamu menjalankan TikTok ads (awareness) → Instagram retargeting → Google Search → Purchase. Dengan U-Shaped attribution, berapa kredit TikTok?",
+        "Brand kamu menjalankan TikTok ads (awareness) â†’ Instagram retargeting â†’ Google Search â†’ Purchase. Dengan U-Shaped attribution, berapa kredit TikTok?",
       options: [
         "100% karena first touch",
         "0% karena bukan last touch",
-        "40% — U-Shaped memberikan 40% ke first touch dan 40% ke last touch",
+        "40% â€” U-Shaped memberikan 40% ke first touch dan 40% ke last touch",
         "25% karena dibagi sama rata",
       ],
       correct: 2,
@@ -97,7 +99,7 @@ Memahami hierarki ini membantu kamu mengalokasikan effort ke konten yang menghas
     id: "roas-clv",
     title: "ROAS & Customer Lifetime Value",
     concept: "Metric yang Sebenarnya Penting",
-    body: `**ROAS (Return On Ad Spend)** mengukur berapa rupiah revenue yang dihasilkan per rupiah yang dibelanjakan untuk iklan. Formula: Revenue / Ad Spend × 100%.
+    body: `**ROAS (Return On Ad Spend)** mengukur berapa rupiah revenue yang dihasilkan per rupiah yang dibelanjakan untuk iklan. Formula: Revenue / Ad Spend Ã— 100%.
 
 ROAS 300% berarti setiap Rp1.000 yang dibelanjakan menghasilkan Rp3.000 revenue. Tapi ROAS saja BUKAN indikator sukses yang lengkap.
 
@@ -106,25 +108,25 @@ ROAS 300% berarti setiap Rp1.000 yang dibelanjakan menghasilkan Rp3.000 revenue.
 - ROAS tinggi di channel kecil bisa kurang impactful dari ROAS rendah di channel besar
 - ROAS tidak memperhitungkan repeat purchase (customer lifetime value)
 
-**Customer Lifetime Value (CLV):** Total revenue yang dihasilkan satu customer selama hubungannya dengan brand kamu. Formula sederhana: Average Order Value × Purchase Frequency × Customer Lifespan.
+**Customer Lifetime Value (CLV):** Total revenue yang dihasilkan satu customer selama hubungannya dengan brand kamu. Formula sederhana: Average Order Value Ã— Purchase Frequency Ã— Customer Lifespan.
 
 **CLV vs CAC Ratio:** Jika CLV/CAC > 3, bisnis kamu sehat. Artinya setiap rupiah yang kamu keluarkan untuk akuisisi menghasilkan 3x revenue jangka panjang. Jika < 1, kamu mengeluarkan lebih banyak untuk mendapatkan customer daripada yang mereka hasilkan.`,
     insight:
       "Brand yang mengoptimasi CLV (bukan hanya ROAS) memiliki profitabilitas 2.5x lebih tinggi dalam jarak 12 bulan",
     challenge:
-      "**HITUNG CLV:** Estimasi CLV untuk bisnis/niche kamu: rata-rata order value × frekuensi pembelian per tahun × rata-rata berapa tahun customer bertahan. Bandingkan dengan biaya akuisisi per customer.",
+      "**HITUNG CLV:** Estimasi CLV untuk bisnis/niche kamu: rata-rata order value Ã— frekuensi pembelian per tahun Ã— rata-rata berapa tahun customer bertahan. Bandingkan dengan biaya akuisisi per customer.",
     quiz: {
       question:
         "ROAS campaign A = 500% (revenue Rp5M dari spend Rp1M). ROAS campaign B = 200% tapi CLV customer-nya 3x lebih tinggi. Mana yang lebih baik jangka panjang?",
       options: [
         "Campaign A karena ROAS-nya lebih tinggi",
-        "Campaign B — CLV 3x lebih tinggi berarti customer dari campaign B menghasilkan total revenue jauh lebih besar meski akuisisinya lebih mahal",
+        "Campaign B â€” CLV 3x lebih tinggi berarti customer dari campaign B menghasilkan total revenue jauh lebih besar meski akuisisinya lebih mahal",
         "Tidak bisa dibandingkan karena metriknya berbeda",
         "ROAS selalu lebih penting dari CLV",
       ],
       correct: 1,
       explanation:
-        "Campaign B menghasilkan customer yang membeli berulang kali. Jika CLV campaign B = Rp15M vs CLV campaign A = Rp5M, total return campaign B di Rp15M/Rp2.5M = 600% secara lifetime — lebih sustainable dan profitable.",
+        "Campaign B menghasilkan customer yang membeli berulang kali. Jika CLV campaign B = Rp15M vs CLV campaign A = Rp5M, total return campaign B di Rp15M/Rp2.5M = 600% secara lifetime â€” lebih sustainable dan profitable.",
     },
   },
   {
@@ -135,13 +137,13 @@ ROAS 300% berarti setiap Rp1.000 yang dibelanjakan menghasilkan Rp3.000 revenue.
 
 **Komponen Dashboard Atribusi:**
 
-**Panel 1 — Channel Performance:** Tabel semua channel marketing dengan metrik: spend, revenue (attributed), ROAS, CLV rata-rata customer dari channel itu, and tren bulan-ke-bulan.
+**Panel 1 â€” Channel Performance:** Tabel semua channel marketing dengan metrik: spend, revenue (attributed), ROAS, CLV rata-rata customer dari channel itu, and tren bulan-ke-bulan.
 
-**Panel 2 — Attribution Comparison:** Tampilkan revenue attribution dari 2-3 model berbeda side-by-side. Ini membantu menghindari bias dari satu model.
+**Panel 2 â€” Attribution Comparison:** Tampilkan revenue attribution dari 2-3 model berbeda side-by-side. Ini membantu menghindari bias dari satu model.
 
-**Panel 3 — Budget Optimizer:** Simulasi "what-if" — jika budget dipindahkan dari channel A ke channel B, berapa estimasi perubahan total revenue?
+**Panel 3 â€” Budget Optimizer:** Simulasi "what-if" â€” jika budget dipindahkan dari channel A ke channel B, berapa estimasi perubahan total revenue?
 
-**Panel 4 — Funnel Leaks:** Di mana customer drop-off terbanyak? Awareness → Consideration → Purchase. Channel mana yang bagus di awareness tapi jelek di conversion (dan sebaliknya)?
+**Panel 4 â€” Funnel Leaks:** Di mana customer drop-off terbanyak? Awareness â†’ Consideration â†’ Purchase. Channel mana yang bagus di awareness tapi jelek di conversion (dan sebaliknya)?
 
 Kunci: dashboard harus **prescriptive**, bukan hanya descriptive. Setiap panel harus menyertakan rekomendasi aksi, bukan hanya menampilkan angka.`,
     insight:
@@ -153,13 +155,13 @@ Kunci: dashboard harus **prescriptive**, bukan hanya descriptive. Setiap panel h
         "Dashboard menunjukkan TikTok ads ROAS = 150% (di bawah breakeven) tapi menjadi first-touch untuk 60% customer yang akhirnya membeli via Google. Apa keputusan terbaik?",
       options: [
         "Cut budget TikTok karena ROAS di bawah breakeven",
-        "Pertahankan TikTok budget — meskipun last-touch ROAS rendah, perannya sebagai awareness driver (first-touch) krusial untuk keseluruhan funnel",
+        "Pertahankan TikTok budget â€” meskipun last-touch ROAS rendah, perannya sebagai awareness driver (first-touch) krusial untuk keseluruhan funnel",
         "Pindahkan semua budget ke Google karena ROAS-nya lebih tinggi",
         "TikTok hanya untuk brand awareness, jangan ukur ROAS",
       ],
       correct: 1,
       explanation:
-        "Ini contoh bahaya last-touch attribution. TikTok sebagai first-touch driver untuk 60% customer berarti Google Search conversion bergantung pada TikTok awareness. Memotong TikTok budget akan menurunkan Google conversion juga — efek domino.",
+        "Ini contoh bahaya last-touch attribution. TikTok sebagai first-touch driver untuk 60% customer berarti Google Search conversion bergantung pada TikTok awareness. Memotong TikTok budget akan menurunkan Google conversion juga â€” efek domino.",
     },
   },
 ];
@@ -295,7 +297,7 @@ function FunnelViz() {
                     padding: "0 8px",
                   }}
                 >
-                  {labels[i].split("(")[0].trim()} —{" "}
+                  {labels[i].split("(")[0].trim()} â€”{" "}
                   {Math.round((b / total) * 100)}%
                 </span>
               </motion.div>
@@ -350,15 +352,27 @@ function FunnelViz() {
 }
 
 export default function RoiAttributionPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("roi-attribution", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -408,7 +422,7 @@ export default function RoiAttributionPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -474,7 +488,7 @@ export default function RoiAttributionPage() {
                 letterSpacing: "0.06em",
               }}
             >
-              MODUL 9 · ROI ATTRIBUTION
+              MODUL 9 Â· ROI ATTRIBUTION
             </span>
           </div>
           <h1
@@ -559,7 +573,7 @@ export default function RoiAttributionPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -788,7 +802,7 @@ export default function RoiAttributionPage() {
                 <Zap size={15} />{" "}
                 {showAILab
                   ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
               </button>
               {showAILab && (
                 <AILab
@@ -830,7 +844,7 @@ export default function RoiAttributionPage() {
                     color: quizAnswer.correct ? "#16A34A" : "#DC2626",
                   }}
                 >
-                  {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
                 </span>
               )}
             </div>
@@ -937,7 +951,7 @@ export default function RoiAttributionPage() {
                       marginBottom: 6,
                     }}
                   >
-                    {quizAnswer.correct ? "✓ PENJELASAN" : "✗ PENJELASAN"}
+                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
                   </div>
                   <p
                     style={{

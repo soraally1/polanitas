@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import {
@@ -18,8 +18,8 @@ import {
   Network,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
-import { useSpeechFormFill } from "@/hooks/use-speech-form-fill";
-import { speak } from "@/lib/speech-utils";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface QuizAnswer {
@@ -261,42 +261,34 @@ Upload deskripsinya ke AI Lab untuk mendapat review dan saran penyempurnaan!`,
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function AIOrchestrationPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("ai-orchestration", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
 
-  // Voice navigation for lessons
-  useSpeechFormFill((action) => {
-    if (action.type === "set-lesson" && typeof action.index === "number") {
-      if (action.index >= 0 && action.index < LESSONS.length) {
-        goToLesson(action.index);
-      }
-    } else if (action.type === "next-lesson") {
-      if (currentLesson < LESSONS.length - 1) {
-        goToLesson(currentLesson + 1);
-      }
-    } else if (action.type === "prev-lesson") {
-      if (currentLesson > 0) {
-        goToLesson(currentLesson - 1);
-      }
-    } else if (action.type === "read-lesson-details") {
-      const ttsText = `Materi ke ${currentLesson + 1}: ${lesson.title}. Konsep: ${lesson.concept}. Isi Pelajaran: ${lesson.body.replace(/\*\*(.*?)\*\*/g, "$1")}. Wawasan: ${lesson.insight}. Tantangan Praktik: ${lesson.challenge.replace(/\*\*(.*?)\*\*/g, "$1")}`;
-      speak(ttsText);
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
     }
-  });
+  }, [currentLesson, quizAnswers]);
 
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
 
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function handleQuizAnswer(optionIdx: number) {
+  async function handleQuizAnswer(optionIdx: number) {
     if (quizAnswer) return;
     const correct = optionIdx === lesson.quiz.correct;
     setQuizAnswer({
@@ -304,7 +296,7 @@ export default function AIOrchestrationPage() {
       selected: optionIdx,
       correct,
     });
-    if (correct) setCompleted((prev) => new Set([...prev, currentLesson]));
+    await saveAnswer(currentLesson, optionIdx, correct);
   }
 
   return (
@@ -350,7 +342,7 @@ export default function AIOrchestrationPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -507,7 +499,7 @@ export default function AIOrchestrationPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button

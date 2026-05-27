@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -17,6 +17,8 @@ import {
   Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -78,19 +80,19 @@ const LESSONS = [
     id: "anatomi-krisis",
     title: "Anatomi Krisis Digital",
     concept: "Bagaimana Krisis Muncul dan Berkembang",
-    body: `**Krisis digital** tidak muncul tiba-tiba — ia mengikuti pola yang bisa diprediksi. Memahami anatomi ini memungkinkan tim kamu merespons sebelum krisis mencapai puncak.
+    body: `**Krisis digital** tidak muncul tiba-tiba â€” ia mengikuti pola yang bisa diprediksi. Memahami anatomi ini memungkinkan tim kamu merespons sebelum krisis mencapai puncak.
 
 **5 Fase Krisis Digital:**
 
-**Fase 1 — Spark (0-2 jam):** Satu complaint viral, review negatif dari influencer, atau skandal bocor. Volume mention masih rendah tapi sentiment sangat negatif.
+**Fase 1 â€” Spark (0-2 jam):** Satu complaint viral, review negatif dari influencer, atau skandal bocor. Volume mention masih rendah tapi sentiment sangat negatif.
 
-**Fase 2 — Kindling (2-6 jam):** Netizen mulai amplify. Screenshot dishare, thread dibuat, media online mulai melirik. Volume naik 5-10x.
+**Fase 2 â€” Kindling (2-6 jam):** Netizen mulai amplify. Screenshot dishare, thread dibuat, media online mulai melirik. Volume naik 5-10x.
 
-**Fase 3 — Blaze (6-24 jam):** Trending topic. Media mainstream coverage. Hashtag negatif bermunculan. Volume naik 50-100x dari baseline.
+**Fase 3 â€” Blaze (6-24 jam):** Trending topic. Media mainstream coverage. Hashtag negatif bermunculan. Volume naik 50-100x dari baseline.
 
-**Fase 4 — Inferno (24-72 jam):** Puncak krisis. Semua membicarakan brand kamu secara negatif. Penjualan turun drastis. Investor khawatir.
+**Fase 4 â€” Inferno (24-72 jam):** Puncak krisis. Semua membicarakan brand kamu secara negatif. Penjualan turun drastis. Investor khawatir.
 
-**Fase 5 — Ember (72 jam+):** Volume menurun tapi sentimen negatif masih tersisa. Recovery dimulai di sini.
+**Fase 5 â€” Ember (72 jam+):** Volume menurun tapi sentimen negatif masih tersisa. Recovery dimulai di sini.
 
 **Golden Window:** Respons terbaik terjadi di Fase 1-2 (0-6 jam pertama). Setelah Fase 3, damage control menjadi 10x lebih mahal dan 10x kurang efektif.`,
     insight:
@@ -102,13 +104,13 @@ const LESSONS = [
         "Sebuah brand menemukan tweet negatif viral (50 RT dalam 1 jam) tentang produk mereka. Apa respons terbaik?",
       options: [
         "Tunggu sampai trending untuk memastikan ini bukan noise",
-        "Segera verifikasi fakta dan siapkan initial response — ini masih di Golden Window (Fase 1)",
+        "Segera verifikasi fakta dan siapkan initial response â€” ini masih di Golden Window (Fase 1)",
         "Hapus semua komentar negatif di akun brand",
         "Diam saja, biasanya netizen akan lupa dalam 24 jam",
       ],
       correct: 1,
       explanation:
-        "50 RT dalam 1 jam menunjukkan velocity tinggi — indikasi potensial memasuki Fase 2. Golden Window masih terbuka di Fase 1. Respons cepat (verifikasi + acknowledgement) bisa menghentikan eskalasi sebelum media mainstream ikut.",
+        "50 RT dalam 1 jam menunjukkan velocity tinggi â€” indikasi potensial memasuki Fase 2. Golden Window masih terbuka di Fase 1. Respons cepat (verifikasi + acknowledgement) bisa menghentikan eskalasi sebelum media mainstream ikut.",
     },
   },
   {
@@ -123,7 +125,7 @@ const LESSONS = [
 
 **Processing Layer:** NLP menganalisis setiap mention: sentiment score (-1 sampai +1), emotion detection (marah, kecewa, takut), dan topic extraction (apa yang dikeluhkan).
 
-**Alert Layer:** Jika sentiment score rata-rata turun di bawah threshold (-0.3) atau volume mention negatif naik >200% dari baseline → trigger alert ke tim crisis management.
+**Alert Layer:** Jika sentiment score rata-rata turun di bawah threshold (-0.3) atau volume mention negatif naik >200% dari baseline â†’ trigger alert ke tim crisis management.
 
 **Dashboard Layer:** Visualisasi real-time: sentiment trend, word cloud kata negatif, top complaints, and sumber utama krisis.
 
@@ -136,8 +138,8 @@ Kunci efektivitas: **speed of detection**. Sistem yang mendeteksi anomali dalam 
       question:
         "Sistem EWS mendeteksi lonjakan mention negatif 300% tapi sentiment score rata-rata hanya -0.15. Apa interpretasinya?",
       options: [
-        "Krisis besar sedang terjadi — volume tinggi berarti darurat",
-        "Volume tinggi tapi sentiment score rendah menunjukkan noise atau concern ringan, bukan krisis — perlu investigasi lebih dalam sebelum eskalasi",
+        "Krisis besar sedang terjadi â€” volume tinggi berarti darurat",
+        "Volume tinggi tapi sentiment score rendah menunjukkan noise atau concern ringan, bukan krisis â€” perlu investigasi lebih dalam sebelum eskalasi",
         "Sistem error, sentiment score seharusnya lebih negatif",
         "Abaikan karena sentiment score masih di atas -0.3",
       ],
@@ -150,21 +152,21 @@ Kunci efektivitas: **speed of detection**. Sistem yang mendeteksi anomali dalam 
     id: "framework-empati",
     title: "Framework Respons Empati",
     concept: "Cara Merespons yang Meredakan, Bukan Memperburuk",
-    body: `Respons krisis yang efektif bukan sekadar menyampaikan fakta — ia harus **meredakan emosi** audiens. Di sinilah **empathetic response framework** berperan.
+    body: `Respons krisis yang efektif bukan sekadar menyampaikan fakta â€” ia harus **meredakan emosi** audiens. Di sinilah **empathetic response framework** berperan.
 
 **Framework E.A.R.:**
 
-**E — Empathize (Empati):** Akui perasaan audiens terlebih dahulu. "Kami memahami kekecewaan Anda" atau "Kami mendengar kekhawatiran Anda". JANGAN langsung defensif.
+**E â€” Empathize (Empati):** Akui perasaan audiens terlebih dahulu. "Kami memahami kekecewaan Anda" atau "Kami mendengar kekhawatiran Anda". JANGAN langsung defensif.
 
-**A — Acknowledge (Akui):** Akui bahwa ada masalah, meskipun investigasi masih berlangsung. "Kami mengakui ada pengalaman yang tidak sesuai standar kami" lebih baik dari diam atau deny.
+**A â€” Acknowledge (Akui):** Akui bahwa ada masalah, meskipun investigasi masih berlangsung. "Kami mengakui ada pengalaman yang tidak sesuai standar kami" lebih baik dari diam atau deny.
 
-**R — Resolve (Selesaikan):** Berikan action plan konkret. Apa yang sedang dilakukan, timeline-nya, and bagaimana audiens bisa mendapat update. "Tim kami sedang menginvestigasi dan kami akan memberikan update dalam 4 jam."
+**R â€” Resolve (Selesaikan):** Berikan action plan konkret. Apa yang sedang dilakukan, timeline-nya, and bagaimana audiens bisa mendapat update. "Tim kami sedang menginvestigasi dan kami akan memberikan update dalam 4 jam."
 
 **Anti-Patterns yang WAJIB dihindari:**
-- ❌ "Kami tidak bertanggung jawab" → defensif, memperburuk
-- ❌ Menghapus komentar negatif → Streisand Effect, menjadi lebih viral
-- ❌ Menyalahkan customer → reputational suicide
-- ❌ Template response yang terasa bot → menunjukkan brand tidak peduli`,
+- âŒ "Kami tidak bertanggung jawab" â†’ defensif, memperburuk
+- âŒ Menghapus komentar negatif â†’ Streisand Effect, menjadi lebih viral
+- âŒ Menyalahkan customer â†’ reputational suicide
+- âŒ Template response yang terasa bot â†’ menunjukkan brand tidak peduli`,
     insight:
       "Respons E.A.R. menurunkan sentiment negatif 3x lebih cepat dibanding respons yang langsung defensif",
     challenge:
@@ -187,25 +189,25 @@ Kunci efektivitas: **speed of detection**. Sistem yang mendeteksi anomali dalam 
     id: "post-crisis",
     title: "Post-Crisis Recovery",
     concept: "Membangun Kembali Setelah Badai",
-    body: `Krisis yang berhasil dikelola bukan akhir — justru fase **recovery** menentukan apakah brand akan lebih kuat atau lebih lemah jangka panjang.
+    body: `Krisis yang berhasil dikelola bukan akhir â€” justru fase **recovery** menentukan apakah brand akan lebih kuat atau lebih lemah jangka panjang.
 
 **Framework Recovery 4R:**
 
-**R1 — Rebuild Trust:** Aksi nyata yang membuktikan brand telah berubah. Jika krisis karena kualitas produk → tunjukkan improvement nyata dengan transparansi proses QC.
+**R1 â€” Rebuild Trust:** Aksi nyata yang membuktikan brand telah berubah. Jika krisis karena kualitas produk â†’ tunjukkan improvement nyata dengan transparansi proses QC.
 
-**R2 — Re-engage Community:** Libatkan kembali komunitas yang kecewa. Program compensation, early access, atau co-creation memberi rasa ownership and mempercepat healing.
+**R2 â€” Re-engage Community:** Libatkan kembali komunitas yang kecewa. Program compensation, early access, atau co-creation memberi rasa ownership and mempercepat healing.
 
-**R3 — Reframe Narrative:** Ubah narasi dari "brand yang gagal" menjadi "brand yang bertanggung jawab dan belajar dari kesalahan". Content strategy harus mendukung narasi baru ini.
+**R3 â€” Reframe Narrative:** Ubah narasi dari "brand yang gagal" menjadi "brand yang bertanggung jawab dan belajar dari kesalahan". Content strategy harus mendukung narasi baru ini.
 
-**R4 — Reinforce Systems:** Perbaiki sistem agar krisis serupa tidak terulang. Implementasi EWS yang lebih baik, SOP respons yang lebih cepat, and training tim crisis.
+**R4 â€” Reinforce Systems:** Perbaiki sistem agar krisis serupa tidak terulang. Implementasi EWS yang lebih baik, SOP respons yang lebih cepat, and training tim crisis.
 
 **Timeline Recovery (tipikal):**
-- Minggu 1-2: Trust Rebuilding — aksi nyata + transparansi
-- Minggu 3-4: Re-engagement — program pelibatan komunitas
-- Bulan 2-3: Narrative reframing — konten positif konsisten
-- Bulan 4+: System reinforcement — audit and improvement`,
+- Minggu 1-2: Trust Rebuilding â€” aksi nyata + transparansi
+- Minggu 3-4: Re-engagement â€” program pelibatan komunitas
+- Bulan 2-3: Narrative reframing â€” konten positif konsisten
+- Bulan 4+: System reinforcement â€” audit and improvement`,
     insight:
-      "Brand yang menerapkan Recovery 4R setelah krisis rata-rata mendapat 15-20% peningkatan brand loyalty — crisis bisa menjadi opportunity",
+      "Brand yang menerapkan Recovery 4R setelah krisis rata-rata mendapat 15-20% peningkatan brand loyalty â€” crisis bisa menjadi opportunity",
     challenge:
       "**RECOVERY PLAN:** Pilih satu kasus krisis digital yang pernah kamu pelajari. Rancang Recovery 4R plan dengan timeline dan aksi spesifik untuk setiap R!",
     quiz: {
@@ -214,12 +216,12 @@ Kunci efektivitas: **speed of detection**. Sistem yang mendeteksi anomali dalam 
       options: [
         "Iklan agresif untuk boost penjualan",
         "Turunkan harga drastis",
-        "Re-engage community yang pernah loyal dengan program eksklusif dan co-creation — trust harus dibangun kembali sebelum conversion bisa pulih",
+        "Re-engage community yang pernah loyal dengan program eksklusif dan co-creation â€” trust harus dibangun kembali sebelum conversion bisa pulih",
         "Tidak perlu aksi khusus, penjualan akan recover sendiri",
       ],
       correct: 2,
       explanation:
-        "Sentiment netral ≠ trust recovered. Penjualan yang belum pulih menunjukkan customer masih ragu meskipun sudah berhenti marah. Re-engagement (bukan hanya awareness) membangun trust kembali melalui experience positif langsung.",
+        "Sentiment netral â‰  trust recovered. Penjualan yang belum pulih menunjukkan customer masih ragu meskipun sudah berhenti marah. Re-engagement (bukan hanya awareness) membangun trust kembali melalui experience positif langsung.",
     },
   },
 ];
@@ -446,15 +448,27 @@ function SentimentPendulumViz() {
 }
 
 export default function CrisisManagementPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("crisis-management", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -504,7 +518,7 @@ export default function CrisisManagementPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -570,7 +584,7 @@ export default function CrisisManagementPage() {
                 letterSpacing: "0.06em",
               }}
             >
-              MODUL 8 · CRISIS MANAGEMENT
+              MODUL 8 Â· CRISIS MANAGEMENT
             </span>
           </div>
           <h1
@@ -655,7 +669,7 @@ export default function CrisisManagementPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -884,7 +898,7 @@ export default function CrisisManagementPage() {
                 <Zap size={15} />{" "}
                 {showAILab
                   ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
               </button>
               {showAILab && (
                 <AILab
@@ -926,7 +940,7 @@ export default function CrisisManagementPage() {
                     color: quizAnswer.correct ? "#16A34A" : "#DC2626",
                   }}
                 >
-                  {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
                 </span>
               )}
             </div>
@@ -1033,7 +1047,7 @@ export default function CrisisManagementPage() {
                       marginBottom: 6,
                     }}
                   >
-                    {quizAnswer.correct ? "✓ PENJELASAN" : "✗ PENJELASAN"}
+                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
                   </div>
                   <p
                     style={{

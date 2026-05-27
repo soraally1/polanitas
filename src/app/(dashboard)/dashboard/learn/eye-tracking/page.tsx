@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,6 +17,8 @@ import {
   Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -36,9 +38,9 @@ const LESSONS = [
 
 **Z-Pattern** terjadi pada halaman dengan sedikit teks dan banyak visual: mata bergerak dari kiri atas ke kanan atas, diagonal ke kiri bawah, lalu horizontal ke kanan bawah. Ini adalah pola alami untuk landing page dan iklan visual.
 
-Memahami pola ini memungkinkan kamu menempatkan elemen – headline, CTA, harga, benefit utama – di posisi yang secara neurologis paling mungkin dilihat pertama kali oleh audiens.`,
+Memahami pola ini memungkinkan kamu menempatkan elemen â€“ headline, CTA, harga, benefit utama â€“ di posisi yang secara neurologis paling mungkin dilihat pertama kali oleh audiens.`,
     insight:
-      "93% pengguna pertama kali melihat area top-left halaman — di sinilah brand identity dan headline utama harus berada",
+      "93% pengguna pertama kali melihat area top-left halaman â€” di sinilah brand identity dan headline utama harus berada",
     challenge:
       "**ANALISIS:** Buka 3 landing page brand yang kamu kagumi. Tandai di mana headline, CTA, dan gambar utama ditempatkan. Apakah mengikuti F-Pattern atau Z-Pattern?",
     quiz: {
@@ -52,18 +54,18 @@ Memahami pola ini memungkinkan kamu menempatkan elemen – headline, CTA, harga,
       ],
       correct: 1,
       explanation:
-        "Dalam F-Pattern maupun Z-Pattern, area kanan bawah adalah zona 'cold spot' — area yang paling sedikit mendapat atensi visual. Informasi kritis seperti harga diskon harus ditempatkan di hot spots: top-left atau inline dengan headline.",
+        "Dalam F-Pattern maupun Z-Pattern, area kanan bawah adalah zona 'cold spot' â€” area yang paling sedikit mendapat atensi visual. Informasi kritis seperti harga diskon harus ditempatkan di hot spots: top-left atau inline dengan headline.",
     },
   },
   {
     id: "fixation-points",
     title: "Fixation Points & Saccades",
     concept: "Memahami Mekanisme Mata Manusia",
-    body: `Mata manusia tidak bergerak smooth saat membaca — ia melakukan **saccades** (lompatan cepat antar titik) dan **fixations** (jeda 200-300ms di mana informasi benar-benar diproses).
+    body: `Mata manusia tidak bergerak smooth saat membaca â€” ia melakukan **saccades** (lompatan cepat antar titik) dan **fixations** (jeda 200-300ms di mana informasi benar-benar diproses).
 
 **Fixation points** adalah titik tempat mata berhenti dan otak memproses informasi visual. Rata-rata, pengguna melakukan 3-4 fixation points per detik saat browsing. Area dengan fixation density tertinggi adalah area yang paling efektif menyampaikan pesan.
 
-Dalam konteks konten digital: **Wajah manusia** adalah magnet fixation terkuat — mata secara otomatis tertarik ke wajah dan mengikuti arah tatapan orang di foto. **Teks berukuran besar** mendapat fixation lebih lama. **Kontras warna tinggi** memaksa saccade ke area tersebut.
+Dalam konteks konten digital: **Wajah manusia** adalah magnet fixation terkuat â€” mata secara otomatis tertarik ke wajah dan mengikuti arah tatapan orang di foto. **Teks berukuran besar** mendapat fixation lebih lama. **Kontras warna tinggi** memaksa saccade ke area tersebut.
 
 Dengan memahami fixation patterns, kamu bisa mendesain thumbnail, banner, dan landing page yang secara kognitif 'memaksa' mata melihat elemen yang kamu inginkan.`,
     insight:
@@ -81,22 +83,22 @@ Dengan memahami fixation patterns, kamu bisa mendesain thumbnail, banner, dan la
       ],
       correct: 1,
       explanation:
-        "Fusiform Face Area di otak adalah area yang secara evolusioner wired untuk mendeteksi wajah dengan sangat cepat. Ini terjadi secara pre-attentive — sebelum kamu sadar melihatnya. Inilah mengapa wajah menjadi magnet fixation terkuat.",
+        "Fusiform Face Area di otak adalah area yang secara evolusioner wired untuk mendeteksi wajah dengan sangat cepat. Ini terjadi secara pre-attentive â€” sebelum kamu sadar melihatnya. Inilah mengapa wajah menjadi magnet fixation terkuat.",
     },
   },
   {
     id: "visual-hierarchy",
     title: "Hierarki Visual untuk Konten",
     concept: "Mengarahkan Mata dengan Desain",
-    body: `**Hierarki visual** adalah teknik menata elemen desain sehingga mata pengguna mengikuti urutan yang kamu inginkan — dari yang paling penting ke yang kurang penting.
+    body: `**Hierarki visual** adalah teknik menata elemen desain sehingga mata pengguna mengikuti urutan yang kamu inginkan â€” dari yang paling penting ke yang kurang penting.
 
 Empat alat utama hierarki visual:
-1. **Ukuran** — Elemen lebih besar dilihat duluan. Headline > subheadline > body text.
-2. **Warna & Kontras** — Warna yang menonjol dari background menarik fixation. CTA dengan warna kontras mendapat 32% lebih banyak klik.
-3. **Posisi** — Area F-Pattern hot spots (top-left, horizontal atas) untuk elemen kritis.
-4. **Whitespace** — Ruang kosong di sekitar elemen membuat elemen itu lebih menonjol.
+1. **Ukuran** â€” Elemen lebih besar dilihat duluan. Headline > subheadline > body text.
+2. **Warna & Kontras** â€” Warna yang menonjol dari background menarik fixation. CTA dengan warna kontras mendapat 32% lebih banyak klik.
+3. **Posisi** â€” Area F-Pattern hot spots (top-left, horizontal atas) untuk elemen kritis.
+4. **Whitespace** â€” Ruang kosong di sekitar elemen membuat elemen itu lebih menonjol.
 
-Kesalahan umum: menempatkan terlalu banyak elemen dengan prioritas visual yang sama — ini menyebabkan **cognitive overload** dan pengguna justru tidak fokus pada apa pun.`,
+Kesalahan umum: menempatkan terlalu banyak elemen dengan prioritas visual yang sama â€” ini menyebabkan **cognitive overload** dan pengguna justru tidak fokus pada apa pun.`,
     insight:
       "Mengurangi elemen visual di landing page dari 7 menjadi 3 meningkatkan conversion rate rata-rata 28%",
     challenge:
@@ -106,7 +108,7 @@ Kesalahan umum: menempatkan terlalu banyak elemen dengan prioritas visual yang s
         "Sebuah banner memiliki 5 elemen CTA dengan ukuran dan warna yang sama. Apa dampaknya?",
       options: [
         "Memberikan banyak pilihan ke user = bagus",
-        "Menyebabkan cognitive overload — user tidak bisa menentukan prioritas dan conversion menurun",
+        "Menyebabkan cognitive overload â€” user tidak bisa menentukan prioritas dan conversion menurun",
         "Tidak ada dampak karena user akan membaca semuanya",
         "Hanya berdampak di mobile, bukan desktop",
       ],
@@ -119,19 +121,19 @@ Kesalahan umum: menempatkan terlalu banyak elemen dengan prioritas visual yang s
     id: "layout-optimization",
     title: "Optimasi Layout Berbasis Data",
     concept: "Dari Teori ke Implementasi Iteratif",
-    body: `Memahami teori eye-tracking tidak cukup — kamu perlu **mengimplementasikan dan mengiterasi** berdasarkan data performance nyata dari konten kamu.
+    body: `Memahami teori eye-tracking tidak cukup â€” kamu perlu **mengimplementasikan dan mengiterasi** berdasarkan data performance nyata dari konten kamu.
 
 **Framework Optimasi Layout:**
 
-**Step 1 — Audit:** Analisis konten existing. Di mana elemen kritis berada? Apakah sesuai dengan pola eye-tracking?
+**Step 1 â€” Audit:** Analisis konten existing. Di mana elemen kritis berada? Apakah sesuai dengan pola eye-tracking?
 
-**Step 2 — Hypothesis:** Berdasarkan teori (F-Pattern, fixation points, hierarki visual), rancang perubahan spesifik. Contoh: "Memindahkan CTA dari bawah ke inline dengan headline akan meningkatkan CTR."
+**Step 2 â€” Hypothesis:** Berdasarkan teori (F-Pattern, fixation points, hierarki visual), rancang perubahan spesifik. Contoh: "Memindahkan CTA dari bawah ke inline dengan headline akan meningkatkan CTR."
 
-**Step 3 — A/B Test:** Jalankan versi original vs. versi baru secara paralel. Ukur metrik: CTR, dwell time, bounce rate.
+**Step 3 â€” A/B Test:** Jalankan versi original vs. versi baru secara paralel. Ukur metrik: CTR, dwell time, bounce rate.
 
-**Step 4 — Analyze & Iterate:** Versi mana yang menang? Mengapa? Gunakan insight ini untuk iterasi berikutnya.
+**Step 4 â€” Analyze & Iterate:** Versi mana yang menang? Mengapa? Gunakan insight ini untuk iterasi berikutnya.
 
-Siklus ini harus berjalan terus — desain yang optimal hari ini bisa tidak efektif dalam 3 bulan karena perubahan perilaku audiens.`,
+Siklus ini harus berjalan terus â€” desain yang optimal hari ini bisa tidak efektif dalam 3 bulan karena perubahan perilaku audiens.`,
     insight:
       "Tim yang menjalankan audit layout setiap 2 minggu mendapat 40% improvement CTR dalam 3 bulan",
     challenge:
@@ -142,7 +144,7 @@ Siklus ini harus berjalan terus — desain yang optimal hari ini bisa tidak efek
       options: [
         "Deploy versi B karena CTR lebih tinggi",
         "Kembali ke versi A karena bounce rate naik",
-        "Investigasi mengapa bounce rate naik — mungkin CTA menarik klik tapi konten landing page tidak sesuai ekspektasi",
+        "Investigasi mengapa bounce rate naik â€” mungkin CTA menarik klik tapi konten landing page tidak sesuai ekspektasi",
         "A/B test-nya gagal, ulangi dari awal",
       ],
       correct: 2,
@@ -415,15 +417,27 @@ function HeatmapViz() {
 }
 
 export default function EyeTrackingPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("eye-tracking", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -473,7 +487,7 @@ export default function EyeTrackingPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -539,7 +553,7 @@ export default function EyeTrackingPage() {
                 letterSpacing: "0.06em",
               }}
             >
-              MODUL 4 · EYE TRACKING
+              MODUL 4 Â· EYE TRACKING
             </span>
           </div>
           <h1
@@ -624,7 +638,7 @@ export default function EyeTrackingPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -853,7 +867,7 @@ export default function EyeTrackingPage() {
                 <Zap size={15} />{" "}
                 {showAILab
                   ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
               </button>
               {showAILab && (
                 <AILab
@@ -895,7 +909,7 @@ export default function EyeTrackingPage() {
                     color: quizAnswer.correct ? "#16A34A" : "#DC2626",
                   }}
                 >
-                  {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
                 </span>
               )}
             </div>
@@ -1003,7 +1017,7 @@ export default function EyeTrackingPage() {
                       letterSpacing: "0.06em",
                     }}
                   >
-                    {quizAnswer.correct ? "✓ PENJELASAN" : "✗ PENJELASAN"}
+                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
                   </div>
                   <p
                     style={{

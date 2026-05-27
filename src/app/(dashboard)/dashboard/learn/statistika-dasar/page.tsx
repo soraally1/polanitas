@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart2,
   ChevronRight,
@@ -11,8 +11,11 @@ import {
   RefreshCw,
   TrendingUp,
   Zap,
+  Trophy,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 // ═══════════════════════════════════════════════════════
 // TYPE
@@ -422,32 +425,43 @@ function QuizBlock({
 // MAIN MODULE PAGE
 // ═══════════════════════════════════════════════════════
 export default function StatistikaDasarPage() {
+  const { user } = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, isLoading, saveAnswer } =
+    useModuleProgress("statistika-dasar", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [computed, setComputed] = useState<Record<string, string | number> | null>(null);
-  const [quizSelected, setQuizSelected] = useState<number | null>(null);
-  const [quizAnswered, setQuizAnswered] = useState(false);
-  const [completedLessons, setCompletedLessons] = useState<Set<number>>(new Set());
-  const [showAILab, setShowAILab] = useState(false);
+  const [computed,      setComputed]      = useState<Record<string, string | number> | null>(null);
+  const [quizSelected,  setQuizSelected]  = useState<number | null>(null);
+  const [quizAnswered,  setQuizAnswered]  = useState(false);
+  const [showAILab,     setShowAILab]     = useState(false);
 
   const lesson = LESSONS[currentLesson];
+
+  // Restore quiz state for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizSelected(saved.selected);
+      setQuizAnswered(true);
+    } else {
+      setQuizSelected(null);
+      setQuizAnswered(false);
+    }
+  }, [currentLesson, quizAnswers]);
 
   function runCompute() {
     setComputed(lesson.compute(lesson.dataset));
   }
 
-  function handleQuizSelect(i: number) {
+  async function handleQuizSelect(i: number) {
     setQuizSelected(i);
     setQuizAnswered(true);
-    if (i === lesson.quiz.correct) {
-      setCompletedLessons((prev) => new Set([...prev, currentLesson]));
-    }
+    await saveAnswer(currentLesson, i, i === lesson.quiz.correct);
   }
 
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
     setComputed(null);
-    setQuizSelected(null);
-    setQuizAnswered(false);
   }
 
   const maxValue = Math.max(...lesson.dataset);
@@ -773,6 +787,30 @@ export default function StatistikaDasarPage() {
             selected={quizSelected}
             onSelect={handleQuizSelect}
           />
+
+          {/* Completion banner */}
+          {isModuleComplete && (
+            <div
+              style={{
+                padding: "20px 24px",
+                background: "linear-gradient(135deg, rgba(34,197,94,0.12), rgba(59,130,246,0.08))",
+                border: "1px solid rgba(34,197,94,0.35)",
+                borderRadius: "var(--radius-lg)",
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                marginBottom: 4,
+              }}
+            >
+              <Trophy size={24} color="#16A34A" style={{ flexShrink: 0 }} />
+              <div>
+                <div style={{ fontWeight: 800, color: "#16A34A", marginBottom: 2 }}>🎉 Modul Selesai!</div>
+                <div style={{ fontSize: "0.875rem", color: "var(--color-text-secondary)" }}>
+                  Semua {LESSONS.length} materi Statistika Dasar telah diselesaikan. Progress disimpan otomatis.
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Navigation */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

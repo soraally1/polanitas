@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,6 +19,8 @@ import {
   Search,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface QuizAnswer {
@@ -364,21 +366,33 @@ function TrendBubbleViz() {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function TrendSignalPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("trend-signal", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
 
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
+
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
 
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-  function handleQuizAnswer(optionIdx: number) {
+  async function handleQuizAnswer(optionIdx: number) {
     if (quizAnswer) return;
     const correct = optionIdx === lesson.quiz.correct;
     setQuizAnswer({
@@ -386,7 +400,7 @@ export default function TrendSignalPage() {
       selected: optionIdx,
       correct,
     });
-    if (correct) setCompleted((p) => new Set([...p, currentLesson]));
+    await saveAnswer(currentLesson, optionIdx, correct);
   }
 
   return (
@@ -430,7 +444,7 @@ export default function TrendSignalPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -586,7 +600,7 @@ export default function TrendSignalPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button

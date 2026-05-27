@@ -1,5 +1,5 @@
-"use client";
-import { useState, useRef, useEffect } from "react";
+﻿"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -17,6 +17,8 @@ import {
   Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -60,7 +62,7 @@ const LESSONS = [
 
 Bayangkan kamu membuat satu video YouTube berdurasi 15 menit tentang "Cara Memulai Bisnis Skincare". Dari video itu, kamu bisa menghasilkan: 5 clip TikTok (1 per tips), 3 carousel Instagram, 1 thread Twitter, 10 quote image, 1 blog post, dan 1 newsletter. Total: 21 aset konten dari 1 ide.
 
-Ini bukan sekadar repurposing — setiap atom konten harus di-**adapt** agar native di platformnya. Clip TikTok butuh hook 1 detik. Carousel butuh visual hierarchy. Thread butuh narasi yang bisa berdiri sendiri.`,
+Ini bukan sekadar repurposing â€” setiap atom konten harus di-**adapt** agar native di platformnya. Clip TikTok butuh hook 1 detik. Carousel butuh visual hierarchy. Thread butuh narasi yang bisa berdiri sendiri.`,
     insight:
       "Brand yang menerapkan atomization menghasilkan 11x lebih banyak konten dengan hanya 2x effort tambahan",
     challenge:
@@ -80,19 +82,19 @@ Ini bukan sekadar repurposing — setiap atom konten harus di-**adapt** agar nat
   },
   {
     id: "satu-ke-banyak",
-    title: "Satu Ide → Puluhan Format",
+    title: "Satu Ide â†’ Puluhan Format",
     concept: "Framework Piramida Konten",
     body: `**Content Pyramid** adalah framework untuk mengekstrak konten secara sistematis:
 
-**Tier 1 — Pillar Content (1 aset besar):** Video panjang, webinar, ebook, atau riset original. Ini membutuhkan effort terbesar tapi menjadi sumber dari segalanya.
+**Tier 1 â€” Pillar Content (1 aset besar):** Video panjang, webinar, ebook, atau riset original. Ini membutuhkan effort terbesar tapi menjadi sumber dari segalanya.
 
-**Tier 2 — Derivative Content (3-5 aset medium):** Blog post, YouTube clip, podcast episode, carousel. Diekstrak dari angle berbeda dalam pillar content.
+**Tier 2 â€” Derivative Content (3-5 aset medium):** Blog post, YouTube clip, podcast episode, carousel. Diekstrak dari angle berbeda dalam pillar content.
 
-**Tier 3 — Micro Content (10-20 aset kecil):** Quote image, short clip, tweet, story, meme. Setiap poin kunci dalam pillar content bisa menjadi 1 micro content.
+**Tier 3 â€” Micro Content (10-20 aset kecil):** Quote image, short clip, tweet, story, meme. Setiap poin kunci dalam pillar content bisa menjadi 1 micro content.
 
-**Tier 4 — Reactive Content (∞ aset):** Respons terhadap komentar, Q&A, behind-the-scenes tentang proses pembuatan pillar content itu sendiri.
+**Tier 4 â€” Reactive Content (âˆž aset):** Respons terhadap komentar, Q&A, behind-the-scenes tentang proses pembuatan pillar content itu sendiri.
 
-Dengan agen AI, Tier 2-4 bisa diotomatisasi sebagian — kamu fokus membuat Tier 1 yang berkualitas tinggi.`,
+Dengan agen AI, Tier 2-4 bisa diotomatisasi sebagian â€” kamu fokus membuat Tier 1 yang berkualitas tinggi.`,
     insight:
       "Content Pyramid yang baik bisa membuat 1 jam kerja pillar content bertahan menghasilkan konten selama 2-4 minggu",
     challenge:
@@ -102,20 +104,20 @@ Dengan agen AI, Tier 2-4 bisa diotomatisasi sebagian — kamu fokus membuat Tier
         "Mengapa Tier 1 (Pillar Content) harus dibuat dengan kualitas paling tinggi?",
       options: [
         "Karena pillar content mendapat views paling banyak",
-        "Karena semua konten turunan bergantung pada kualitas pillar — jika pillar lemah, seluruh piramida collapse",
+        "Karena semua konten turunan bergantung pada kualitas pillar â€” jika pillar lemah, seluruh piramida collapse",
         "Karena hanya Tier 1 yang dilihat algoritma",
         "Pillar content sebenarnya tidak perlu berkualitas tinggi",
       ],
       correct: 1,
       explanation:
-        "Pillar content is the foundation. Every derivative and micro content inherits its quality, insights, and value. A weak pillar means every derived piece will also be weak — garbage in, garbage out at scale.",
+        "Pillar content is the foundation. Every derivative and micro content inherits its quality, insights, and value. A weak pillar means every derived piece will also be weak â€” garbage in, garbage out at scale.",
     },
   },
   {
     id: "platform-native",
     title: "Platform-Native Adaptation",
     concept: "Satu Pesan, Bahasa Berbeda",
-    body: `Setiap platform memiliki **bahasa native** yang berbeda — bukan hanya format, tapi juga: panjang ideal, tone, hook style, CTA, dan behavior audiens yang dominan.
+    body: `Setiap platform memiliki **bahasa native** yang berbeda â€” bukan hanya format, tapi juga: panjang ideal, tone, hook style, CTA, dan behavior audiens yang dominan.
 
 **Platform Adaptation Matrix:**
 - **TikTok:** 15-60 detik, hook di 1 detik pertama, trend-riding, casual/authentic
@@ -125,7 +127,7 @@ Dengan agen AI, Tier 2-4 bisa diotomatisasi sebagian — kamu fokus membuat Tier
 - **LinkedIn:** 1500+ karakter, professional storytelling, data-backed insight
 - **Carousel IG:** 7-10 slides, visual hierarchy per slide, swipe-worthy hook di slide 1
 
-Kesalahan fatal: membuat satu konten dan mendistribusikan verbatim ke semua platform. Audiens setiap platform punya ekspektasi berbeda — konten yang viral di TikTok bisa flopped di LinkedIn.`,
+Kesalahan fatal: membuat satu konten dan mendistribusikan verbatim ke semua platform. Audiens setiap platform punya ekspektasi berbeda â€” konten yang viral di TikTok bisa flopped di LinkedIn.`,
     insight:
       "Konten yang diadaptasi native mendapat 2.5x engagement dibanding konten cross-posted tanpa adaptasi",
     challenge:
@@ -141,7 +143,7 @@ Kesalahan fatal: membuat satu konten dan mendistribusikan verbatim ke semua plat
       ],
       correct: 1,
       explanation:
-        "TikTok has its own language: vertical format, 1-second hook, pattern interrupts, and trend audio. Simply shortening a YouTube video won't work — you need to create something that feels native to TikTok's culture.",
+        "TikTok has its own language: vertical format, 1-second hook, pattern interrupts, and trend audio. Simply shortening a YouTube video won't work â€” you need to create something that feels native to TikTok's culture.",
     },
   },
   {
@@ -150,17 +152,17 @@ Kesalahan fatal: membuat satu konten dan mendistribusikan verbatim ke semua plat
     concept: "Pipeline Otomatis dari Ide ke Distribusi",
     body: `Dengan AI agents, proses atomization bisa diakselerasi secara dramatis. Berikut pipeline yang bisa kamu implementasikan:
 
-**Step 1 — Input:** Kamu membuat atau mendeskripsikan pillar content (brief, transkrip video, atau draft blog post).
+**Step 1 â€” Input:** Kamu membuat atau mendeskripsikan pillar content (brief, transkrip video, atau draft blog post).
 
-**Step 2 — AI Decomposition:** Agen AI memecah konten menjadi poin-poin kunci, quote-worthy statements, dan data points yang bisa berdiri sendiri.
+**Step 2 â€” AI Decomposition:** Agen AI memecah konten menjadi poin-poin kunci, quote-worthy statements, dan data points yang bisa berdiri sendiri.
 
-**Step 3 — Platform Mapping:** Agen mencocokkan setiap atom dengan platform paling cocok berdasarkan format dan audiens.
+**Step 3 â€” Platform Mapping:** Agen mencocokkan setiap atom dengan platform paling cocok berdasarkan format dan audiens.
 
-**Step 4 — Native Adaptation:** Untuk setiap atom-platform pair, agen menulis draft yang sudah disesuaikan tone, panjang, and format platform target.
+**Step 4 â€” Native Adaptation:** Untuk setiap atom-platform pair, agen menulis draft yang sudah disesuaikan tone, panjang, and format platform target.
 
-**Step 5 — Quality Gate (Manusia):** Kamu review output, edit yang perlu, and approve untuk scheduling.
+**Step 5 â€” Quality Gate (Manusia):** Kamu review output, edit yang perlu, and approve untuk scheduling.
 
-**Step 6 — Auto-Schedule:** Konten dijadwalkan secara optimal berdasarkan peak engagement time per platform.
+**Step 6 â€” Auto-Schedule:** Konten dijadwalkan secara optimal berdasarkan peak engagement time per platform.
 
 Dengan pipeline ini, dari 1 pillar content, kamu bisa menghasilkan 15-20 aset siap publish dalam waktu 2-3 jam (termasuk QC manual).`,
     insight:
@@ -171,9 +173,9 @@ Dengan pipeline ini, dari 1 pillar content, kamu bisa menghasilkan 15-20 aset si
       question:
         "Di mana posisi quality gate manusia yang paling kritis dalam pipeline atomization AI?",
       options: [
-        "Sebelum Step 1 — sebelum membuat pillar content",
-        "Antara Step 4 dan Step 5 — setelah AI mengadaptasi tapi sebelum publish",
-        "Setelah Step 6 — setelah konten sudah terposting",
+        "Sebelum Step 1 â€” sebelum membuat pillar content",
+        "Antara Step 4 dan Step 5 â€” setelah AI mengadaptasi tapi sebelum publish",
+        "Setelah Step 6 â€” setelah konten sudah terposting",
         "Quality gate tidak diperlukan jika prompt-nya sudah bagus",
       ],
       correct: 1,
@@ -352,15 +354,27 @@ function AtomizationViz() {
 }
 
 export default function ContentAtomizationPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("content-atomization", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -410,7 +424,7 @@ export default function ContentAtomizationPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -476,7 +490,7 @@ export default function ContentAtomizationPage() {
                 letterSpacing: "0.06em",
               }}
             >
-              MODUL 6 · ATOMIZATION
+              MODUL 6 Â· ATOMIZATION
             </span>
           </div>
           <h1
@@ -560,7 +574,7 @@ export default function ContentAtomizationPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -789,7 +803,7 @@ export default function ContentAtomizationPage() {
                 <Zap size={15} />{" "}
                 {showAILab
                   ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
               </button>
               {showAILab && (
                 <AILab
@@ -831,7 +845,7 @@ export default function ContentAtomizationPage() {
                     color: quizAnswer.correct ? "#16A34A" : "#DC2626",
                   }}
                 >
-                  {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
                 </span>
               )}
             </div>
@@ -938,7 +952,7 @@ export default function ContentAtomizationPage() {
                       marginBottom: 6,
                     }}
                   >
-                    {quizAnswer.correct ? "✓ PENJELASAN" : "✗ PENJELASAN"}
+                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
                   </div>
                   <p
                     style={{

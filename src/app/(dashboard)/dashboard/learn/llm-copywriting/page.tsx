@@ -1,5 +1,5 @@
-"use client";
-import { useState, useRef, useEffect } from "react";
+﻿"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -17,6 +17,8 @@ import {
   Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -34,7 +36,7 @@ const TONES: Record<
     label: "Agresif",
     icon: "solar:fire-bold-duotone",
     sample:
-      "STOP scroll sekarang! Kamu sedang kehilangan ribuan pelanggan setiap hari karena caption yang membosankan. Waktu kamu TERBATAS — pesaing sudah bergerak. Ambil keputusan SEKARANG atau tertinggal selamanya!",
+      "STOP scroll sekarang! Kamu sedang kehilangan ribuan pelanggan setiap hari karena caption yang membosankan. Waktu kamu TERBATAS â€” pesaing sudah bergerak. Ambil keputusan SEKARANG atau tertinggal selamanya!",
     emotionWords: ["STOP", "kehilangan", "TERBATAS", "SEKARANG", "tertinggal"],
   },
   casual: {
@@ -48,7 +50,7 @@ const TONES: Record<
     label: "Empatis",
     icon: "solar:heart-bold-duotone",
     sample:
-      "Kami memahami betapa lelahnya kamu mencoba membuat konten yang benar-benar terasa personal. Perasaan itu valid. Biarkan kami membantu kamu menemukan suara autentik brand-mu — satu langkah ringan di satu waktu.",
+      "Kami memahami betapa lelahnya kamu mencoba membuat konten yang benar-benar terasa personal. Perasaan itu valid. Biarkan kami membantu kamu menemukan suara autentik brand-mu â€” satu langkah ringan di satu waktu.",
     emotionWords: ["memahami", "lelahnya", "valid", "autentik", "ringan"],
   },
 };
@@ -61,11 +63,11 @@ const LESSONS = [
     body: `Membuat copy yang efektif dengan LLM bukan sekadar mengetik "buatkan caption bagus". Dibutuhkan **arsitektur prompt** yang tersistematiskan agar output konsisten dan berkualitas tinggi.
 
 **Framework CRISP untuk prompt copywriting:**
-- **Context** — Siapa brand-nya, apa produknya, siapa audiens target
-- **Role** — Peran apa yang dimainkan AI (copywriter senior, brand strategist, dll)
-- **Instruction** — Tugas spesifik dengan batasan jelas (panjang, tone, format)
-- **Style** — Contoh gaya bahasa yang diinginkan (berikan sample)
-- **Parameters** — Variabel yang bisa diubah (nama produk, benefit, CTA)
+- **Context** â€” Siapa brand-nya, apa produknya, siapa audiens target
+- **Role** â€” Peran apa yang dimainkan AI (copywriter senior, brand strategist, dll)
+- **Instruction** â€” Tugas spesifik dengan batasan jelas (panjang, tone, format)
+- **Style** â€” Contoh gaya bahasa yang diinginkan (berikan sample)
+- **Parameters** â€” Variabel yang bisa diubah (nama produk, benefit, CTA)
 
 Dengan framework ini, kamu bisa menghasilkan ratusan variasi caption yang konsisten secara brand voice tapi unik secara konten.`,
     insight:
@@ -76,10 +78,10 @@ Dengan framework ini, kamu bisa menghasilkan ratusan variasi caption yang konsis
       question:
         "Elemen mana dalam CRISP yang paling sering dilewatkan tapi paling berdampak pada kualitas output?",
       options: [
-        "Context — karena AI tidak perlu tahu tentang brand",
-        "Style — memberikan contoh gaya bahasa membuat output jauh lebih aligned dengan brand voice",
-        "Parameters — variabel tidak penting untuk copywriting",
-        "Role — AI tahu kalau diminta menulis pasti berperan sebagai penulis",
+        "Context â€” karena AI tidak perlu tahu tentang brand",
+        "Style â€” memberikan contoh gaya bahasa membuat output jauh lebih aligned dengan brand voice",
+        "Parameters â€” variabel tidak penting untuk copywriting",
+        "Role â€” AI tahu kalau diminta menulis pasti berperan sebagai penulis",
       ],
       correct: 1,
       explanation:
@@ -94,11 +96,11 @@ Dengan framework ini, kamu bisa menghasilkan ratusan variasi caption yang konsis
 
 **Framework Personalisasi 3-Layer:**
 
-**Layer 1 — Demographic:** Umur, lokasi, gender → mengubah bahasa dan referensi budaya. Gen Z Jakarta vs Ibu rumah tangga Surabaya membutuhkan framing yang berbeda total.
+**Layer 1 â€” Demographic:** Umur, lokasi, gender â†’ mengubah bahasa dan referensi budaya. Gen Z Jakarta vs Ibu rumah tangga Surabaya membutuhkan framing yang berbeda total.
 
-**Layer 2 — Psychographic:** Pain points, aspirasi, values → mengubah angle dan emotional trigger. Audiens yang price-sensitive vs quality-focused membutuhkan CTA berbeda.
+**Layer 2 â€” Psychographic:** Pain points, aspirasi, values â†’ mengubah angle dan emotional trigger. Audiens yang price-sensitive vs quality-focused membutuhkan CTA berbeda.
 
-**Layer 3 — Behavioral:** Power user vs first-timer, cart abandoner vs browser → mengubah urgency level dan offer structure.
+**Layer 3 â€” Behavioral:** Power user vs first-timer, cart abandoner vs browser â†’ mengubah urgency level dan offer structure.
 
 Dengan LLM, kamu bisa mengkombinasikan 3 layer ini untuk menghasilkan 50-100 variasi caption yang masing-masing terasa "ditulis khusus" untuk segmen tertentu.`,
     insight:
@@ -110,7 +112,7 @@ Dengan LLM, kamu bisa mengkombinasikan 3 layer ini untuk menghasilkan 50-100 var
       options: [
         "Biaya API yang terlalu mahal",
         "Output yang terlalu banyak sehingga tidak bisa dikelola",
-        "Inkonsistensi brand voice — setiap variasi terasa seperti brand berbeda jika tidak ada style guide yang kuat",
+        "Inkonsistensi brand voice â€” setiap variasi terasa seperti brand berbeda jika tidak ada style guide yang kuat",
         "Personalisasi selalu lebih baik, tidak ada risiko",
       ],
       correct: 2,
@@ -121,7 +123,7 @@ Dengan LLM, kamu bisa mengkombinasikan 3 layer ini untuk menghasilkan 50-100 var
   {
     id: "viral-hooks",
     title: "Viral Hook Engineering",
-    concept: "Hook × CTA × Urgency Formula",
+    concept: "Hook Ã— CTA Ã— Urgency Formula",
     body: `Sebuah copy yang viral memiliki tiga komponen yang bekerja sinergis: **Hook** yang menghentikan scroll, **CTA** yang memaksa aksi, dan **Urgency** yang menciptakan kebutuhan bertindak sekarang.
 
 **Hook Pattern Library:**
@@ -131,9 +133,9 @@ Dengan LLM, kamu bisa mengkombinasikan 3 layer ini untuk menghasilkan 50-100 var
 - **Direct Challenge:** "Kamu pikir X kamu sudah bagus? Cek ini."
 - **Story Lead:** "3 bulan lalu, aku hampir menyerah..."
 
-Rahasia: hook yang efektif menciptakan **open loop** di otak audiens — mereka HARUS menyelesaikan membaca untuk menutup loop tersebut.`,
+Rahasia: hook yang efektif menciptakan **open loop** di otak audiens â€” mereka HARUS menyelesaikan membaca untuk menutup loop tersebut.`,
     insight:
-      "Hook di 3 detik pertama menentukan 80% keberhasilan konten — investasikan waktu terbesar di sini",
+      "Hook di 3 detik pertama menentukan 80% keberhasilan konten â€” investasikan waktu terbesar di sini",
     challenge:
       "**HOOK BATTLE:** Tulis 5 variasi hook untuk satu produk menggunakan 5 pattern berbeda. Tanyakan ke AI Lab mana yang paling kuat dan mengapa!",
     quiz: {
@@ -147,7 +149,7 @@ Rahasia: hook yang efektif menciptakan **open loop** di otak audiens — mereka 
       ],
       correct: 1,
       explanation:
-        "Zeigarnik Effect: otak manusia secara natural cenderung mengingat dan memprioritaskan tugas/informasi yang belum selesai. Curiosity Gap exploit efek ini — audiens harus terus menonton/membaca untuk 'menutup' loop yang dibuka oleh hook.",
+        "Zeigarnik Effect: otak manusia secara natural cenderung mengingat dan memprioritaskan tugas/informasi yang belum selesai. Curiosity Gap exploit efek ini â€” audiens harus terus menonton/membaca untuk 'menutup' loop yang dibuka oleh hook.",
     },
   },
   {
@@ -158,13 +160,13 @@ Rahasia: hook yang efektif menciptakan **open loop** di otak audiens — mereka 
 
 **Framework QC 4-Layer:**
 
-**Layer 1 — Fact Check:** Verifikasi setiap klaim, statistik, dan pernyataan. LLM sering "mengarang" angka yang terdengar masuk akal tapi tidak factual.
+**Layer 1 â€” Fact Check:** Verifikasi setiap klaim, statistik, dan pernyataan. LLM sering "mengarang" angka yang terdengar masuk akal tapi tidak factual.
 
-**Layer 2 — Brand Alignment:** Cek apakah tone, vocabulary, dan messaging sesuai brand guidelines. Red flags: kata-kata yang brand kamu tidak akan pernah gunakan.
+**Layer 2 â€” Brand Alignment:** Cek apakah tone, vocabulary, dan messaging sesuai brand guidelines. Red flags: kata-kata yang brand kamu tidak akan pernah gunakan.
 
-**Layer 3 — Legal Compliance:** Pastikan tidak ada klaim kesehatan yang berlebihan, perbandingan kompetitor yang ilegal, atau pelanggaran UU ITE.
+**Layer 3 â€” Legal Compliance:** Pastikan tidak ada klaim kesehatan yang berlebihan, perbandingan kompetitor yang ilegal, atau pelanggaran UU ITE.
 
-**Layer 4 — A/B Readiness:** Format output agar siap untuk split testing — setiap variasi harus cukup berbeda untuk menghasilkan insight yang bermakna.
+**Layer 4 â€” A/B Readiness:** Format output agar siap untuk split testing â€” setiap variasi harus cukup berbeda untuk menghasilkan insight yang bermakna.
 
 Automasi QC: buat checklist template yang bisa di-reuse untuk setiap batch output LLM.`,
     insight:
@@ -175,10 +177,10 @@ Automasi QC: buat checklist template yang bisa di-reuse untuk setiap batch outpu
       question:
         "Pada Layer QC mana kamu paling mungkin menemukan masalah kritis yang bisa merugikan brand secara legal?",
       options: [
-        "Layer 1 — Fact Check",
-        "Layer 2 — Brand Alignment",
-        "Layer 3 — Legal Compliance, karena klaim berlebihan dan pelanggaran regulasi bisa berujung sanksi hukum",
-        "Layer 4 — A/B Readiness",
+        "Layer 1 â€” Fact Check",
+        "Layer 2 â€” Brand Alignment",
+        "Layer 3 â€” Legal Compliance, karena klaim berlebihan dan pelanggaran regulasi bisa berujung sanksi hukum",
+        "Layer 4 â€” A/B Readiness",
       ],
       correct: 2,
       explanation:
@@ -355,15 +357,27 @@ function TypewriterViz() {
 }
 
 export default function LLMCopywritingPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("llm-copywriting", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -413,7 +427,7 @@ export default function LLMCopywritingPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -479,7 +493,7 @@ export default function LLMCopywritingPage() {
                 letterSpacing: "0.06em",
               }}
             >
-              MODUL 5 · LLM COPYWRITING
+              MODUL 5 Â· LLM COPYWRITING
             </span>
           </div>
           <h1
@@ -564,7 +578,7 @@ export default function LLMCopywritingPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -793,7 +807,7 @@ export default function LLMCopywritingPage() {
                 <Zap size={15} />{" "}
                 {showAILab
                   ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
               </button>
               {showAILab && (
                 <AILab
@@ -835,7 +849,7 @@ export default function LLMCopywritingPage() {
                     color: quizAnswer.correct ? "#16A34A" : "#DC2626",
                   }}
                 >
-                  {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
                 </span>
               )}
             </div>
@@ -942,7 +956,7 @@ export default function LLMCopywritingPage() {
                       marginBottom: 6,
                     }}
                   >
-                    {quizAnswer.correct ? "✓ PENJELASAN" : "✗ PENJELASAN"}
+                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
                   </div>
                   <p
                     style={{

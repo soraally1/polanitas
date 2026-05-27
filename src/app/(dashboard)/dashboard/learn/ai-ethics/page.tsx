@@ -1,5 +1,5 @@
-"use client";
-import { useState, useRef, useEffect } from "react";
+﻿"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
@@ -17,6 +17,8 @@ import {
   Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
   questionIndex: number;
@@ -36,11 +38,11 @@ const LESSONS = [
 Di Indonesia, risiko ini semakin nyata dengan adanya **UU PDP (Perlindungan Data Pribadi)** yang mengatur bagaimana data personal boleh dikumpulkan, diproses, dan digunakan oleh AI. Pelanggaran bisa berujung denda hingga 2% dari pendapatan tahunan.
 
 **3 Risiko Utama AI Tanpa Etika:**
-1. **Bias Amplification:** AI memperkuat bias yang ada di training data — stereotip gender, ras, atau ekonomi bisa terrefleksi dalam output konten.
+1. **Bias Amplification:** AI memperkuat bias yang ada di training data â€” stereotip gender, ras, atau ekonomi bisa terrefleksi dalam output konten.
 2. **Hallucination as Fact:** AI menghasilkan informasi palsu yang terdengar meyakinkan, bisa merusak kredibilitas brand jika dipublish tanpa verifikasi.
 3. **Privacy Violation:** Menggunakan data customer tanpa consent untuk personalisasi bisa melanggar UU PDP.
 
-Brand yang proaktif membangun **AI governance** sebelum krisis terjadi memiliki competitive advantage — trust is a moat.`,
+Brand yang proaktif membangun **AI governance** sebelum krisis terjadi memiliki competitive advantage â€” trust is a moat.`,
     insight:
       "73% konsumen Indonesia menyatakan akan berhenti membeli dari brand yang terbukti menyalahgunakan data personal mereka (survey 2024)",
     challenge:
@@ -50,7 +52,7 @@ Brand yang proaktif membangun **AI governance** sebelum krisis terjadi memiliki 
         "Brand menggunakan data browsing customer tanpa consent untuk personalisasi iklan AI. Apa risikonya?",
       options: [
         "Tidak ada risiko karena semua brand melakukannya",
-        "Melanggar UU PDP — bisa dikenai denda dan merusak brand trust secara permanen",
+        "Melanggar UU PDP â€” bisa dikenai denda dan merusak brand trust secara permanen",
         "Risikonya hanya kecil jika hasilnya akurat",
         "UU PDP tidak berlaku untuk AI marketing",
       ],
@@ -67,16 +69,16 @@ Brand yang proaktif membangun **AI governance** sebelum krisis terjadi memiliki 
 
 **Framework Guardrails 3-Layer:**
 
-**Layer 1 — Input Filtering:** Mencegah prompt yang bisa menghasilkan output berbahaya. Contoh: block request yang mengandung hate speech, adult content, atau competitive bashing.
+**Layer 1 â€” Input Filtering:** Mencegah prompt yang bisa menghasilkan output berbahaya. Contoh: block request yang mengandung hate speech, adult content, atau competitive bashing.
 
-**Layer 2 — Output Monitoring:** Setiap output AI dicheck sebelum publish. Automated check: profanity filter, fact-check against knowledge base, brand voice alignment score.
+**Layer 2 â€” Output Monitoring:** Setiap output AI dicheck sebelum publish. Automated check: profanity filter, fact-check against knowledge base, brand voice alignment score.
 
-**Layer 3 — Human-in-the-Loop (HITL):** Untuk konten berisiko tinggi (iklan berbayar, press release, product claim), WAJIB ada approval manusia sebelum publish.
+**Layer 3 â€” Human-in-the-Loop (HITL):** Untuk konten berisiko tinggi (iklan berbayar, press release, product claim), WAJIB ada approval manusia sebelum publish.
 
 **Implementasi Teknis:**
 - System prompt yang jelas tentang batasan (apa yang TIDAK boleh di-generate)
 - Blocklist kata dan frasa yang brand kamu tidak boleh gunakan
-- Confidence threshold — output di bawah threshold tertentu otomatis di-flag untuk review manual`,
+- Confidence threshold â€” output di bawah threshold tertentu otomatis di-flag untuk review manual`,
     insight:
       "Brand dengan guardrails AI yang ketat memiliki 85% lebih sedikit 'content recall incidents' dibanding yang tanpa guardrails",
     challenge:
@@ -86,7 +88,7 @@ Brand yang proaktif membangun **AI governance** sebelum krisis terjadi memiliki 
         "AI menghasilkan copy 'Produk kami TERBUKTI menyembuhkan diabetes'. Apa yang salah?",
       options: [
         "Tidak ada masalah jika produknya memang bagus",
-        "Klaim kesehatan tanpa bukti ilmiah melanggar regulasi BPOM dan UU Perlindungan Konsumen — guardrails output harus menangkap ini",
+        "Klaim kesehatan tanpa bukti ilmiah melanggar regulasi BPOM dan UU Perlindungan Konsumen â€” guardrails output harus menangkap ini",
         "Hanya masalah jika diposting di marketplace",
         "Cukup tambahkan disclaimer 'hasil bervariasi'",
       ],
@@ -116,7 +118,7 @@ Brand yang proaktif membangun **AI governance** sebelum krisis terjadi memiliki 
 
 **Sanksi:** Denda administratif hingga 2% pendapatan tahunan dan/atau pidana.`,
     insight:
-      "Hanya 23% bisnis digital Indonesia yang sudah fully compliant dengan UU PDP — ini berarti 77% masih berisiko terkena sanksi",
+      "Hanya 23% bisnis digital Indonesia yang sudah fully compliant dengan UU PDP â€” ini berarti 77% masih berisiko terkena sanksi",
     challenge:
       "**COMPLIANCE CHECK:** Audit website/platform kamu: (1) Apakah ada privacy policy yang jelas? (2) Apakah cookie consent menjelaskan tujuan? (3) Apakah ada mekanisme data deletion request?",
     quiz: {
@@ -124,7 +126,7 @@ Brand yang proaktif membangun **AI governance** sebelum krisis terjadi memiliki 
         "Brand menggunakan AI untuk membuat segmentasi audiens otomatis berdasarkan behavior data tanpa menginformasikan ke user. Ini melanggar prinsip UU PDP yang mana?",
       options: [
         "Purpose Limitation saja",
-        "Consent dan Transparency — profiling otomatis harus diinformasikan dan disetujui oleh subjek data",
+        "Consent dan Transparency â€” profiling otomatis harus diinformasikan dan disetujui oleh subjek data",
         "Data Minimization saja",
         "Tidak melanggar UU PDP karena data behavior bukan data pribadi",
       ],
@@ -137,17 +139,17 @@ Brand yang proaktif membangun **AI governance** sebelum krisis terjadi memiliki 
     id: "governance",
     title: "Framework Governance AI",
     concept: "Kebijakan Organisasi untuk AI yang Bertanggung Jawab",
-    body: `**AI Governance** adalah framework kebijakan organisasi yang memastikan penggunaan AI berjalan etis, legal, dan aligned dengan values perusahaan. Tanpa governance, setiap tim akan membuat keputusan AI sendiri-sendiri — menghasilkan inkonsistensi dan risiko.
+    body: `**AI Governance** adalah framework kebijakan organisasi yang memastikan penggunaan AI berjalan etis, legal, dan aligned dengan values perusahaan. Tanpa governance, setiap tim akan membuat keputusan AI sendiri-sendiri â€” menghasilkan inkonsistensi dan risiko.
 
 **Framework SAFE untuk AI Governance:**
 
-**S — Standards:** Tetapkan standar kualitas output AI: accuracy threshold, brand voice compliance, factual verification requirement.
+**S â€” Standards:** Tetapkan standar kualitas output AI: accuracy threshold, brand voice compliance, factual verification requirement.
 
-**A — Accountability:** Siapa yang bertanggung jawab jika AI menghasilkan output bermasalah? Setiap use case AI harus memiliki designated owner.
+**A â€” Accountability:** Siapa yang bertanggung jawab jika AI menghasilkan output bermasalah? Setiap use case AI harus memiliki designated owner.
 
-**F — Fairness:** Audit bias secara reguler. Apakah AI kamu menarget/menghindari segmen tertentu secara tidak fair? Apakah training data representatif?
+**F â€” Fairness:** Audit bias secara reguler. Apakah AI kamu menarget/menghindari segmen tertentu secara tidak fair? Apakah training data representatif?
 
-**E — Explainability:** Bisa menjelaskan MENGAPA AI menghasilkan output tertentu. Ini penting untuk audit, debugging, dan transparansi ke stakeholder.
+**E â€” Explainability:** Bisa menjelaskan MENGAPA AI menghasilkan output tertentu. Ini penting untuk audit, debugging, dan transparansi ke stakeholder.
 
 **Implementasi Praktis:**
 1. Buat AI Usage Policy tertulis (1-2 halaman)
@@ -163,7 +165,7 @@ Brand yang proaktif membangun **AI governance** sebelum krisis terjadi memiliki 
         "Tim marketing menggunakan ChatGPT dengan API key perusahaan tanpa policy tertulis. Apa risiko terbesar?",
       options: [
         "Tidak ada risiko karena ChatGPT aman",
-        "Tanpa policy, setiap orang menggunakan AI secara berbeda — risiko data leak, brand inconsistency, dan legal violation menjadi tidak terkontrol",
+        "Tanpa policy, setiap orang menggunakan AI secara berbeda â€” risiko data leak, brand inconsistency, dan legal violation menjadi tidak terkontrol",
         "Risikonya hanya biaya API yang membengkak",
         "Cukup buat policy lisan saja",
       ],
@@ -463,15 +465,27 @@ function EthicalShieldViz() {
 }
 
 export default function AIEthicsPage() {
+  const { user }   = useAuth();
+  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
+    useModuleProgress("ai-ethics", user?.uid, LESSONS.length);
+
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
   const [showAILab, setShowAILab] = useState(false);
+
+  // Restore quiz answer for current lesson from Firestore
+  useEffect(() => {
+    const saved = quizAnswers[currentLesson];
+    if (saved) {
+      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+    } else {
+      setQuizAnswer(null);
+    }
+  }, [currentLesson, quizAnswers]);
   const lesson = LESSONS[currentLesson];
-  const progress = (completed.size / LESSONS.length) * 100;
+  const progress = (completedLessons.size / LESSONS.length) * 100;
   function goToLesson(idx: number) {
     setCurrentLesson(idx);
-    setQuizAnswer(null);
     setShowAILab(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -521,7 +535,7 @@ export default function AIEthicsPage() {
             }}
           >
             <BookOpen size={15} />
-            {completed.size}/{LESSONS.length} selesai
+            {completedLessons.size}/{LESSONS.length} selesai
           </div>
           <div
             style={{
@@ -587,7 +601,7 @@ export default function AIEthicsPage() {
                 letterSpacing: "0.06em",
               }}
             >
-              MODUL 10 · AI ETHICS
+              MODUL 10 Â· AI ETHICS
             </span>
           </div>
           <h1
@@ -672,7 +686,7 @@ export default function AIEthicsPage() {
             DAFTAR MATERI
           </div>
           {LESSONS.map((l, i) => {
-            const isDone = completed.has(i);
+            const isDone = completedLessons.has(i);
             const isActive = i === currentLesson;
             return (
               <button
@@ -901,7 +915,7 @@ export default function AIEthicsPage() {
                 <Zap size={15} />{" "}
                 {showAILab
                   ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
               </button>
               {showAILab && (
                 <AILab
@@ -943,7 +957,7 @@ export default function AIEthicsPage() {
                     color: quizAnswer.correct ? "#16A34A" : "#DC2626",
                   }}
                 >
-                  {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
                 </span>
               )}
             </div>
@@ -1050,7 +1064,7 @@ export default function AIEthicsPage() {
                       marginBottom: 6,
                     }}
                   >
-                    {quizAnswer.correct ? "✓ PENJELASAN" : "✗ PENJELASAN"}
+                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
                   </div>
                   <p
                     style={{

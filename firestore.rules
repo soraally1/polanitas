@@ -39,6 +39,12 @@ service cloud.firestore {
                          'accessibility', 'profileCompleted'
                        ]);
       allow delete: if false; // Never allow client-side deletion of profiles
+
+      // ── /users/{uid}/moduleProgress/{moduleId} ──────────────────────────
+      // Quiz answers and lesson completion — owned by the user only.
+      match /moduleProgress/{moduleId} {
+        allow read, write: if isOwner(uid);
+      }
     }
 
 
