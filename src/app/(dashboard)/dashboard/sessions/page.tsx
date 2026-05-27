@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   FolderOpen,
@@ -12,6 +12,9 @@ import {
   Users,
   BarChart2,
   Hash,
+  FileText,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { db } from "@/lib/firebase-client";
@@ -49,12 +52,22 @@ export default function SessionsPage() {
   const [sessions, setSessions] = useState<ExtendedSession[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
 
+  const [firestoreError, setFirestoreError] = useState<string | null>(null);
+
   // Fetch sessions from Firestore
   useEffect(() => {
-    if (authLoading || !user) {
+    // Auth still loading — keep the loading skeleton; do nothing yet
+    if (authLoading) return;
+
+    // Auth done, but no user → show empty state
+    if (!user) {
       setLoadingSessions(false);
       return;
     }
+
+    // Auth done + user present → subscribe to Firestore
+    setLoadingSessions(true);
+    setFirestoreError(null);
     const q = query(
       collection(db, "sessions"),
       where("userId", "==", user.uid),
@@ -65,10 +78,27 @@ export default function SessionsPage() {
         setSessions(snap.docs.map((d) => ({ ...d.data(), id: d.id } as ExtendedSession)));
         setLoadingSessions(false);
       },
-      () => setLoadingSessions(false)
+      (err) => {
+        console.error("[Sessions] Firestore error:", err);
+        setFirestoreError(err.message);
+        setLoadingSessions(false);
+      }
     );
     return () => unsub();
   }, [user, authLoading]);
+
+  // Derived stats
+  const stats = useMemo(() => {
+    const total = sessions.length;
+    const done = sessions.filter((s) =>
+      Object.values(s.agents || {}).every((a: any) => a.status === "done")
+    ).length;
+    const running = sessions.filter((s) =>
+      Object.values(s.agents || {}).some((a: any) => a.status === "running")
+    ).length;
+    const waiting = total - done - running;
+    return { total, done, running, waiting };
+  }, [sessions]);
 
   return (
     <div className="animate-fade-in-up flex flex-col gap-8 pb-20">
@@ -90,6 +120,28 @@ export default function SessionsPage() {
         </Link>
       </div>
 
+      {/* ── Summary Stats ─────────────────────────────────────────────── */}
+      {!loadingSessions && !authLoading && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: "Total Sesi", value: stats.total, Icon: FileText, color: "#6366F1" },
+            { label: "Selesai", value: stats.done, Icon: CheckCircle2, color: "#10B981" },
+            { label: "Berjalan", value: stats.running, Icon: Loader2, color: "#F59E0B" },
+            { label: "Menunggu", value: stats.waiting, Icon: Clock, color: "#94A3B8" },
+          ].map(({ label, value, Icon, color }) => (
+            <div key={label} className="bg-surface border border-border rounded-[16px] p-4 flex items-center gap-3">
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${color}15`, border: `1px solid ${color}25`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <Icon size={16} color={color} />
+              </div>
+              <div>
+                <div style={{ fontSize: "1.375rem", fontWeight: 800, color: "var(--color-text-primary)", lineHeight: 1 }}>{value}</div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: 2 }}>{label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ── Riwayat Sesi ─────────────────────────────────────────────── */}
       <div className="bento-card">
         <h2 className="font-extrabold text-[1.0625rem] mb-5">Riwayat Sesi Analisis</h2>
@@ -97,6 +149,15 @@ export default function SessionsPage() {
         {loadingSessions || authLoading ? (
           <div className="flex flex-col gap-3">
             {[1, 2, 3].map(i => <div key={i} className="skeleton h-24 rounded-2xl" />)}
+          </div>
+        ) : firestoreError ? (
+          <div className="py-10 px-6 text-center flex flex-col items-center gap-3">
+            <p className="text-sm font-semibold" style={{ color: "var(--color-error, #EF4444)" }}>
+              Gagal memuat sesi: {firestoreError}
+            </p>
+            <p className="text-xs text-muted max-w-sm">
+              Coba refresh halaman. Jika masih gagal, periksa koneksi internet atau hubungi support.
+            </p>
           </div>
         ) : sessions.length === 0 ? (
           <div className="py-16 px-6 text-center bg-surface border-[1.5px] border-dashed border-border rounded-[20px] flex flex-col items-center gap-3">

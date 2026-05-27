@@ -49,8 +49,10 @@ const SENSITIVITY    = 4.0;   // Head movement amplification to screen space
 // EAR threshold: 0.25 is standard for 4:3 video with aspect-ratio-corrected distances.
 // Open eye ≈ 0.35–0.45, closed eye ≈ 0.10–0.20. Threshold at 0.25 gives safe margin.
 const EAR_THRESH     = 0.25;
-// BLINK_MIN=1: allows detecting a quick blink even at low MediaPipe framerates (~15fps)
-const BLINK_MIN      = 1;
+// BLINK_MIN=3: a genuine blink needs ≥3 consecutive frames below threshold.
+// At ~15fps that's ≥200ms — filters out single-frame EAR dips from noise/head movement.
+// BLINK_MIN=1 was too sensitive; almost any micro-expression triggered a click.
+const BLINK_MIN      = 3;
 const BLINK_MAX      = 30;    // Max frames closed (>30 = deliberate close, not blink)
 const CALIB_FRAMES   = 45;    // Frames to sample for auto-center calibration (~1.5s)
 

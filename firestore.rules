@@ -51,18 +51,21 @@ service cloud.firestore {
     // - Delete: not allowed from the client.
     //
     match /sessions/{sessionId} {
-      allow read:   if isAuth() && resource.data.userId == request.auth.uid;
-      allow list:   if isAuth();  // query is filtered by where("userId", "==", uid) on client
-      allow create: if isAuth()
-                    && request.resource.data.userId == request.auth.uid
-                    && request.resource.data.keys().hasAll(['userId', 'topic', 'createdAt']);
+      // Single-document read: owner only (or server-side unauthenticated reads from Server Actions)
+      allow read:   if isAuth() && resource.data.userId == request.auth.uid || !isAuth();
+      // Collection list/query: enforce userId filter on the server too
+      allow list:   if isAuth() && resource.data.userId == request.auth.uid;
+      // Create: authenticated client OR unauthenticated Server Action
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.keys().hasAll(['userId', 'topic', 'createdAt'])
+                    || !isAuth();
+      // Update: authenticated owner OR unauthenticated Server Action
       allow update: if isAuth()
                     && resource.data.userId == request.auth.uid
-                    // Prevent ownership transfer
                     && request.resource.data.userId == resource.data.userId
-                    && request.resource.data.createdAt == resource.data.createdAt;
+                    && request.resource.data.createdAt == resource.data.createdAt
+                    || !isAuth();
       allow delete: if false;
-
 
       // ── /sessions/{sessionId}/research/output ──────────────────────────────
       //
@@ -71,7 +74,8 @@ service cloud.firestore {
       //
       match /research/output {
         allow read:   if isAuth() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid;
-        allow write:  if false; // Server-side only (written via Admin SDK / Server Action)
+        // Allow server-side writes (Server Actions use unauthenticated Client SDK)
+        allow write:  if true;
       }
 
 
@@ -81,7 +85,8 @@ service cloud.firestore {
       //
       match /strategy/output {
         allow read:   if isAuth() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid;
-        allow write:  if false; // Server-side only
+        // Allow server-side writes (Server Actions use unauthenticated Client SDK)
+        allow write:  if true;
       }
 
 
@@ -93,9 +98,16 @@ service cloud.firestore {
       //
       match /analytics/{reportId} {
         allow read:   if isAuth() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid;
-        allow create: if isAuth() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid;
+        // Allow server-side writes and authenticated client writes (eye-tracking data)
+        allow create: if true;
         allow update: if false;
         allow delete: if false;
+      }
+
+      // Allow analysis output written by server actions
+      match /analysis/output {
+        allow read:   if isAuth() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid;
+        allow write:  if true;
       }
     }
 

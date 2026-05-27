@@ -27,36 +27,49 @@ export async function fetchYouTubeTrends(
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey) throw new Error("YOUTUBE_API_KEY is not set.");
 
+  // Strip enrichment suffixes added by the orchestrator (e.g. "— Target audiens: ...").
+  // The YouTube search API returns 0 results for overly long queries.
+  const cleanTopic = topic.split(/\s*[—\-]{1,2}\s*(Target audiens|Fokus):/)[0].trim();
+
   const url = new URL("https://www.googleapis.com/youtube/v3/search");
   url.searchParams.set("part", "snippet");
-  url.searchParams.set("q", topic);
+  url.searchParams.set("q", cleanTopic);
   url.searchParams.set("type", "video");
   url.searchParams.set("regionCode", regionCode);
   url.searchParams.set("maxResults", String(maxResults));
-  url.searchParams.set("order", "relevance"); // Get the most relevant videos
+  url.searchParams.set("order", "relevance");
   url.searchParams.set("key", apiKey);
+
+  console.log(`[Researcher] YouTube search query: "${cleanTopic}"`);
 
   const res = await fetch(url.toString(), {
     next: { revalidate: 3600 },
   });
 
   if (!res.ok) {
-    throw new Error(`YouTube API error: ${res.status} ${res.statusText}`);
+    const body = await res.text().catch(() => "");
+    throw new Error(`YouTube API error: ${res.status} ${res.statusText} — ${body.slice(0, 200)}`);
   }
 
   const data = await res.json();
 
-  // The search endpoint returns videoId inside an id object
-  return (data.items ?? []).map((item: any): YouTubeTrend => ({
+  if (data.error) {
+    throw new Error(`YouTube API error: ${data.error.message}`);
+  }
+
+  const items: YouTubeTrend[] = (data.items ?? []).map((item: any): YouTubeTrend => ({
     videoId: item.id.videoId,
     title: item.snippet.title,
     channelTitle: item.snippet.channelTitle,
-    viewCount: "0", // Search endpoint doesn't return stats by default without extra calls
+    viewCount: "0",
     likeCount: "0",
     tags: [],
-    thumbnail: item.snippet.thumbnails?.high?.url ?? "",
+    thumbnail: item.snippet.thumbnails?.high?.url ?? item.snippet.thumbnails?.default?.url ?? "",
     publishedAt: item.snippet.publishedAt,
   }));
+
+  console.log(`[Researcher] YouTube returned ${items.length} videos for "${cleanTopic}"`);
+  return items;
 }
 
 // ============================================================
@@ -270,6 +283,13 @@ export async function runMarketResearch(
       fetchTokopediaProducts(topic),
       fetchShopeeProducts(topic),
     ]);
+
+  // Log any rejections so they're visible in the server log
+  if (youtubeTrends.status === "rejected")    console.error("[Researcher] YouTube fetch error:",     youtubeTrends.reason);
+  if (socialTikTok.status === "rejected")     console.error("[Researcher] TikTok fetch error:",      socialTikTok.reason);
+  if (socialIG.status === "rejected")         console.error("[Researcher] Instagram fetch error:",   socialIG.reason);
+  if (tokopediaProducts.status === "rejected") console.error("[Researcher] Tokopedia fetch error:", tokopediaProducts.reason);
+  if (shopeeProducts.status === "rejected")   console.error("[Researcher] Shopee fetch error:",    shopeeProducts.reason);
 
   const rawOutput = {
     topic,

@@ -5,10 +5,12 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useAccessibility } from "@/hooks/use-accessibility";
 import { useFaceTracker } from "@/hooks/use-face-tracker";
 import { useDraggable } from "@/hooks/use-draggable";
+import { useVoiceInput } from "@/hooks/use-voice-input";
 import {
   Eye, EyeOff, ChevronUp, ChevronDown,
   Loader2, GripVertical, AlertCircle, Video, RefreshCw,
   Move, MousePointerClick, ArrowUp, ArrowDown, Check, X,
+  Mic, MicOff, Volume2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -85,7 +87,15 @@ export function EyeTrackingNavigation() {
   // ── Gaze cursor state ─────────────────────────────────────────────────────
   const [cursorPos,  setCursorPos]  = useState({ x: -1, y: -1 });
   const [blinkFlash, setBlinkFlash] = useState(false);
-  const cursorRef = useRef({ x: -1, y: -1 });
+  const cursorRef    = useRef({ x: -1, y: -1 });
+  // After a blink fires, ignore all further blinks for this many ms.
+  // Prevents rapid double-clicks from EAR oscillating around the threshold.
+  const lastBlinkRef = useRef(0);
+  const BLINK_COOLDOWN_MS = 1500;
+
+  // ── Voice input ──────────────────────────────────────────────────────────
+  const { isListening, interimText, transcript, error: voiceError, startListening, stopListening } = useVoiceInput();
+  const [voiceTarget, setVoiceTarget] = useState<{ label: string; placeholder: string } | null>(null);
 
   // ── Scroll zone state ─────────────────────────────────────────────────────
   const [scrollDir,  setScrollDir]  = useState<"up" | "down" | "none">("none");
@@ -143,24 +153,71 @@ export function EyeTrackingNavigation() {
     }
   }, []);
 
-  // ── Blink handler — click element under cursor ────────────────────────────
+  // ── Blink handler — click element under cursor ─────────────────────────────
   const handleBlink = useCallback(() => {
     const { x, y } = cursorRef.current;
     if (x < 0 || y < 0) return;
 
+    // ── Cooldown: ignore rapid blink bursts ───────────────────────────────
+    const now = Date.now();
+    if (now - lastBlinkRef.current < BLINK_COOLDOWN_MS) return;
+    lastBlinkRef.current = now;
+
     setBlinkFlash(true);
     setTimeout(() => setBlinkFlash(false), 300);
 
-    const el = document.elementFromPoint(x, y);
-    if (el && el.tagName !== "BODY" && el.tagName !== "HTML") {
-      const htmlEl = el as HTMLElement;
-      const old    = htmlEl.style.outline;
-      htmlEl.style.outline = "3px solid var(--color-primary)";
-      setTimeout(() => { htmlEl.style.outline = old; }, 300);
-      htmlEl.click();
-      showFeedback("Klik Kedip", <MousePointerClick size={14} />);
+    const target = document.elementFromPoint(x, y);
+    if (!target || target.tagName === "BODY" || target.tagName === "HTML") return;
+
+    // Walk up the DOM to find nearest interactable HTMLElement
+    let clickable: HTMLElement | null = null;
+    let el: Element | null = target;
+    while (el && el !== document.documentElement) {
+      if (el instanceof HTMLElement) {
+        const tag  = el.tagName;
+        const role = el.getAttribute("role");
+        if (
+          tag === "BUTTON" || tag === "A" || tag === "INPUT" ||
+          tag === "SELECT" || tag === "TEXTAREA" || tag === "LABEL" ||
+          role === "button" || role === "link" || role === "tab" ||
+          el.getAttribute("tabindex") !== null
+        ) { clickable = el; break; }
+        if (!clickable && window.getComputedStyle(el).cursor === "pointer") clickable = el;
+      }
+      el = el.parentElement;
     }
-  }, []);
+
+    const htmlEl = clickable ?? (target instanceof HTMLElement ? target : null);
+    if (!htmlEl) return;
+
+    // ── Voice input for text fields ──────────────────────────────────────────
+    const tag = htmlEl.tagName;
+    const type = (htmlEl as HTMLInputElement).type ?? "";
+    const isTextInput =
+      tag === "TEXTAREA" ||
+      (tag === "INPUT" && ["text", "search", "url", "email", ""].includes(type));
+
+    if (isTextInput) {
+      const inputEl = htmlEl as HTMLInputElement | HTMLTextAreaElement;
+      inputEl.focus();
+      const label =
+        document.querySelector(`label[for="${inputEl.id}"]`)?.textContent ??
+        inputEl.getAttribute("aria-label") ??
+        inputEl.placeholder ??
+        "Kolom teks";
+      setVoiceTarget({ label: label.trim(), placeholder: inputEl.placeholder ?? "" });
+      startListening(inputEl, { lang: "id-ID", mode: "replace" });
+      showFeedback("Mikrofon Aktif 🎤", <Mic size={14} />);
+      return;
+    }
+
+    // ── Regular blink-click for non-text elements ────────────────────────────
+    const old = htmlEl.style.outline;
+    htmlEl.style.outline = "3px solid var(--color-primary)";
+    setTimeout(() => { htmlEl.style.outline = old; }, 300);
+    htmlEl.click();
+    showFeedback("Klik Kedip", <MousePointerClick size={14} />);
+  }, [startListening]);
 
   const {
     isReady, isTracking, isFaceDetected, isCalibrating,
@@ -230,6 +287,10 @@ export function EyeTrackingNavigation() {
 
   const showCursor = enabled && isTracking && !isCalibrating && cursorPos.x >= 0 && cursorPos.y >= 0;
 
+  // Clear voiceTarget when listening ends
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  if (!isListening && voiceTarget && transcript) setTimeout(() => setVoiceTarget(null), 1200);
+
   const statusLabel = !isReady
     ? "Memuat FaceMesh..."
     : isCalibrating
@@ -241,6 +302,130 @@ export function EyeTrackingNavigation() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <>
+      {/* ── Voice Listening Overlay ──────────────────────────────────────────── */}
+      {isListening && voiceTarget && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 10010,
+            background: "rgba(0,0,0,0.72)",
+            backdropFilter: "blur(10px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            gap: 20,
+          }}
+        >
+          {/* Pulsing mic */}
+          <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{
+              position: "absolute",
+              width: 96, height: 96,
+              borderRadius: "50%",
+              background: "rgba(99,102,241,0.25)",
+              animation: "pulse 1.2s ease-in-out infinite",
+            }} />
+            <div style={{
+              position: "absolute",
+              width: 72, height: 72,
+              borderRadius: "50%",
+              background: "rgba(99,102,241,0.35)",
+              animation: "pulse 1.2s ease-in-out infinite 0.3s",
+            }} />
+            <div style={{
+              width: 56, height: 56,
+              borderRadius: "50%",
+              background: "#6366f1",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 0 24px rgba(99,102,241,0.6)",
+              zIndex: 1,
+            }}>
+              <Mic size={26} color="#fff" />
+            </div>
+          </div>
+
+          {/* Field name */}
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>
+              Mengisi kolom
+            </div>
+            <div style={{ fontSize: "1.125rem", fontWeight: 800, color: "#fff" }}>
+              {voiceTarget.label}
+            </div>
+            {voiceTarget.placeholder && (
+              <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.45)", marginTop: 4 }}>
+                {voiceTarget.placeholder}
+              </div>
+            )}
+          </div>
+
+          {/* Live transcript */}
+          <div style={{
+            minHeight: 56,
+            maxWidth: 480,
+            width: "90%",
+            padding: "14px 20px",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: 16,
+            color: interimText ? "rgba(255,255,255,0.7)" : (transcript ? "#fff" : "rgba(255,255,255,0.35)"),
+            fontSize: "1rem",
+            fontWeight: 600,
+            textAlign: "center",
+            fontStyle: !interimText && !transcript ? "italic" : "normal",
+            lineHeight: 1.5,
+            transition: "color 0.2s",
+          }}>
+            {interimText || transcript || "Mulai berbicara…"}
+          </div>
+
+          {/* Hint */}
+          <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.4)", display: "flex", alignItems: "center", gap: 6 }}>
+            <Volume2 size={13} />
+            Bicara dengan jelas dalam Bahasa Indonesia
+          </div>
+
+          {/* Manual stop button */}
+          <button
+            onClick={stopListening}
+            style={{
+              marginTop: 4,
+              padding: "10px 24px",
+              borderRadius: 999,
+              border: "1px solid rgba(255,255,255,0.25)",
+              background: "rgba(255,255,255,0.1)",
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              backdropFilter: "blur(4px)",
+            }}
+          >
+            <MicOff size={15} /> Hentikan
+          </button>
+
+          <style>{`@keyframes pulse { 0%,100%{transform:scale(1);opacity:0.8} 50%{transform:scale(1.25);opacity:0.4} }`}</style>
+        </div>
+      )}
+
+      {/* Voice error toast */}
+      {voiceError && !isListening && (
+        <div style={{
+          position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+          zIndex: 10009, background: "#ef4444", color: "#fff",
+          padding: "10px 20px", borderRadius: 12, fontSize: "0.875rem", fontWeight: 600,
+          display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+        }}>
+          <MicOff size={14} /> {voiceError}
+        </div>
+      )}
       {/* ── Scroll zone overlays — appear at screen edges ──────────────────── */}
       <AnimatePresence>
         {showCursor && scrollDir === "up" && (

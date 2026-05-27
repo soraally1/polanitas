@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Keep Firebase Admin out of the client bundle
-  serverExternalPackages: ["firebase-admin"],
+  // Keep Firebase Admin and Apify client out of the client bundle
+  serverExternalPackages: ["firebase-admin", "apify-client"],
 
   images: {
     remotePatterns: [

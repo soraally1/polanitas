@@ -3,7 +3,8 @@
 import { useAgentSync } from "@/hooks/use-agent-sync";
 import AgentStatusPanel from "./AgentStatusPanel";
 import EyeTrackingPanel from "./EyeTrackingPanel";
-import { ContentScript } from "@/types";
+import { ContentScript, YouTubeTrend, SocialTrend, MarketplaceProduct } from "@/types";
+import { useState } from "react";
 import {
   BarChart2,
   Play,
@@ -17,6 +18,13 @@ import {
   CheckSquare,
   FileText,
   Target,
+  ExternalLink,
+  Music,
+  ChevronRight,
+  Eye,
+  ThumbsUp,
+  Package,
+  Star,
 } from "lucide-react";
 
 interface SessionDetailClientProps {
@@ -66,8 +74,7 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
 
       {/* Agent status real-time */}
       <AgentStatusPanel sessionId={sessionId} />
-
-      {/* Research output */}
+      {/* Research output */}
       {research && (
         <div className="bento-card animate-fade-in-up">
           <div className="flex items-center gap-2 mb-4">
@@ -75,97 +82,94 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
             <h3 className="m-0">Hasil Riset</h3>
           </div>
 
-          <div className="stats-grid mb-5">
+          <div className="stats-grid mb-6">
             <StatCard label="YouTube Trends" value={research.youtubeTrends.length} Icon={Play} />
             <StatCard label="Social Trends"  value={research.socialTrends.length}  Icon={Hash} />
             <StatCard label="Marketplace"    value={research.marketplaceProducts.length} Icon={ShoppingBag} />
           </div>
 
-          {/* YouTube List */}
+          {/* ── YouTube Content Cards ─────────────────────────────────── */}
           {research.youtubeTrends.length > 0 && (
-            <div className="mt-6">
-              <div className="caption mb-2.5">Top YouTube Trends</div>
-              <div className="flex flex-col gap-2">
-                {research.youtubeTrends.slice(0, 4).map((v) => (
-                  <div
-                    key={v.videoId}
-                    className="flex items-center gap-3 py-2.5 px-3.5 bg-surface-2 rounded-[var(--radius-sm)] border border-border"
-                  >
-                    <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-surface-3 border border-border flex items-center justify-center shrink-0">
-                      <Play size={13} strokeWidth={2} className="text-accent-text fill-accent-text" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-sm overflow-hidden text-ellipsis whitespace-nowrap text-primary">
-                        {v.title}
-                      </div>
-                      <div className="caption">
-                        {v.channelTitle} · {Number(v.viewCount).toLocaleString()} views
-                      </div>
-                    </div>
-                  </div>
+            <div className="mt-4">
+              <div className="caption mb-3">
+                Top YouTube Trends — klik untuk putar langsung
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {research.youtubeTrends.slice(0, 6).map((v) => (
+                  <YouTubeCard key={v.videoId} video={v} />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Social List */}
+          {/* ── Social Trend Cards ────────────────────────────────────── */}
           {research.socialTrends.length > 0 && (
             <div className="mt-8">
-              <div className="caption mb-2.5">Viral Hashtags & Topics</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {research.socialTrends.slice(0, 8).map((t, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between py-2.5 px-3.5 bg-surface-2 rounded-[var(--radius-sm)] border border-border"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-6 h-6 rounded-full bg-surface-3 border border-border flex items-center justify-center shrink-0">
-                        <Hash size={11} className="text-accent-text" />
-                      </div>
-                      <span className="font-bold text-sm text-primary truncate">#{t.hashtag.replace(/^#/, "")}</span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0 ml-4">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted py-0.5 px-1.5 bg-surface-3 rounded border border-border">
-                        {t.platform}
-                      </span>
-                      {t.usageCount !== undefined && t.usageCount > 0 && (
-                        <span className="text-[10px] font-bold text-accent-text bg-accent-glow/10 py-0.5 px-1.5 rounded">
-                          {t.usageCount.toLocaleString()}
-                        </span>
-                      )}
+              <div className="caption mb-3">Viral Hashtags &amp; Topics</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {research.socialTrends
+                  .filter((t) => t.usageCount !== 0 || t.relatedSounds?.length)
+                  .slice(0, 8)
+                  .map((t, i) => (
+                    <SocialTrendCard key={i} trend={t} />
+                  ))}
+                {/* AI-generated keywords (usageCount === 0, no sounds) */}
+                {research.socialTrends.filter((t) => t.usageCount === 0 && !t.relatedSounds?.length).length > 0 && (
+                  <div className="sm:col-span-2">
+                    <div className="caption mb-2 mt-2">AI Keyword Synthesis</div>
+                    <div className="flex flex-wrap gap-2">
+                      {research.socialTrends
+                        .filter((t) => t.usageCount === 0 && !t.relatedSounds?.length)
+                        .map((t, i) => (
+                          <a
+                            key={i}
+                            href={`https://www.tiktok.com/search?q=${encodeURIComponent(t.hashtag)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ textDecoration: "none" }}
+                          >
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 5,
+                                padding: "5px 12px",
+                                borderRadius: 999,
+                                background: "var(--color-accent-subtle)",
+                                border: "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)",
+                                fontSize: "0.8125rem",
+                                fontWeight: 700,
+                                color: "var(--color-accent-text)",
+                              }}
+                            >
+                              <Hash size={11} />
+                              {t.hashtag.replace(/^#/, "")}
+                              <ExternalLink size={9} />
+                            </span>
+                          </a>
+                        ))}
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           )}
 
-          {/* Marketplace List */}
+          {/* ── Marketplace Product Cards ─────────────────────────────── */}
           {research.marketplaceProducts.length > 0 && (
             <div className="mt-8">
-              <div className="caption mb-2.5">Competitor Products (Marketplace)</div>
-              <div className="flex flex-col gap-2">
-                {research.marketplaceProducts.slice(0, 5).map((p, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between py-2.5 px-3.5 bg-surface-2 rounded-[var(--radius-sm)] border border-border"
-                  >
-                    <div className="flex flex-col min-w-0">
-                      <div className="font-semibold text-sm text-primary truncate">{p.productName}</div>
-                      <div className="caption">Rp{p.price.toLocaleString()} · {p.platform}</div>
-                    </div>
-                    {p.soldCount !== undefined && p.soldCount > 0 && (
-                      <div className="text-[10px] font-bold text-done bg-done/5 border border-done/10 py-1 px-2 rounded-full shrink-0 ml-4">
-                        {p.soldCount} Terjual
-                      </div>
-                    )}
-                  </div>
+              <div className="caption mb-3">Competitor Products (Marketplace)</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {research.marketplaceProducts.slice(0, 6).map((p, i) => (
+                  <MarketplaceCard key={i} product={p} />
                 ))}
               </div>
             </div>
           )}
         </div>
       )}
+
+
 
       {/* Strategy output */}
       {strategy && (
@@ -364,6 +368,7 @@ export default function SessionDetailClient({ sessionId }: SessionDetailClientPr
           sessionId={sessionId}
           scripts={strategy.scripts}
           analytics={analytics}
+          youtubeTrends={research?.youtubeTrends ?? []}
         />
       )}
     </div>
@@ -456,4 +461,351 @@ function ScriptCard({ script, index }: { script: ContentScript; index: number })
       </div>
     </div>
   );
+}
+
+// ── YouTubeCard ───────────────────────────────────────────────────────────────
+// Shows thumbnail; click expands to embedded iframe player.
+function YouTubeCard({ video }: { video: YouTubeTrend }) {
+  const [playing, setPlaying] = useState(false);
+  const embedUrl = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0`;
+  const watchUrl = `https://www.youtube.com/watch?v=${video.videoId}`;
+  const thumbnailUrl = video.thumbnail || `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`;
+
+  return (
+    <div
+      style={{
+        borderRadius: 14,
+        overflow: "hidden",
+        border: "1px solid var(--color-border)",
+        background: "var(--color-surface-2)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* Thumbnail / Player */}
+      <div style={{ position: "relative", aspectRatio: "16/9", background: "#000" }}>
+        {playing ? (
+          <iframe
+            src={embedUrl}
+            title={video.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+          />
+        ) : (
+          <>
+            {/* Thumbnail */}
+            {thumbnailUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={thumbnailUrl}
+                alt={video.title}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            )}
+            {/* Overlay */}
+            <div
+              onClick={() => setPlaying(true)}
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "rgba(0,0,0,0.35)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0.15)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0.35)")}
+            >
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: "50%",
+                  background: "rgba(255,0,0,0.92)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 16px rgba(255,0,0,0.4)",
+                }}
+              >
+                <Play size={20} strokeWidth={0} fill="#fff" />
+              </div>
+            </div>
+            {/* YouTube badge */}
+            <div
+              style={{
+                position: "absolute",
+                top: 8,
+                left: 8,
+                background: "#FF0000",
+                color: "#fff",
+                fontSize: "0.6rem",
+                fontWeight: 800,
+                padding: "2px 7px",
+                borderRadius: 4,
+                letterSpacing: "0.05em",
+              }}
+            >
+              YouTube
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Info */}
+      <div style={{ padding: "10px 12px", flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+        <div
+          style={{
+            fontWeight: 700,
+            fontSize: "0.8125rem",
+            color: "var(--color-text-primary)",
+            lineHeight: 1.35,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {video.title}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
+          <span style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", fontWeight: 600 }}>
+            {video.channelTitle}
+          </span>
+          <a
+            href={watchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "flex", alignItems: "center", gap: 3, fontSize: "0.7rem", color: "var(--color-accent-text)", fontWeight: 700, textDecoration: "none" }}
+          >
+            Buka <ExternalLink size={10} />
+          </a>
+        </div>
+        {Number(video.viewCount) > 0 && (
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "0.7rem", color: "var(--color-text-muted)" }}>
+            <Eye size={10} />
+            {Number(video.viewCount).toLocaleString()} views
+            {Number(video.likeCount) > 0 && (
+              <>
+                <ThumbsUp size={10} style={{ marginLeft: 6 }} />
+                {Number(video.likeCount).toLocaleString()}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── SocialTrendCard ───────────────────────────────────────────────────────────
+const PLATFORM_CONFIG: Record<string, { bg: string; accent: string; label: string; searchBase: string }> = {
+  tiktok: {
+    bg: "linear-gradient(135deg, #010101 0%, #1a1a2e 100%)",
+    accent: "#69C9D0",
+    label: "TikTok",
+    searchBase: "https://www.tiktok.com/search?q=",
+  },
+  instagram: {
+    bg: "linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)",
+    accent: "#fff",
+    label: "Instagram",
+    searchBase: "https://www.instagram.com/explore/tags/",
+  },
+};
+
+function SocialTrendCard({ trend }: { trend: SocialTrend }) {
+  const cfg = PLATFORM_CONFIG[trend.platform] ?? PLATFORM_CONFIG.tiktok;
+  const tag = trend.hashtag.replace(/^#/, "");
+  const searchUrl = trend.platform === "instagram"
+    ? `${cfg.searchBase}${encodeURIComponent(tag)}`
+    : `${cfg.searchBase}${encodeURIComponent(tag)}`;
+
+  return (
+    <a href={searchUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+      <div
+        style={{
+          borderRadius: 14,
+          overflow: "hidden",
+          border: "1px solid var(--color-border)",
+          background: cfg.bg,
+          padding: "16px 16px 14px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          cursor: "pointer",
+          transition: "transform 0.15s, box-shadow 0.15s",
+          minHeight: 110,
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+          (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.3)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.transform = "";
+          (e.currentTarget as HTMLElement).style.boxShadow = "";
+        }}
+      >
+        {/* Platform badge */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: "0.65rem", fontWeight: 800, color: cfg.accent, opacity: 0.8, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            {cfg.label}
+          </span>
+          <ExternalLink size={11} color={cfg.accent} style={{ opacity: 0.6 }} />
+        </div>
+
+        {/* Hashtag */}
+        <div style={{ fontWeight: 800, fontSize: "1rem", color: cfg.accent, lineHeight: 1.2 }}>
+          #{tag}
+        </div>
+
+        {/* Stats row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: "auto" }}>
+          {trend.usageCount !== undefined && trend.usageCount > 0 && (
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: cfg.accent, opacity: 0.75, display: "flex", alignItems: "center", gap: 3 }}>
+              <TrendingUp size={10} />
+              {trend.usageCount.toLocaleString()} views
+            </span>
+          )}
+          {trend.relatedSounds && trend.relatedSounds.length > 0 && (
+            <span style={{ fontSize: "0.72rem", fontWeight: 600, color: cfg.accent, opacity: 0.6, display: "flex", alignItems: "center", gap: 3 }}>
+              <Music size={10} />
+              {trend.relatedSounds[0].slice(0, 22)}{trend.relatedSounds[0].length > 22 ? "…" : ""}
+            </span>
+          )}
+        </div>
+      </div>
+    </a>
+  );
+}
+
+// ── MarketplaceCard ───────────────────────────────────────────────────────────
+const MARKETPLACE_CONFIG: Record<string, { accent: string; label: string }> = {
+  tokopedia: { accent: "#42B549", label: "Tokopedia" },
+  shopee:    { accent: "#EE4D2D", label: "Shopee" },
+};
+
+function MarketplaceCard({ product }: { product: MarketplaceProduct }) {
+  const cfg = MARKETPLACE_CONFIG[product.platform] ?? { accent: "#6366F1", label: product.platform };
+
+  const inner = (
+    <div
+      style={{
+        borderRadius: 14,
+        overflow: "hidden",
+        border: `1.5px solid ${cfg.accent}22`,
+        background: "var(--color-surface-2)",
+        padding: "14px 14px 12px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        height: "100%",
+        transition: "transform 0.15s, box-shadow 0.15s",
+        cursor: product.url ? "pointer" : "default",
+      }}
+      onMouseEnter={(e) => {
+        if (!product.url) return;
+        (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+        (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 20px ${cfg.accent}22`;
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.transform = "";
+        (e.currentTarget as HTMLElement).style.boxShadow = "";
+      }}
+    >
+      {/* Platform badge + link icon */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span
+          style={{
+            fontSize: "0.65rem",
+            fontWeight: 800,
+            color: cfg.accent,
+            background: `${cfg.accent}18`,
+            border: `1px solid ${cfg.accent}30`,
+            padding: "2px 8px",
+            borderRadius: 999,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+          }}
+        >
+          {cfg.label}
+        </span>
+        {product.url && <ExternalLink size={11} color={cfg.accent} style={{ opacity: 0.6 }} />}
+      </div>
+
+      {/* Product icon + name */}
+      <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            background: `${cfg.accent}12`,
+            border: `1px solid ${cfg.accent}25`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <Package size={15} color={cfg.accent} />
+        </div>
+        <div
+          style={{
+            fontWeight: 700,
+            fontSize: "0.8125rem",
+            color: "var(--color-text-primary)",
+            lineHeight: 1.35,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          } as React.CSSProperties}
+        >
+          {product.productName}
+        </div>
+      </div>
+
+      {/* Price + sold */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
+        <span style={{ fontWeight: 800, fontSize: "0.9375rem", color: cfg.accent }}>
+          Rp{product.price.toLocaleString("id-ID")}
+        </span>
+        {product.soldCount !== undefined && product.soldCount > 0 && (
+          <span
+            style={{
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              color: "var(--color-done)",
+              background: "color-mix(in srgb, var(--color-done) 8%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--color-done) 20%, transparent)",
+              padding: "2px 8px",
+              borderRadius: 999,
+              display: "flex",
+              alignItems: "center",
+              gap: 3,
+            }}
+          >
+            <Star size={9} fill="currentColor" /> {product.soldCount.toLocaleString()} terjual
+          </span>
+        )}
+      </div>
+
+      {/* Shop name */}
+      {product.shopName && (
+        <div style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", fontWeight: 600, borderTop: "1px solid var(--color-border)", paddingTop: 6, marginTop: 2 }}>
+          🏪 {product.shopName}
+        </div>
+      )}
+    </div>
+  );
+
+  return product.url ? (
+    <a href={product.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", display: "block" }}>
+      {inner}
+    </a>
+  ) : inner;
 }
