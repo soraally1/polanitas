@@ -4,10 +4,10 @@ import { BarChart2, TrendingUp, FileText, Eye, Download } from "lucide-react";
 export const metadata: Metadata = { title: "Reports" };
 
 const MONTHLY_DATA = [
-  { month: "Jan", sessions: 4, scripts: 12, eyeSessions: 3  },
-  { month: "Feb", sessions: 6, scripts: 18, eyeSessions: 5  },
-  { month: "Mar", sessions: 9, scripts: 27, eyeSessions: 8  },
-  { month: "Apr", sessions: 7, scripts: 21, eyeSessions: 6  },
+  { month: "Jan", sessions: 4, scripts: 12, eyeSessions: 3 },
+  { month: "Feb", sessions: 6, scripts: 18, eyeSessions: 5 },
+  { month: "Mar", sessions: 9, scripts: 27, eyeSessions: 8 },
+  { month: "Apr", sessions: 7, scripts: 21, eyeSessions: 6 },
 ];
 
 const BAR_MAX = 30;
@@ -29,9 +29,9 @@ export default function ReportsPage() {
       {/* Summary stats */}
       <div className="stats-grid" style={{ marginBottom: 24 }}>
         {[
-          { label: "Total Sesi",   value: "26", Icon: FileText,   trend: "+4 bulan ini"  },
-          { label: "Skrip Dibuat", value: "78", Icon: BarChart2,  trend: "+21 bulan ini" },
-          { label: "Eye Sessions", value: "22", Icon: Eye,        trend: "+6 bulan ini"  },
+          { label: "Total Sesi", value: "26", Icon: FileText, trend: "+4 bulan ini" },
+          { label: "Skrip Dibuat", value: "78", Icon: BarChart2, trend: "+21 bulan ini" },
+          { label: "Eye Sessions", value: "22", Icon: Eye, trend: "+6 bulan ini" },
           { label: "Conversion Est.", value: "3.4%", Icon: TrendingUp, trend: "+0.8% vs bulan lalu" },
         ].map(({ label, value, Icon, trend }) => (
           <div key={label} className="stat-card">
@@ -88,9 +88,9 @@ export default function ReportsPage() {
               {/* Bars */}
               <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 120 }}>
                 {[
-                  { value: d.sessions,   color: "var(--color-accent-text)" },
-                  { value: d.scripts,    color: "#8B5CF6"  },
-                  { value: d.eyeSessions,color: "#3B82F6"  },
+                  { value: d.sessions, color: "var(--color-accent-text)" },
+                  { value: d.scripts, color: "#8B5CF6" },
+                  { value: d.eyeSessions, color: "#3B82F6" },
                 ].map(({ value, color }, bi) => (
                   <div
                     key={bi}
@@ -128,9 +128,9 @@ export default function ReportsPage() {
             </thead>
             <tbody>
               {[
-                { topic: "Skincare untuk remaja Gen Z", scripts: 3, eye: 1, status: "done"    },
-                { topic: "UMKM kuliner viral TikTok",   scripts: 3, eye: 0, status: "running" },
-                { topic: "Traveling Bali backpacker",   scripts: 3, eye: 0, status: "done"    },
+                { topic: "Skincare untuk remaja Gen Z", scripts: 3, eye: 1, status: "done" },
+                { topic: "UMKM kuliner viral TikTok", scripts: 3, eye: 0, status: "running" },
+                { topic: "Traveling Bali backpacker", scripts: 3, eye: 0, status: "done" },
               ].map((row) => (
                 <tr key={row.topic}>
                   <td style={{ fontWeight: 600 }}>{row.topic}</td>
