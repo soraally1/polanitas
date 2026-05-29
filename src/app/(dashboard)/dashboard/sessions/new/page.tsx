@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -15,6 +15,7 @@ import {
   Hash,
   ArrowLeft,
   Zap,
+  ChevronDown,
 } from "lucide-react";
 import { startResearchSession } from "@/actions/agent-actions";
 import { useSpeechFormFill } from "@/hooks/use-speech-form-fill";
@@ -50,11 +51,24 @@ export default function NewSessionPage() {
   const [isPending, startTransition] = useTransition();
   const [topic, setTopic] = useState("");
   const [regionCode, setRegionCode] = useState("ID");
+  const [regionOpen, setRegionOpen] = useState(false);
+  const regionRef = useRef<HTMLDivElement>(null);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["tiktok", "youtube"]);
   const [researchFocus, setResearchFocus] = useState("trend-konten");
   const [targetAudience, setTargetAudience] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
+
+  // Close region dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (regionRef.current && !regionRef.current.contains(e.target as Node)) {
+        setRegionOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -187,17 +201,107 @@ export default function NewSessionPage() {
               </div>
             </div>
 
-            {/* Region */}
-            <div className="min-w-[160px]">
+            {/* Region — custom dropdown */}
+            <div className="min-w-[180px]" ref={regionRef} style={{ position: "relative" }}>
               <label className="flex items-center gap-1.5 font-bold text-[0.875rem] mb-2.5 text-primary">
                 <MapPin size={14} /> Region
               </label>
-              <select
-                value={regionCode} onChange={(e) => setRegionCode(e.target.value)}
-                className="w-full py-2.5 px-4 rounded-[10px] text-[0.9rem] border border-border bg-surface text-primary outline-none cursor-pointer font-sans"
+
+              {/* Trigger button */}
+              <button
+                type="button"
+                onClick={() => setRegionOpen((v) => !v)}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 10,
+                  padding: "10px 14px",
+                  borderRadius: 12,
+                  border: regionOpen ? "1px solid #6366F1" : "1px solid var(--color-border)",
+                  background: "var(--color-surface)",
+                  color: "var(--color-text-primary)",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontFamily: "var(--font-sans)",
+                  boxShadow: regionOpen ? "0 0 0 3px rgba(99,102,241,0.12)" : "none",
+                  transition: "all 0.2s",
+                }}
               >
-                {REGIONS.map(r => <option key={r.code} value={r.code}>{r.label} ({r.code})</option>)}
-              </select>
+                <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                  <MapPin size={13} style={{ color: "#6366F1", flexShrink: 0 }} />
+                  {REGIONS.find((r) => r.code === regionCode)?.label ?? regionCode}
+                  <span style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", fontWeight: 500 }}>
+                    ({regionCode})
+                  </span>
+                </span>
+                <ChevronDown
+                  size={15}
+                  style={{
+                    color: "var(--color-text-muted)",
+                    transition: "transform 0.2s",
+                    transform: regionOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    flexShrink: 0,
+                  }}
+                />
+              </button>
+
+              {/* Dropdown list */}
+              {regionOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 6px)",
+                    left: 0,
+                    right: 0,
+                    zIndex: 50,
+                    background: "var(--color-surface-2)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.16)",
+                    backdropFilter: "blur(12px)",
+                    animation: "fadeInDown 0.15s ease",
+                  }}
+                >
+                  {REGIONS.map((r) => {
+                    const isActive = r.code === regionCode;
+                    return (
+                      <button
+                        key={r.code}
+                        type="button"
+                        onClick={() => { setRegionCode(r.code); setRegionOpen(false); }}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 8,
+                          padding: "10px 14px",
+                          border: "none",
+                          background: isActive ? "rgba(99,102,241,0.1)" : "transparent",
+                          color: isActive ? "#818CF8" : "var(--color-text-secondary)",
+                          fontSize: "0.875rem",
+                          fontWeight: isActive ? 700 : 500,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-sans)",
+                          textAlign: "left",
+                          transition: "background 0.15s",
+                        }}
+                        onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "var(--color-surface-3)"; }}
+                        onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                      >
+                        <span>{r.label}</span>
+                        <span style={{ fontSize: "0.7rem", color: isActive ? "#818CF8" : "var(--color-text-muted)", fontWeight: 600 }}>
+                          {r.code}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 

@@ -1,21 +1,27 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   BarChart2,
   ChevronRight,
   ChevronLeft,
   CheckCircle,
-  BookOpen,
-  Lightbulb,
-  RefreshCw,
-  TrendingUp,
+  Circle,
   Zap,
+  Lightbulb,
+  BookOpen,
+  Clock,
+  ArrowLeft,
+  TrendingUp,
   Trophy,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useModuleProgress } from "@/hooks/use-module-progress";
+
+const ACCENT = "#22C55E";
+const ACCENT_LIGHT = "rgba(34,197,94,";
 
 // ═══════════════════════════════════════════════════════
 // TYPE
@@ -313,12 +319,17 @@ function QuizBlock({
   answered,
   selected,
   onSelect,
+  onReset,
 }: {
   quiz: Lesson["quiz"];
   answered: boolean;
   selected: number | null;
   onSelect: (i: number) => void;
+  onReset: () => Promise<void>;
 }) {
+  const isCorrect = answered && selected === quiz.correct;
+  const isWrong = answered && selected !== null && selected !== quiz.correct;
+
   return (
     <div
       style={{
@@ -346,15 +357,18 @@ function QuizBlock({
           let color = "var(--color-text-primary)";
 
           if (answered) {
-            if (i === quiz.correct) {
+            if (isCorrect && i === quiz.correct) {
+              // User answered correctly — highlight correct answer green
               bg = "color-mix(in srgb, #22C55E 12%, transparent)";
               border = "1px solid #22C55E50";
               color = "#166534";
-            } else if (i === selected) {
+            } else if (isWrong && i === selected) {
+              // User answered wrong — only highlight their wrong pick in red
               bg = "color-mix(in srgb, #EF4444 12%, transparent)";
               border = "1px solid #EF444450";
               color = "#991B1B";
             }
+            // If wrong, do NOT highlight the correct answer
           } else if (selected === i) {
             border = "1px solid var(--color-accent)";
             bg = "var(--color-accent-subtle)";
@@ -387,13 +401,13 @@ function QuizBlock({
                   fontWeight: 700,
                   fontSize: "0.75rem",
                   minWidth: 20,
-                  color: answered && i === quiz.correct ? "#22C55E" : "var(--color-text-muted)",
+                  color: isCorrect && i === quiz.correct ? "#22C55E" : "var(--color-text-muted)",
                 }}
               >
                 {String.fromCharCode(65 + i)}.
               </span>
               {opt}
-              {answered && i === quiz.correct && (
+              {isCorrect && i === quiz.correct && (
                 <CheckCircle size={14} color="#22C55E" style={{ marginLeft: "auto", flexShrink: 0, marginTop: 2 }} />
               )}
             </button>
@@ -401,7 +415,8 @@ function QuizBlock({
         })}
       </div>
 
-      {answered && (
+      {/* Show explanation only when correct */}
+      {isCorrect && (
         <div
           style={{
             marginTop: 14,
@@ -417,6 +432,45 @@ function QuizBlock({
           <strong style={{ color: "#166534" }}>Penjelasan:</strong> {quiz.explanation}
         </div>
       )}
+
+      {/* Show hint when wrong, with retry button */}
+      {isWrong && (
+        <div
+          style={{
+            marginTop: 14,
+            padding: "12px 14px",
+            background: "color-mix(in srgb, #EF4444 8%, transparent)",
+            border: "1px solid #EF444430",
+            borderRadius: "var(--radius-sm)",
+            fontSize: "0.875rem",
+            color: "var(--color-text-secondary)",
+            lineHeight: 1.65,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+          }}
+        >
+          <span><strong style={{ color: "#991B1B" }}>Jawaban salah.</strong> Coba lagi untuk melihat penjelasan.</span>
+          <button
+            onClick={onReset}
+            style={{
+              flexShrink: 0,
+              padding: "6px 14px",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid #EF444450",
+              background: "color-mix(in srgb, #EF4444 15%, transparent)",
+              color: "#991B1B",
+              fontSize: "0.8125rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              fontFamily: "var(--font-sans)",
+            }}
+          >
+            Coba Lagi
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -426,7 +480,7 @@ function QuizBlock({
 // ═══════════════════════════════════════════════════════
 export default function StatistikaDasarPage() {
   const { user } = useAuth();
-  const { completedLessons, quizAnswers, isModuleComplete, isLoading, saveAnswer } =
+  const { completedLessons, quizAnswers, isModuleComplete, isLoading, saveAnswer, resetAnswer } =
     useModuleProgress("statistika-dasar", user?.uid, LESSONS.length);
 
   const [currentLesson, setCurrentLesson] = useState(0);
@@ -436,8 +490,10 @@ export default function StatistikaDasarPage() {
   const [showAILab,     setShowAILab]     = useState(false);
 
   const lesson = LESSONS[currentLesson];
+  const ACCENT = "var(--color-accent)";
+  const ACCENT_LIGHT = "var(--color-accent-subtle)";
+  const progress = (completedLessons.size / LESSONS.length) * 100;
 
-  // Restore quiz state for current lesson from Firestore
   useEffect(() => {
     const saved = quizAnswers[currentLesson];
     if (saved) {
@@ -467,125 +523,266 @@ export default function StatistikaDasarPage() {
   const maxValue = Math.max(...lesson.dataset);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 0 }} className="animate-fade-in-up">
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <p className="caption" style={{ color: "var(--color-accent-text)", marginBottom: 8 }}>
-          JALUR PEMULA · STATISTIKA DASAR
-        </p>
-        <h1 style={{ marginBottom: 8, fontSize: "clamp(1.4rem,3vw,1.875rem)" }}>
-          Statistika Dasar untuk Analis Data
-        </h1>
-        <p>Pelajari 6 konsep inti statistik deskriptif dengan dataset nyata dan latihan interaktif.</p>
+    <div
+      className="animate-fade-in-up"
+      style={{ display: "flex", flexDirection: "column" }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 32,
+          flexWrap: "wrap",
+          gap: 12,
+        }}
+      >
+        <Link
+          href="/dashboard/learn"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            color: "var(--color-text-secondary)",
+            textDecoration: "none",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+          }}
+        >
+          <ArrowLeft size={16} /> Kembali ke Kurikulum
+        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: "0.875rem",
+              color: "var(--color-text-muted)",
+            }}
+          >
+            <BookOpen size={15} />
+            {completedLessons.size}/{LESSONS.length} selesai
+          </div>
+          <div
+            style={{
+              width: 120,
+              height: 6,
+              background: "var(--color-surface-3)",
+              borderRadius: 999,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                width: `${progress}%`,
+                background: `linear-gradient(90deg, ${ACCENT}, #059669)`,
+                borderRadius: 999,
+                transition: "width 0.5s ease",
+              }}
+            />
+          </div>
+        </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 24, alignItems: "start" }}>
-        {/* ── Sidebar: Lesson list ────────────────────── */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #1A1D23 0%, #2D2F3A 100%)",
+          borderRadius: "var(--radius-xl)",
+          padding: "32px 36px",
+          marginBottom: 32,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         <div
           style={{
-            background: "var(--color-surface)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-lg)",
-            overflow: "hidden",
+            position: "absolute",
+            top: -50,
+            right: -50,
+            width: 200,
+            height: 200,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${ACCENT_LIGHT}0.3, transparent 70%)`,
+          }}
+        />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: `${ACCENT_LIGHT}20`,
+              border: `1px solid ${ACCENT_LIGHT}40`,
+              borderRadius: 100,
+              padding: "4px 14px",
+              marginBottom: 12,
+            }}
+          >
+            <BarChart2 size={13} color="#6EE7B7" />
+            <span
+              style={{
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                color: "#6EE7B7",
+                letterSpacing: "0.06em",
+              }}
+            >
+              MODUL 0 · STATISTIKA
+            </span>
+          </div>
+          <h1
+            style={{
+              fontSize: "clamp(1.375rem, 3vw, 1.875rem)",
+              color: "#F8F9FA",
+              letterSpacing: "-0.04em",
+              marginBottom: 8,
+            }}
+          >
+            Statistika Dasar untuk Analis Data
+          </h1>
+          <p style={{ color: "#9CA3AF", maxWidth: 480 }}>
+            Pelajari 6 konsep inti statistik deskriptif dengan dataset nyata dan latihan interaktif.
+          </p>
+          <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: "0.8125rem",
+                color: "#9CA3AF",
+              }}
+            >
+              <BookOpen size={14} /> 6 Materi
+            </span>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: "0.8125rem",
+                color: "#9CA3AF",
+              }}
+            >
+              <Clock size={14} /> 2 jam
+            </span>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: "0.8125rem",
+                color: "#6EE7B7",
+                fontWeight: 700,
+              }}
+            >
+              <Zap size={14} /> AI Tutor Lab
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          gap: 28,
+          alignItems: "flex-start",
+          flexWrap: "wrap",
+        }}
+      >
+        <div
+          style={{
+            flex: "0 0 260px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
             position: "sticky",
-            top: "calc(var(--header-height) + 20px)",
+            top: 24,
           }}
         >
           <div
             style={{
-              padding: "12px 14px",
-              borderBottom: "1px solid var(--color-border)",
-              background: "var(--color-surface-2)",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              color: "var(--color-text-muted)",
+              letterSpacing: "0.08em",
+              marginBottom: 8,
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <BookOpen size={14} color="var(--color-text-muted)" />
-              <span className="caption" style={{ fontSize: "0.75rem", letterSpacing: "1px" }}>{completedLessons.size}/{LESSONS.length} Selesai</span>
-            </div>
-            {/* Progress bar */}
-            <div
-              style={{
-                marginTop: 10,
-                height: 6,
-                background: "var(--color-surface-3)",
-                borderRadius: 999,
-                overflow: "hidden",
-                boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)"
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: `${(completedLessons.size / LESSONS.length) * 100}%`,
-                  background: "var(--color-accent)",
-                  borderRadius: 999,
-                  transition: "width 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-                  boxShadow: "0 0 10px var(--color-accent-glow)"
-                }}
-              />
-            </div>
+            DAFTAR MATERI
           </div>
-
-          {LESSONS.map((l, i) => (
-            <button
-              key={l.id}
-              onClick={() => goToLesson(i)}
-              style={{
-                width: "100%",
-                padding: "11px 14px",
-                textAlign: "left",
-                background: i === currentLesson ? "var(--color-accent-subtle)" : "transparent",
-                border: "none",
-                borderBottom: "1px solid var(--color-border)",
-                borderLeft: i === currentLesson ? "3px solid var(--color-accent)" : "3px solid transparent",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                transition: "all 0.15s",
-                fontFamily: "var(--font-sans)",
-              }}
-            >
-              {completedLessons.has(i) ? (
-                <CheckCircle size={13} color="#22C55E" style={{ flexShrink: 0 }} />
-              ) : (
-                <div
-                  style={{
-                    width: 13,
-                    height: 13,
-                    borderRadius: "50%",
-                    border: `2px solid ${i === currentLesson ? "var(--color-accent)" : "var(--color-border-2)"}`,
-                    flexShrink: 0,
-                  }}
-                />
-              )}
-              <span
+          {LESSONS.map((l, i) => {
+            const isDone = completedLessons.has(i);
+            const isActive = i === currentLesson;
+            return (
+              <button
+                key={l.id}
+                onClick={() => goToLesson(i)}
                 style={{
-                  fontSize: "0.8125rem",
-                  fontWeight: i === currentLesson ? 600 : 500,
-                  color: i === currentLesson ? "var(--color-accent-text)" : "var(--color-text-secondary)",
-                  lineHeight: 1.4,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "10px 12px",
+                  borderRadius: "var(--radius-md)",
+                  border: isActive
+                    ? `1px solid ${ACCENT_LIGHT}50`
+                    : "1px solid transparent",
+                  background: isActive ? `${ACCENT_LIGHT}10` : "transparent",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "all 0.2s",
+                  width: "100%",
+                  fontFamily: "var(--font-sans)",
                 }}
               >
-                {l.title}
-              </span>
-            </button>
-          ))}
+                {isDone ? (
+                  <CheckCircle
+                    size={16}
+                    color="#6EE12B"
+                    style={{ flexShrink: 0 }}
+                  />
+                ) : (
+                  <Circle
+                    size={16}
+                    color={isActive ? ACCENT : "var(--color-border-2)"}
+                    style={{ flexShrink: 0 }}
+                  />
+                )}
+                <span
+                  style={{
+                    fontSize: "0.8125rem",
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? ACCENT : "var(--color-text-secondary)",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {i + 1}. {l.title}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* ── Main Content ────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* Lesson card */}
-          <div className="premium-card">
-            {/* Lesson header */}
+        <div
+          style={{
+            flex: "1 1 400px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 24,
+            minWidth: 0,
+          }}
+        >
+          <div className="premium-card" style={{ padding: 0 }}>
             <div
               style={{
                 padding: "24px 28px",
                 borderBottom: "1px solid var(--color-border)",
-                background: "var(--color-surface-2)",
+                background: `${ACCENT_LIGHT}05`,
                 display: "flex",
-                alignItems: "center",
-                gap: 16,
+                alignItems: "flex-start",
+                gap: 14,
               }}
             >
               <div
@@ -593,47 +790,60 @@ export default function StatistikaDasarPage() {
                   width: 48,
                   height: 48,
                   borderRadius: "var(--radius-md)",
-                  background: "color-mix(in srgb, var(--color-accent) 20%, transparent)",
-                  border: "1px solid color-mix(in srgb, var(--color-accent) 40%, transparent)",
+                  background: `${ACCENT_LIGHT}15`,
+                  border: `1px solid ${ACCENT_LIGHT}30`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
-                  boxShadow: "0 4px 12px var(--color-accent-glow)"
                 }}
               >
-                <BarChart2 size={22} color="var(--color-accent-text)" strokeWidth={2} />
+                <BarChart2 size={22} color={ACCENT} strokeWidth={2} />
               </div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: "1.25rem", color: "var(--color-text-primary)", letterSpacing: "-0.02em" }}>
-                  {lesson.title}
+                <div
+                  style={{
+                    fontSize: "0.6875rem",
+                    fontWeight: 700,
+                    color: ACCENT,
+                    letterSpacing: "0.08em",
+                    marginBottom: 4,
+                  }}
+                >
+                  MATERI {currentLesson + 1} DARI {LESSONS.length}
                 </div>
-                <div className="caption" style={{ marginTop: 4, color: "var(--color-accent-text)" }}>
-                  Modul {currentLesson + 1} dari {LESSONS.length}
+                <h2
+                  style={{
+                    fontSize: "1.25rem",
+                    letterSpacing: "-0.02em",
+                    color: "var(--color-text-primary)",
+                    marginBottom: 2,
+                  }}
+                >
+                  {lesson.title}
+                </h2>
+                <div
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "var(--color-text-muted)",
+                  }}
+                >
+                  {lesson.concept}
                 </div>
               </div>
             </div>
-
-            {/* Concept + explanation */}
-            <div style={{ padding: "24px" }}>
+            <div style={{ padding: 28 }}>
               <div
                 style={{
-                  padding: "14px 16px",
-                  background: "var(--color-accent-subtle)",
-                  border: "1px solid color-mix(in srgb, var(--color-accent) 25%, transparent)",
-                  borderRadius: "var(--radius-sm)",
-                  marginBottom: 16,
+                  fontSize: "0.9375rem",
+                  lineHeight: 1.75,
+                  color: "var(--color-text-secondary)",
+                  marginBottom: 24,
+                  whiteSpace: "pre-wrap",
                 }}
               >
-                <span style={{ fontWeight: 700, fontSize: "0.875rem", color: "var(--color-accent-text)" }}>
-                  Konsep:{" "}
-                </span>
-                <span style={{ fontSize: "0.875rem", color: "var(--color-text-primary)", lineHeight: 1.6 }}>
-                  {lesson.concept}
-                </span>
+                {lesson.explanation}
               </div>
-
-              <p style={{ lineHeight: 1.75, marginBottom: 16 }}>{lesson.explanation}</p>
 
               {lesson.formula && (
                 <div
@@ -645,7 +855,6 @@ export default function StatistikaDasarPage() {
                     border: "1px solid var(--color-border)",
                     borderRadius: "var(--radius-sm)",
                     color: "var(--color-text-primary)",
-                    marginBottom: 0,
                   }}
                 >
                   {lesson.formula}
@@ -654,8 +863,7 @@ export default function StatistikaDasarPage() {
             </div>
           </div>
 
-          {/* Dataset explorer */}
-          <div className="premium-card">
+          <div className="premium-card" style={{ padding: 0 }}>
             <div
               style={{
                 padding: "16px 24px",
@@ -663,7 +871,7 @@ export default function StatistikaDasarPage() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                background: "var(--color-surface-2)"
+                background: "var(--color-surface-2)",
               }}
             >
               <div>
@@ -674,22 +882,31 @@ export default function StatistikaDasarPage() {
               </div>
               <button
                 onClick={runCompute}
-                className="btn btn-primary"
-                style={{ gap: 6, boxShadow: "0 4px 12px var(--color-accent-glow)" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "10px 16px",
+                  borderRadius: "var(--radius-md)",
+                  background: `linear-gradient(135deg, ${ACCENT}, #059669)`,
+                  border: "none",
+                  color: "#FFF",
+                  fontSize: "0.875rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
               >
                 <TrendingUp size={15} strokeWidth={2.5} />
                 Hitung Sekarang
               </button>
             </div>
 
-            {/* Data bars */}
             <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
               {lesson.dataset.map((v, i) => (
-                <DataBar key={i} value={v} max={maxValue} />
+                <DataBar key={i} value={v} max={maxValue} color={ACCENT} />
               ))}
             </div>
 
-            {/* Results */}
             {computed && (
               <div
                 style={{
@@ -712,7 +929,7 @@ export default function StatistikaDasarPage() {
                     }}
                   >
                     <div className="caption" style={{ marginBottom: 5 }}>{key}</div>
-                    <div style={{ fontWeight: 700, fontSize: "0.9375rem", color: "var(--color-accent-text)" }}>
+                    <div style={{ fontWeight: 700, fontSize: "0.9375rem", color: ACCENT }}>
                       {val}
                     </div>
                   </div>
@@ -720,7 +937,6 @@ export default function StatistikaDasarPage() {
               </div>
             )}
 
-            {/* Insight */}
             {computed && (
               <div
                 style={{
@@ -732,7 +948,7 @@ export default function StatistikaDasarPage() {
                   background: "var(--color-surface-2)",
                 }}
               >
-                <Lightbulb size={15} color="var(--color-accent-text)" style={{ flexShrink: 0, marginTop: 1 }} />
+                <Lightbulb size={15} color={ACCENT} style={{ flexShrink: 0, marginTop: 1 }} />
                 <p style={{ fontSize: "0.875rem", lineHeight: 1.7, margin: 0 }}>
                   <strong style={{ color: "var(--color-text-primary)" }}>Insight: </strong>
                   {lesson.insight}
@@ -741,60 +957,60 @@ export default function StatistikaDasarPage() {
             )}
           </div>
 
-          {/* AI Lab Toggle */}
-          <div style={{ marginBottom: 10 }}>
-            <button
-              onClick={() => setShowAILab(!showAILab)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "12px 18px",
-                borderRadius: "var(--radius-md)",
-                background: showAILab
-                  ? "linear-gradient(135deg, var(--color-accent), #3B82F6)"
-                  : "var(--color-surface-3)",
-                border: "1px solid",
-                borderColor: showAILab ? "transparent" : "var(--color-border)",
-                color: showAILab ? "#12200A" : "var(--color-text-secondary)",
-                fontSize: "0.875rem",
-                fontWeight: 700,
-                cursor: "pointer",
-                width: "100%",
-                justifyContent: "center",
-                marginBottom: showAILab ? 20 : 0,
-                fontFamily: "var(--font-sans)",
-                transition: "all 0.3s ease",
-              }}
-            >
-              <Zap size={15} />
-              {showAILab ? "Tutup AI Tutor Lab" : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
-            </button>
-            {showAILab && (
-              <AILab
-                moduleId="statistika-dasar"
-                moduleName="Statistika Dasar"
-                initialMessage="Halo! Saya AI Tutor Lab. Ingin bertanya lebih lanjut tentang Mean, Median, Standar Deviasi, atau Korelasi? Tanyakan saja!"
-                themeColor="var(--color-accent)"
-                themeGradient="linear-gradient(135deg, var(--color-accent), #3B82F6)"
-              />
-            )}
-          </div>
+          <button
+            onClick={() => setShowAILab((v) => !v)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "12px 18px",
+              borderRadius: "var(--radius-md)",
+              background: showAILab
+                ? `linear-gradient(135deg, ${ACCENT}, #059669)`
+                : "var(--color-surface-3)",
+              border: "1px solid",
+              borderColor: showAILab ? "transparent" : "var(--color-border)",
+              color: showAILab ? "#FFF" : "var(--color-text-secondary)",
+              fontSize: "0.875rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              width: "100%",
+              justifyContent: "center",
+              marginBottom: showAILab ? 20 : 0,
+              fontFamily: "var(--font-sans)",
+            }}
+          >
+            <Zap size={15} />{" "}
+            {showAILab ? "Tutup AI Tutor Lab" : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+          </button>
+          {showAILab && (
+            <AILab
+              moduleId="statistika-dasar"
+              moduleName="Statistika Dasar"
+              initialMessage="Halo! Saya AI Tutor Lab. Ingin bertanya lebih lanjut tentang Mean, Median, Standar Deviasi, atau Korelasi? Tanyakan saja!"
+              themeColor={ACCENT}
+              themeGradient={`linear-gradient(135deg, ${ACCENT}, #059669)`}
+            />
+          )}
 
           <QuizBlock
             quiz={lesson.quiz}
             answered={quizAnswered}
             selected={quizSelected}
             onSelect={handleQuizSelect}
+            onReset={async () => {
+              setQuizSelected(null);
+              setQuizAnswered(false);
+              await resetAnswer(currentLesson);
+            }}
           />
 
-          {/* Completion banner */}
           {isModuleComplete && (
             <div
               style={{
                 padding: "20px 24px",
-                background: "linear-gradient(135deg, rgba(34,197,94,0.12), rgba(59,130,246,0.08))",
-                border: "1px solid rgba(34,197,94,0.35)",
+                background: `linear-gradient(135deg, ${ACCENT_LIGHT}12, rgba(59,130,246,0.08))`,
+                border: `1px solid ${ACCENT_LIGHT}35`,
                 borderRadius: "var(--radius-lg)",
                 display: "flex",
                 alignItems: "center",
@@ -812,7 +1028,6 @@ export default function StatistikaDasarPage() {
             </div>
           )}
 
-          {/* Navigation */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <button
               onClick={() => goToLesson(currentLesson - 1)}
@@ -826,8 +1041,9 @@ export default function StatistikaDasarPage() {
             {currentLesson < LESSONS.length - 1 ? (
               <button
                 onClick={() => goToLesson(currentLesson + 1)}
+                disabled={!quizAnswered || quizSelected !== lesson.quiz.correct}
                 className="btn btn-primary"
-                style={{ gap: 5 }}
+                style={{ gap: 5, opacity: quizAnswered && quizSelected === lesson.quiz.correct ? 1 : 0.5 }}
               >
                 Modul Berikutnya <ChevronRight size={15} />
               </button>

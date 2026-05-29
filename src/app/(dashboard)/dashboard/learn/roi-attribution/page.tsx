@@ -1,74 +1,74 @@
-﻿"use client";
+"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 import {
-  DollarSign,
-  ArrowLeft,
-  ChevronRight,
-  ChevronLeft,
-  CheckCircle,
-  Circle,
-  Zap,
-  Lightbulb,
-  Target,
-  BookOpen,
-  Clock,
+ DollarSign,
+ ArrowLeft,
+ ChevronRight,
+ ChevronLeft,
+ CheckCircle,
+ Circle,
+ Zap,
+ Lightbulb,
+ Target,
+ BookOpen,
+ Clock,
 } from "lucide-react";
 import { AILab } from "@/components/Chatbot";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useModuleProgress } from "@/hooks/use-module-progress";
 
 interface QuizAnswer {
-  questionIndex: number;
-  selected: number;
-  correct: boolean;
+ questionIndex: number;
+ selected: number;
+ correct: boolean;
 }
 const C = "#6366F1";
 const CL = "rgba(99,102,241,";
 
 const LESSONS = [
-  {
-    id: "engagement-revenue",
-    title: "Engagement ke Revenue",
-    concept: "Mitos vs. Realita Konversi",
-    body: `Banyak marketer terjebak dalam **vanity metrics** â€” likes, views, followers â€” tanpa menghubungkannya dengan **revenue nyata**. Pertanyaan kritis yang jarang dijawab: "Berapa rupiah yang dihasilkan dari 1.000 likes?"
+ {
+ id: "engagement-revenue",
+ title: "Engagement ke Revenue",
+ concept: "Mitos vs. Realita Konversi",
+ body: `Banyak marketer terjebak dalam **vanity metrics** — likes, views, followers — tanpa menghubungkannya dengan **revenue nyata**. Pertanyaan kritis yang jarang dijawab: "Berapa rupiah yang dihasilkan dari 1.000 likes?"
 
 Realita yang harus dihadapi: **tidak semua engagement sama nilainya**. Save dan share jauh lebih bernilai dari like karena menunjukkan intent yang lebih tinggi. Comment dengan pertanyaan tentang produk lebih bernilai dari comment emoji.
 
 **Hierarchy of Engagement Value:**
-1. **Purchase** (konversi langsung) â†’ highest value
-2. **Add to Cart / Inquiry** â†’ high commercial intent
-3. **Save / Bookmark** â†’ consideration stage
-4. **Share** â†’ advocacy, organic reach multiplier
-5. **Comment** â†’ engagement, bervariasi tergantung konten komentar
-6. **Like** â†’ awareness, lowest direct commercial value
+1. **Purchase** (konversi langsung) → highest value
+2. **Add to Cart / Inquiry** → high commercial intent
+3. **Save / Bookmark** → consideration stage
+4. **Share** → advocacy, organic reach multiplier
+5. **Comment** → engagement, bervariasi tergantung konten komentar
+6. **Like** → awareness, lowest direct commercial value
 
 Memahami hierarki ini membantu kamu mengalokasikan effort ke konten yang menghasilkan engagement BERNILAI TINGGI, bukan sekadar engagement BERJUMLAH BANYAK.`,
-    insight:
-      "Konten dengan save rate tinggi menghasilkan 4x lebih banyak konversi dibanding konten dengan like rate tinggi",
-    challenge:
-      "**AUDIT ENGAGEMENT:** Ambil 5 post terakhir kamu. Untuk setiap post, hitung: likes, comments, saves, shares. Hitung rasio save-to-like. Post mana yang paling 'valuable'?",
-    quiz: {
-      question:
-        "Post A: 10.000 likes, 20 saves. Post B: 1.000 likes, 200 saves. Mana yang lebih bernilai secara komersial?",
-      options: [
-        "Post A karena likes-nya 10x lebih banyak",
-        "Post B â€” save rate 20% menunjukkan buying consideration yang jauh lebih tinggi dari Post A (save rate 0.2%)",
-        "Keduanya sama nilainya",
-        "Tidak bisa ditentukan tanpa data followers",
-      ],
-      correct: 1,
-      explanation:
-        "Save menunjukkan intent untuk kembali dan membeli. Post B memiliki save rate 20% vs Post A 0.2% â€” artinya audiens Post B 100x lebih mungkin dalam consideration stage. Dalam perspective revenue, Post B jauh lebih bernilai.",
-    },
-  },
-  {
-    id: "attribution-models",
-    title: "Model Atribusi",
-    concept: "First-Touch, Last-Touch, Multi-Touch",
-    body: `**Model atribusi** menentukan bagaimana kredit penjualan dibagi ke touchpoint marketing. Pilihan model yang salah bisa menyebabkan alokasi budget yang keliru.
+ insight:
+ "Konten dengan save rate tinggi menghasilkan 4x lebih banyak konversi dibanding konten dengan like rate tinggi",
+ challenge:
+ "**AUDIT ENGAGEMENT:** Ambil 5 post terakhir kamu. Untuk setiap post, hitung: likes, comments, saves, shares. Hitung rasio save-to-like. Post mana yang paling 'valuable'?",
+ quiz: {
+ question:
+ "Post A: 10.000 likes, 20 saves. Post B: 1.000 likes, 200 saves. Mana yang lebih bernilai secara komersial?",
+ options: [
+ "Post A karena likes-nya 10x lebih banyak",
+ "Post B — save rate 20% menunjukkan buying consideration yang jauh lebih tinggi dari Post A (save rate 0.2%)",
+ "Keduanya sama nilainya",
+ "Tidak bisa ditentukan tanpa data followers",
+ ],
+ correct: 1,
+ explanation:
+ "Save menunjukkan intent untuk kembali dan membeli. Post B memiliki save rate 20% vs Post A 0.2% — artinya audiens Post B 100x lebih mungkin dalam consideration stage. Dalam perspective revenue, Post B jauh lebih bernilai.",
+ },
+ },
+ {
+ id: "attribution-models",
+ title: "Model Atribusi",
+ concept: "First-Touch, Last-Touch, Multi-Touch",
+ body: `**Model atribusi** menentukan bagaimana kredit penjualan dibagi ke touchpoint marketing. Pilihan model yang salah bisa menyebabkan alokasi budget yang keliru.
 
 **First-Touch Attribution:** 100% kredit ke touchpoint pertama (awareness). Kelebihan: mengidentifikasi channel terbaik untuk akuisisi. Kelemahan: mengabaikan semua nurturing yang terjadi setelahnya.
 
@@ -77,29 +77,29 @@ Memahami hierarki ini membantu kamu mengalokasikan effort ke konten yang menghas
 **Multi-Touch Attribution (MTA):** Kredit dibagi ke semua touchpoint. Variasi: Linear (sama rata), Time Decay (touchpoint terakhir lebih besar), U-Shaped (first+last touch masing-masing 40%, sisanya 20% dibagi rata ke tengah).
 
 **Rekomendasi untuk bisnis kecil-menengah:** Mulai dengan **U-Shaped** karena memberikan bobot yang fair ke awareness (first touch) dan conversion (last touch) tanpa mengabaikan nurturing di tengah.`,
-    insight:
-      "Bisnis yang beralih dari Last-Touch ke Multi-Touch attribution mengalokasikan budget 30% lebih efisien â€” karena awareness channel yang sebelumnya undervalued akhirnya mendapat kredit",
-    challenge:
-      "**MAPPING JOURNEY:** Pilih satu pembelian terakhir yang kamu lakukan secara online. Trace balik: apa touchpoint pertama? Apa yang terjadi di tengah? Apa touchpoint terakhir sebelum beli? Apply 3 model atribusi.",
-    quiz: {
-      question:
-        "Brand kamu menjalankan TikTok ads (awareness) â†’ Instagram retargeting â†’ Google Search â†’ Purchase. Dengan U-Shaped attribution, berapa kredit TikTok?",
-      options: [
-        "100% karena first touch",
-        "0% karena bukan last touch",
-        "40% â€” U-Shaped memberikan 40% ke first touch dan 40% ke last touch",
-        "25% karena dibagi sama rata",
-      ],
-      correct: 2,
-      explanation:
-        "U-Shaped: First touch (TikTok ads) = 40%, Last touch (Google Search) = 40%, Middle touches (IG retargeting) membagi sisa 20%. Model ini menghargai TikTok sebagai driver awareness tanpa mengabaikan peran Google sebagai converter.",
-    },
-  },
-  {
-    id: "roas-clv",
-    title: "ROAS & Customer Lifetime Value",
-    concept: "Metric yang Sebenarnya Penting",
-    body: `**ROAS (Return On Ad Spend)** mengukur berapa rupiah revenue yang dihasilkan per rupiah yang dibelanjakan untuk iklan. Formula: Revenue / Ad Spend Ã— 100%.
+ insight:
+ "Bisnis yang beralih dari Last-Touch ke Multi-Touch attribution mengalokasikan budget 30% lebih efisien — karena awareness channel yang sebelumnya undervalued akhirnya mendapat kredit",
+ challenge:
+ "**MAPPING JOURNEY:** Pilih satu pembelian terakhir yang kamu lakukan secara online. Trace balik: apa touchpoint pertama? Apa yang terjadi di tengah? Apa touchpoint terakhir sebelum beli? Apply 3 model atribusi.",
+ quiz: {
+ question:
+ "Brand kamu menjalankan TikTok ads (awareness) → Instagram retargeting → Google Search → Purchase. Dengan U-Shaped attribution, berapa kredit TikTok?",
+ options: [
+ "100% karena first touch",
+ "0% karena bukan last touch",
+ "40% — U-Shaped memberikan 40% ke first touch dan 40% ke last touch",
+ "25% karena dibagi sama rata",
+ ],
+ correct: 2,
+ explanation:
+ "U-Shaped: First touch (TikTok ads) = 40%, Last touch (Google Search) = 40%, Middle touches (IG retargeting) membagi sisa 20%. Model ini menghargai TikTok sebagai driver awareness tanpa mengabaikan peran Google sebagai converter.",
+ },
+ },
+ {
+ id: "roas-clv",
+ title: "ROAS & Customer Lifetime Value",
+ concept: "Metric yang Sebenarnya Penting",
+ body: `**ROAS (Return On Ad Spend)** mengukur berapa rupiah revenue yang dihasilkan per rupiah yang dibelanjakan untuk iklan. Formula: Revenue / Ad Spend Ã— 100%.
 
 ROAS 300% berarti setiap Rp1.000 yang dibelanjakan menghasilkan Rp3.000 revenue. Tapi ROAS saja BUKAN indikator sukses yang lengkap.
 
@@ -111,897 +111,1036 @@ ROAS 300% berarti setiap Rp1.000 yang dibelanjakan menghasilkan Rp3.000 revenue.
 **Customer Lifetime Value (CLV):** Total revenue yang dihasilkan satu customer selama hubungannya dengan brand kamu. Formula sederhana: Average Order Value Ã— Purchase Frequency Ã— Customer Lifespan.
 
 **CLV vs CAC Ratio:** Jika CLV/CAC > 3, bisnis kamu sehat. Artinya setiap rupiah yang kamu keluarkan untuk akuisisi menghasilkan 3x revenue jangka panjang. Jika < 1, kamu mengeluarkan lebih banyak untuk mendapatkan customer daripada yang mereka hasilkan.`,
-    insight:
-      "Brand yang mengoptimasi CLV (bukan hanya ROAS) memiliki profitabilitas 2.5x lebih tinggi dalam jarak 12 bulan",
-    challenge:
-      "**HITUNG CLV:** Estimasi CLV untuk bisnis/niche kamu: rata-rata order value Ã— frekuensi pembelian per tahun Ã— rata-rata berapa tahun customer bertahan. Bandingkan dengan biaya akuisisi per customer.",
-    quiz: {
-      question:
-        "ROAS campaign A = 500% (revenue Rp5M dari spend Rp1M). ROAS campaign B = 200% tapi CLV customer-nya 3x lebih tinggi. Mana yang lebih baik jangka panjang?",
-      options: [
-        "Campaign A karena ROAS-nya lebih tinggi",
-        "Campaign B â€” CLV 3x lebih tinggi berarti customer dari campaign B menghasilkan total revenue jauh lebih besar meski akuisisinya lebih mahal",
-        "Tidak bisa dibandingkan karena metriknya berbeda",
-        "ROAS selalu lebih penting dari CLV",
-      ],
-      correct: 1,
-      explanation:
-        "Campaign B menghasilkan customer yang membeli berulang kali. Jika CLV campaign B = Rp15M vs CLV campaign A = Rp5M, total return campaign B di Rp15M/Rp2.5M = 600% secara lifetime â€” lebih sustainable dan profitable.",
-    },
-  },
-  {
-    id: "dashboard-attribution",
-    title: "Dashboard Atribusi untuk Tim",
-    concept: "Dari Data ke Keputusan Budget",
-    body: `Dashboard atribusi yang efektif harus membantu tim menjawab satu pertanyaan: **"Di mana kami harus menginvestasikan rupiah berikutnya?"**
+ insight:
+ "Brand yang mengoptimasi CLV (bukan hanya ROAS) memiliki profitabilitas 2.5x lebih tinggi dalam jarak 12 bulan",
+ challenge:
+ "**HITUNG CLV:** Estimasi CLV untuk bisnis/niche kamu: rata-rata order value Ã— frekuensi pembelian per tahun Ã— rata-rata berapa tahun customer bertahan. Bandingkan dengan biaya akuisisi per customer.",
+ quiz: {
+ question:
+ "ROAS campaign A = 500% (revenue Rp5M dari spend Rp1M). ROAS campaign B = 200% tapi CLV customer-nya 3x lebih tinggi. Mana yang lebih baik jangka panjang?",
+ options: [
+ "Campaign A karena ROAS-nya lebih tinggi",
+ "Campaign B — CLV 3x lebih tinggi berarti customer dari campaign B menghasilkan total revenue jauh lebih besar meski akuisisinya lebih mahal",
+ "Tidak bisa dibandingkan karena metriknya berbeda",
+ "ROAS selalu lebih penting dari CLV",
+ ],
+ correct: 1,
+ explanation:
+ "Campaign B menghasilkan customer yang membeli berulang kali. Jika CLV campaign B = Rp15M vs CLV campaign A = Rp5M, total return campaign B di Rp15M/Rp2.5M = 600% secara lifetime — lebih sustainable dan profitable.",
+ },
+ },
+ {
+ id: "dashboard-attribution",
+ title: "Dashboard Atribusi untuk Tim",
+ concept: "Dari Data ke Keputusan Budget",
+ body: `Dashboard atribusi yang efektif harus membantu tim menjawab satu pertanyaan: **"Di mana kami harus menginvestasikan rupiah berikutnya?"**
 
 **Komponen Dashboard Atribusi:**
 
-**Panel 1 â€” Channel Performance:** Tabel semua channel marketing dengan metrik: spend, revenue (attributed), ROAS, CLV rata-rata customer dari channel itu, and tren bulan-ke-bulan.
+**Panel 1 — Channel Performance:** Tabel semua channel marketing dengan metrik: spend, revenue (attributed), ROAS, CLV rata-rata customer dari channel itu, and tren bulan-ke-bulan.
 
-**Panel 2 â€” Attribution Comparison:** Tampilkan revenue attribution dari 2-3 model berbeda side-by-side. Ini membantu menghindari bias dari satu model.
+**Panel 2 — Attribution Comparison:** Tampilkan revenue attribution dari 2-3 model berbeda side-by-side. Ini membantu menghindari bias dari satu model.
 
-**Panel 3 â€” Budget Optimizer:** Simulasi "what-if" â€” jika budget dipindahkan dari channel A ke channel B, berapa estimasi perubahan total revenue?
+**Panel 3 — Budget Optimizer:** Simulasi "what-if" — jika budget dipindahkan dari channel A ke channel B, berapa estimasi perubahan total revenue?
 
-**Panel 4 â€” Funnel Leaks:** Di mana customer drop-off terbanyak? Awareness â†’ Consideration â†’ Purchase. Channel mana yang bagus di awareness tapi jelek di conversion (dan sebaliknya)?
+**Panel 4 — Funnel Leaks:** Di mana customer drop-off terbanyak? Awareness → Consideration → Purchase. Channel mana yang bagus di awareness tapi jelek di conversion (dan sebaliknya)?
 
 Kunci: dashboard harus **prescriptive**, bukan hanya descriptive. Setiap panel harus menyertakan rekomendasi aksi, bukan hanya menampilkan angka.`,
-    insight:
-      "Tim yang menggunakan dashboard atribusi prescriptive mengambil keputusan budget 60% lebih cepat dan 40% lebih akurat",
-    challenge:
-      "**DESIGN DASHBOARD:** Sketsa dashboard atribusi untuk bisnis kamu. Tentukan: 4 panel utama, metrik di setiap panel, and rekomendasi otomatis apa yang ingin kamu tampilkan.",
-    quiz: {
-      question:
-        "Dashboard menunjukkan TikTok ads ROAS = 150% (di bawah breakeven) tapi menjadi first-touch untuk 60% customer yang akhirnya membeli via Google. Apa keputusan terbaik?",
-      options: [
-        "Cut budget TikTok karena ROAS di bawah breakeven",
-        "Pertahankan TikTok budget â€” meskipun last-touch ROAS rendah, perannya sebagai awareness driver (first-touch) krusial untuk keseluruhan funnel",
-        "Pindahkan semua budget ke Google karena ROAS-nya lebih tinggi",
-        "TikTok hanya untuk brand awareness, jangan ukur ROAS",
-      ],
-      correct: 1,
-      explanation:
-        "Ini contoh bahaya last-touch attribution. TikTok sebagai first-touch driver untuk 60% customer berarti Google Search conversion bergantung pada TikTok awareness. Memotong TikTok budget akan menurunkan Google conversion juga â€” efek domino.",
-    },
-  },
+ insight:
+ "Tim yang menggunakan dashboard atribusi prescriptive mengambil keputusan budget 60% lebih cepat dan 40% lebih akurat",
+ challenge:
+ "**DESIGN DASHBOARD:** Sketsa dashboard atribusi untuk bisnis kamu. Tentukan: 4 panel utama, metrik di setiap panel, and rekomendasi otomatis apa yang ingin kamu tampilkan.",
+ quiz: {
+ question:
+ "Dashboard menunjukkan TikTok ads ROAS = 150% (di bawah breakeven) tapi menjadi first-touch untuk 60% customer yang akhirnya membeli via Google. Apa keputusan terbaik?",
+ options: [
+ "Cut budget TikTok karena ROAS di bawah breakeven",
+ "Pertahankan TikTok budget — meskipun last-touch ROAS rendah, perannya sebagai awareness driver (first-touch) krusial untuk keseluruhan funnel",
+ "Pindahkan semua budget ke Google karena ROAS-nya lebih tinggi",
+ "TikTok hanya untuk brand awareness, jangan ukur ROAS",
+ ],
+ correct: 1,
+ explanation:
+ "Ini contoh bahaya last-touch attribution. TikTok sebagai first-touch driver untuk 60% customer berarti Google Search conversion bergantung pada TikTok awareness. Memotong TikTok budget akan menurunkan Google conversion juga — efek domino.",
+ },
+ },
+ {
+ id: "utm-tracking",
+ title: "UTM Tracking & Link Strategy",
+ concept: "Melacak Sumber Setiap Klik Secara Akurat",
+ body: `Sebelum Anda bisa mengatribusikan penjualan ke channel tertentu, Anda harus tahu dari mana traffic tersebut berasal. **UTM Tracking** adalah metode menyisipkan parameter khusus di akhir URL Anda untuk melacak asal-usul klik.
+
+Komponen utama parameter UTM:
+
+**1. utm_source (Sumber):** Platform tempat link dipasang (misal: instagram, newsletter, google).
+
+**2. utm_medium (Media):** Format marketing yang digunakan (misal: cpc untuk iklan berbayar, bio-link untuk link bio profil, email untuk buletin).
+
+**3. utm_campaign (Kampanye):** Nama kampanye promosi spesifik Anda (misal: ramadhan-sale, product-launch-2026).
+
+Contoh URL lengkap bertracking: 
+https://brandkamu.com/produk?utm_source=instagram&utm_medium=bio-link&utm_campaign=launch
+
+Dengan menggunakan standar UTM yang konsisten, Google Analytics atau tools atribusi Anda dapat secara otomatis memetakan jalur belanja pengguna.`,
+ insight:
+ "Lebih dari 50% kesalahan data dalam tools atribusi disebabkan oleh penamaan parameter UTM yang tidak konsisten dan tidak terstandarisasi.",
+ challenge: `**BUAT URL TRACKING:** Buat 3 URL tracking yang berbeda menggunakan parameter UTM untuk 1 kampanye produk baru Anda yang dipromosikan di Instagram Ads, TikTok Bio, dan Email Newsletter!`,
+ quiz: {
+ question:
+ "Manakah parameter UTM yang paling tepat digunakan untuk menunjukkan jenis media marketing (seperti iklan berbayar vs email)?",
+ options: [
+ "utm_source",
+ "utm_medium",
+ "utm_campaign",
+ "utm_term",
+ ],
+ correct: 1,
+ explanation:
+ "utm_medium digunakan untuk mendefinisikan media transmisi traffic, seperti 'email', 'cpc' (iklan berbayar), 'organic-social', atau 'affiliate'.",
+ },
+ },
+ {
+ id: "cohort-analysis",
+ title: "Cohort Analysis untuk Konten",
+ concept: "Mengukur Perilaku Kelompok Pengguna dari Waktu ke Waktu",
+ body: `Tidak semua pelanggan yang Anda dapatkan memiliki nilai yang sama. **Cohort Analysis** adalah teknik mengelompokkan pengguna berdasarkan karakteristik atau waktu akuisisi yang sama, lalu melacak perilaku belanja mereka dari waktu ke waktu.
+
+Bagaimana cohort analysis membantu Anda:
+
+**1. Retensi Pelanggan:** Anda bisa membandingkan cohort pelanggan yang diakuisisi saat diskon besar (misal: promo 11.11) dengan cohort pelanggan normal. Apakah pelanggan diskon memiliki retensi belanja yang sama baiknya, atau mereka langsung hilang?
+
+**2. Pengaruh Konten:** Kelompokkan cohort berdasarkan konten pertama yang mereka lihat. Apakah pengguna yang masuk melalui artikel edukasi memiliki Lifetime Value (LTV) lebih tinggi dibanding pengguna yang masuk dari video lucu?
+
+**3. Mengukur Peningkatan Produk:** Dengan membandingkan cohort bulanan, Anda bisa melihat apakah perubahan strategi konten di bulan tertentu benar-benar meningkatkan loyalitas pembeli.`,
+ insight:
+ "Cohort analysis membantu menemukan 20% pelanggan setia yang biasanya menyumbang hingga 80% total revenue jangka panjang bisnis Anda.",
+ challenge: `**DESAIN COHORT:** Tentukan 2 kriteria cohort pengguna yang ingin Anda bandingkan di bisnis Anda (misal: Pengguna dari Instagram vs TikTok). Apa metrik utama yang akan Anda lacak selama 3 bulan?`,
+ quiz: {
+ question:
+ "Apa kegunaan utama dari melakukan Cohort Analysis bagi seorang marketer?",
+ options: [
+ "Melihat total jumlah traffic harian secara umum",
+ "Mengelompokkan pengguna berdasarkan waktu/karakteristik akuisisi untuk melacak loyalitas dan perilaku belanja mereka dalam jangka panjang",
+ "Menghitung jumlah postingan blog yang diterbitkan",
+ "Mendeteksi lokasi geografis pengguna secara real-time",
+ ],
+ correct: 1,
+ explanation:
+ "Cohort Analysis fokus melacak kelompok pengguna yang sejenis seiring berjalannya waktu. Ini memberikan gambaran riil tentang retensi, churn rate, dan LTV kelompok tersebut.",
+ },
+ },
+ {
+ id: "incrementality-testing",
+ title: "Incrementality Testing",
+ concept: "Membedakan Traffic Organik dan Hasil Iklan",
+ body: `Tantangan terbesar atribusi adalah mengetahui apakah pembeli membeli produk *karena* melihat iklan Anda, atau mereka memang *akan tetap membeli* meskipun Anda tidak beriklan. Ini disebut **Incrementality Testing** (Pengukuran Dampak Inkremental).
+
+Untuk menguji ini, kita menggunakan metode eksperimen terkontrol:
+
+**1. Kelompok Uji (Test Group):** Kelompok pengguna yang tetap melihat iklan Anda secara normal.
+
+**2. Kelompok Kontrol (Control Group):** Kelompok pengguna serupa yang sengaja tidak ditunjukkan iklan Anda sama sekali.
+
+**3. Lift Measurement:** Hitung perbedaan tingkat konversi antara kelompok uji dan kelompok kontrol. Selisih inilah yang disebut **Incremental Lift** — kontribusi murni dari campaign iklan Anda. Jika konversi di kedua kelompok sama saja, berarti iklan Anda tidak memberikan dampak inkremental (hanya membuang budget untuk orang yang pasti membeli).`,
+ insight:
+ "Rata-rata 20-30% konversi yang diatribusikan ke iklan retargeting sebenarnya bukan inkremental — mereka adalah pengguna setia yang tetap akan membeli secara organik.",
+ challenge: `**RANCANG TES INKREMENTAL:** Rancang eksperimen inkremental sederhana untuk kampanye retargeting Anda. Bagaimana Anda membagi kelompok pengguna menjadi kelompok uji dan kontrol?`,
+ quiz: {
+ question:
+ "Apa yang dimaksud dengan 'Incremental Lift' dalam testing performa marketing?",
+ options: [
+ "Kenaikan budget iklan bulanan",
+ "Persentase konversi tambahan yang murni disebabkan oleh paparan iklan, di luar konversi organik yang pasti terjadi",
+ "Peningkatan jumlah follower di akun media sosial",
+ "Perubahan harga produk kompetitor",
+ ],
+ correct: 1,
+ explanation:
+ "Incremental Lift mengukur efektivitas murni dari iklan Anda dengan membandingkan konversi kelompok yang melihat iklan vs kelompok kontrol yang tidak melihat iklan.",
+ },
+ },
+ {
+ id: "data-storytelling",
+ title: "Reporting & Storytelling Data",
+ concept: "Mengubah Angka Menjadi Narasi Keputusan",
+ body: `Data ROI yang canggih tidak akan ada gunanya jika stakeholder atau klien Anda tidak memahami maknanya. **Reporting & Data Storytelling** adalah keterampilan merangkum data teknis menjadi laporan visual yang mudah dipahami dan berorientasi pada tindakan.
+
+Tiga pilar dalam menyusun laporan data storytelling:
+
+**1. Fokus Pada Metrik Utama (North Star Metric):** Jangan membanjiri laporan dengan puluhan metrik kecil. Mulailah dengan metrik yang paling dipedulikan stakeholder (misal: Profit, CAC, atau ROI), baru jelaskan metrik pendukungnya.
+
+**2. Gunakan Visualisasi yang Tepat:** Pilih grafik yang tepat untuk menunjukkan tren (line chart untuk pertumbuhan, bar chart untuk perbandingan, funnel chart untuk drop-off konversi).
+
+**3. Berikan Konteks dan Rekomendasi:** Jangan hanya menulis angka. Selalu lengkapi dengan "Mengapa" hal itu terjadi dan "Apa langkah selanjutnya" (misal: "ROI naik 15% karena optimalisasi landing page, rekomendasi: naikkan budget 20%").`,
+ insight:
+ "Laporan bulanan yang menyertakan rekomendasi aksi konkret (actionable insights) disetujui 3x lebih cepat oleh manajemen dibanding laporan berisi grafik mentah saja.",
+ challenge: `**BUAT EXECUTIVE SUMMARY:** Tulis ringkasan laporan eksekutif sepanjang 1 paragraf untuk kampanye bulan lalu yang mencakup: 1 pencapaian utama, 1 masalah yang ditemukan, dan 1 rekomendasi tindakan!`,
+ quiz: {
+ question:
+ "Apa komponen terpenting yang harus ada di akhir setiap slide laporan data marketing?",
+ options: [
+ "Penjelasan rumus statistik yang rumit",
+ "Rekomendasi tindakan konkret berdasarkan insight data (actionable next steps)",
+ "Logo perusahaan berukuran besar",
+ "Daftar semua link sumber data mentah",
+ ],
+ correct: 1,
+ explanation:
+ "Data storytelling bertujuan memicu keputusan bisnis. Menyediakan rekomendasi tindakan konkret memastikan data diterjemahkan menjadi langkah eksekusi nyata.",
+ },
+ },
 ];
 
 function FunnelViz() {
-  const [budgets, setBudgets] = useState([40, 35, 25]);
-  const labels = [
-    "Awareness (TikTok/IG)",
-    "Consideration (Retargeting)",
-    "Conversion (Search/CTA)",
-  ];
-  const colors = ["#818CF8", "#6366F1", "#4F46E5"];
-  const total = budgets.reduce((a, b) => a + b, 0);
-  return (
-    <div
-      style={{
-        background: "var(--color-surface)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius-xl)",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          padding: "16px 24px",
-          borderBottom: "1px solid var(--color-border)",
-          background: "var(--color-surface-2)",
-        }}
-      >
-        <div style={{ fontWeight: 800, fontSize: "1rem" }}>
-          Budget Allocation Funnel
-        </div>
-        <div className="caption" style={{ marginTop: 4 }}>
-          Atur alokasi budget dan lihat visualisasi funnel berubah
-        </div>
-      </div>
-      <div style={{ padding: 24 }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 14,
-            marginBottom: 28,
-          }}
-        >
-          {labels.map((label, i) => (
-            <div
-              key={i}
-              style={{ display: "flex", alignItems: "center", gap: 12 }}
-            >
-              <div
-                style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: 3,
-                  background: colors[i],
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  fontSize: "0.8125rem",
-                  fontWeight: 600,
-                  color: "var(--color-text-secondary)",
-                  flex: "0 0 200px",
-                }}
-              >
-                {label}
-              </span>
-              <input
-                type="range"
-                min={5}
-                max={80}
-                value={budgets[i]}
-                onChange={(e) => {
-                  const n = [...budgets];
-                  n[i] = +e.target.value;
-                  setBudgets(n);
-                }}
-                style={{ flex: 1, accentColor: colors[i], cursor: "grab" }}
-              />
-              <span
-                style={{
-                  fontSize: "0.875rem",
-                  fontWeight: 800,
-                  color: colors[i],
-                  width: 50,
-                  textAlign: "right",
-                }}
-              >
-                {Math.round((budgets[i] / total) * 100)}%
-              </span>
-            </div>
-          ))}
-        </div>
-        {/* Funnel */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 4,
-          }}
-        >
-          {budgets.map((b, i) => {
-            const widthPct = 30 + (b / total) * 60;
-            return (
-              <motion.div
-                key={i}
-                animate={{ width: `${widthPct}%` }}
-                transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                style={{
-                  height: 52,
-                  background: colors[i],
-                  borderRadius:
-                    i === 0
-                      ? "12px 12px 4px 4px"
-                      : i === budgets.length - 1
-                        ? "4px 4px 12px 12px"
-                        : 4,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  position: "relative",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 800,
-                    color: "#FFF",
-                    textAlign: "center",
-                    padding: "0 8px",
-                  }}
-                >
-                  {labels[i].split("(")[0].trim()} â€”{" "}
-                  {Math.round((b / total) * 100)}%
-                </span>
-              </motion.div>
-            );
-          })}
-        </div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          style={{
-            marginTop: 20,
-            padding: "14px 16px",
-            background: `${CL}0.06)`,
-            border: `1px solid ${CL}0.2)`,
-            borderRadius: "var(--radius-sm)",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "0.8125rem",
-              color: "var(--color-text-secondary)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-            }}
-          >
-            {budgets[0] / total > 0.5 || budgets[2] / total > 0.5 ? (
-              <Icon
-                icon="solar:danger-triangle-bold-duotone"
-                width={18}
-                className="text-amber-500"
-              />
-            ) : (
-              <Icon
-                icon="solar:check-circle-bold-duotone"
-                width={18}
-                className="text-green-500"
-              />
-            )}
-            {budgets[0] / total > 0.5
-              ? "Budget terlalu berat di Awareness. Pertimbangkan pindahkan sebagian ke Conversion untuk meningkatkan ROAS."
-              : budgets[2] / total > 0.5
-                ? "Budget terlalu berat di Conversion. Tanpa Awareness yang cukup, funnel akan kering."
-                : "Alokasi budget cukup seimbang. Pastikan setiap layer dioptimasi sesuai model atribusi yang dipilih."}
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
+ const [budgets, setBudgets] = useState([40, 35, 25]);
+ const labels = [
+ "Awareness (TikTok/IG)",
+ "Consideration (Retargeting)",
+ "Conversion (Search/CTA)",
+ ];
+ const colors = ["#818CF8", "#6366F1", "#4F46E5"];
+ const total = budgets.reduce((a, b) => a + b, 0);
+ return (
+ <div
+ style={{
+ background: "var(--color-surface)",
+ border: "1px solid var(--color-border)",
+ borderRadius: "var(--radius-xl)",
+ overflow: "hidden",
+ }}
+ >
+ <div
+ style={{
+ padding: "16px 24px",
+ borderBottom: "1px solid var(--color-border)",
+ background: "var(--color-surface-2)",
+ }}
+ >
+ <div style={{ fontWeight: 800, fontSize: "1rem" }}>
+ Budget Allocation Funnel
+ </div>
+ <div className="caption" style={{ marginTop: 4 }}>
+ Atur alokasi budget dan lihat visualisasi funnel berubah
+ </div>
+ </div>
+ <div style={{ padding: 24 }}>
+ <div
+ style={{
+ display: "flex",
+ flexDirection: "column",
+ gap: 14,
+ marginBottom: 28,
+ }}
+ >
+ {labels.map((label, i) => (
+ <div
+ key={i}
+ style={{ display: "flex", alignItems: "center", gap: 12 }}
+ >
+ <div
+ style={{
+ width: 12,
+ height: 12,
+ borderRadius: 3,
+ background: colors[i],
+ flexShrink: 0,
+ }}
+ />
+ <span
+ style={{
+ fontSize: "0.8125rem",
+ fontWeight: 600,
+ color: "var(--color-text-secondary)",
+ flex: "0 0 200px",
+ }}
+ >
+ {label}
+ </span>
+ <input
+ type="range"
+ min={5}
+ max={80}
+ value={budgets[i]}
+ onChange={(e) => {
+ const n = [...budgets];
+ n[i] = +e.target.value;
+ setBudgets(n);
+ }}
+ style={{ flex: 1, accentColor: colors[i], cursor: "grab" }}
+ />
+ <span
+ style={{
+ fontSize: "0.875rem",
+ fontWeight: 800,
+ color: colors[i],
+ width: 50,
+ textAlign: "right",
+ }}
+ >
+ {Math.round((budgets[i] / total) * 100)}%
+ </span>
+ </div>
+ ))}
+ </div>
+ {/* Funnel */}
+ <div
+ style={{
+ display: "flex",
+ flexDirection: "column",
+ alignItems: "center",
+ gap: 4,
+ }}
+ >
+ {budgets.map((b, i) => {
+ const widthPct = 30 + (b / total) * 60;
+ return (
+ <motion.div
+ key={i}
+ animate={{ width: `${widthPct}%` }}
+ transition={{ type: "spring", stiffness: 200, damping: 25 }}
+ style={{
+ height: 52,
+ background: colors[i],
+ borderRadius:
+ i === 0
+ ? "12px 12px 4px 4px"
+ : i === budgets.length - 1
+ ? "4px 4px 12px 12px"
+ : 4,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ position: "relative",
+ }}
+ >
+ <span
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 800,
+ color: "#FFF",
+ textAlign: "center",
+ padding: "0 8px",
+ }}
+ >
+ {labels[i].split("(")[0].trim()} —{" "}
+ {Math.round((b / total) * 100)}%
+ </span>
+ </motion.div>
+ );
+ })}
+ </div>
+ <motion.div
+ initial={{ opacity: 0 }}
+ animate={{ opacity: 1 }}
+ style={{
+ marginTop: 20,
+ padding: "14px 16px",
+ background: `${CL}0.06)`,
+ border: `1px solid ${CL}0.2)`,
+ borderRadius: "var(--radius-sm)",
+ textAlign: "center",
+ }}
+ >
+ <div
+ style={{
+ fontSize: "0.8125rem",
+ color: "var(--color-text-secondary)",
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ gap: 8,
+ }}
+ >
+ {budgets[0] / total > 0.5 || budgets[2] / total > 0.5 ? (
+ <Icon
+ icon="solar:danger-triangle-bold-duotone"
+ width={18}
+ className="text-amber-500"
+ />
+ ) : (
+ <Icon
+ icon="solar:check-circle-bold-duotone"
+ width={18}
+ className="text-green-500"
+ />
+ )}
+ {budgets[0] / total > 0.5
+ ? "Budget terlalu berat di Awareness. Pertimbangkan pindahkan sebagian ke Conversion untuk meningkatkan ROAS."
+ : budgets[2] / total > 0.5
+ ? "Budget terlalu berat di Conversion. Tanpa Awareness yang cukup, funnel akan kering."
+ : "Alokasi budget cukup seimbang. Pastikan setiap layer dioptimasi sesuai model atribusi yang dipilih."}
+ </div>
+ </motion.div>
+ </div>
+ </div>
+ );
 }
 
 export default function RoiAttributionPage() {
-  const { user }   = useAuth();
-  const { completedLessons, quizAnswers, isModuleComplete, saveAnswer } =
-    useModuleProgress("roi-attribution", user?.uid, LESSONS.length);
+ const { user } = useAuth();
+ const { completedLessons, quizAnswers, isModuleComplete, saveAnswer, resetAnswer } =
+ useModuleProgress("roi-attribution", user?.uid, LESSONS.length);
 
-  const [currentLesson, setCurrentLesson] = useState(0);
-  const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
-  const [showAILab, setShowAILab] = useState(false);
+ const [currentLesson, setCurrentLesson] = useState(0);
+ const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | null>(null);
+ const [showAILab, setShowAILab] = useState(false);
 
-  // Restore quiz answer for current lesson from Firestore
-  useEffect(() => {
-    const saved = quizAnswers[currentLesson];
-    if (saved) {
-      setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
-    } else {
-      setQuizAnswer(null);
-    }
-  }, [currentLesson, quizAnswers]);
-  const lesson = LESSONS[currentLesson];
-  const progress = (completedLessons.size / LESSONS.length) * 100;
-  function goToLesson(idx: number) {
-    setCurrentLesson(idx);
-    setShowAILab(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-  function handleQuizAnswer(i: number) {
-    if (quizAnswer) return;
-    const correct = i === lesson.quiz.correct;
-    setQuizAnswer({ questionIndex: currentLesson, selected: i, correct });
-    if (correct) setCompleted((p) => new Set([...p, currentLesson]));
-  }
-  return (
-    <div
-      className="animate-fade-in-up"
-      style={{ display: "flex", flexDirection: "column" }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 32,
-          flexWrap: "wrap",
-          gap: 12,
-        }}
-      >
-        <Link
-          href="/dashboard/learn"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            color: "var(--color-text-secondary)",
-            textDecoration: "none",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-          }}
-        >
-          <ArrowLeft size={16} /> Kembali ke Kurikulum
-        </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontSize: "0.875rem",
-              color: "var(--color-text-muted)",
-            }}
-          >
-            <BookOpen size={15} />
-            {completedLessons.size}/{LESSONS.length} selesai
-          </div>
-          <div
-            style={{
-              width: 120,
-              height: 6,
-              background: "var(--color-surface-3)",
-              borderRadius: 999,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                height: "100%",
-                width: `${progress}%`,
-                background: `linear-gradient(90deg,${C},#4F46E5)`,
-                borderRadius: 999,
-                transition: "width 0.5s ease",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          background: "linear-gradient(135deg,#1A1D23 0%,#2D2F3A 100%)",
-          borderRadius: "var(--radius-xl)",
-          padding: "32px 36px",
-          marginBottom: 32,
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: -50,
-            right: -50,
-            width: 200,
-            height: 200,
-            borderRadius: "50%",
-            background: `radial-gradient(circle,${CL}0.3) 0%,transparent 70%)`,
-          }}
-        />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              background: `${CL}0.2)`,
-              border: `1px solid ${CL}0.4)`,
-              borderRadius: 100,
-              padding: "4px 14px",
-              marginBottom: 12,
-            }}
-          >
-            <DollarSign size={13} color="#A5B4FC" />
-            <span
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                color: "#A5B4FC",
-                letterSpacing: "0.06em",
-              }}
-            >
-              MODUL 9 Â· ROI ATTRIBUTION
-            </span>
-          </div>
-          <h1
-            style={{
-              fontSize: "clamp(1.375rem,3vw,1.875rem)",
-              color: "#F8F9FA",
-              letterSpacing: "-0.04em",
-              marginBottom: 8,
-            }}
-          >
-            Atribusi ROI & Revenue
-          </h1>
-          <p style={{ color: "#9CA3AF", maxWidth: 480 }}>
-            Menghubungkan metrik engagement dengan penjualan nyata menggunakan
-            model atribusi.
-          </p>
-          <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8125rem",
-                color: "#9CA3AF",
-              }}
-            >
-              <BookOpen size={14} /> 4 Materi
-            </span>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8125rem",
-                color: "#9CA3AF",
-              }}
-            >
-              <Clock size={14} /> 3.5 jam
-            </span>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.8125rem",
-                color: "#A5B4FC",
-                fontWeight: 700,
-              }}
-            >
-              <Zap size={14} /> AI Tutor Lab
-            </span>
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          gap: 28,
-          alignItems: "flex-start",
-          flexWrap: "wrap",
-        }}
-      >
-        <div
-          style={{
-            flex: "0 0 260px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-            position: "sticky",
-            top: 24,
-          }}
-        >
-          <div
-            style={{
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              color: "var(--color-text-muted)",
-              letterSpacing: "0.08em",
-              marginBottom: 8,
-            }}
-          >
-            DAFTAR MATERI
-          </div>
-          {LESSONS.map((l, i) => {
-            const isDone = completedLessons.has(i);
-            const isActive = i === currentLesson;
-            return (
-              <button
-                key={l.id}
-                onClick={() => goToLesson(i)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "10px 12px",
-                  borderRadius: "var(--radius-md)",
-                  border: isActive
-                    ? `1px solid ${CL}0.5)`
-                    : "1px solid transparent",
-                  background: isActive ? `${CL}0.1)` : "transparent",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.2s",
-                  width: "100%",
-                  fontFamily: "var(--font-sans)",
-                }}
-              >
-                {isDone ? (
-                  <CheckCircle
-                    size={16}
-                    color="#6EE12B"
-                    style={{ flexShrink: 0 }}
-                  />
-                ) : (
-                  <Circle
-                    size={16}
-                    color={isActive ? C : "var(--color-border-2)"}
-                    style={{ flexShrink: 0 }}
-                  />
-                )}
-                <span
-                  style={{
-                    fontSize: "0.8125rem",
-                    fontWeight: isActive ? 700 : 500,
-                    color: isActive ? C : "var(--color-text-secondary)",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {i + 1}. {l.title}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        <div
-          style={{
-            flex: "1 1 400px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 24,
-            minWidth: 0,
-          }}
-        >
-          <div className="premium-card" style={{ padding: 0 }}>
-            <div
-              style={{
-                padding: "24px 28px",
-                borderBottom: "1px solid var(--color-border)",
-                background: `${CL}0.05)`,
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 14,
-              }}
-            >
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: "var(--radius-md)",
-                  background: `${CL}0.15)`,
-                  border: `1px solid ${CL}0.3)`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <DollarSign size={22} color={C} strokeWidth={2} />
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: "0.6875rem",
-                    fontWeight: 700,
-                    color: C,
-                    letterSpacing: "0.08em",
-                    marginBottom: 4,
-                  }}
-                >
-                  MATERI {currentLesson + 1} DARI {LESSONS.length}
-                </div>
-                <h2
-                  style={{
-                    fontSize: "1.25rem",
-                    letterSpacing: "-0.02em",
-                    color: "var(--color-text-primary)",
-                    marginBottom: 2,
-                  }}
-                >
-                  {lesson.title}
-                </h2>
-                <div
-                  style={{
-                    fontSize: "0.8125rem",
-                    color: "var(--color-text-muted)",
-                  }}
-                >
-                  {lesson.concept}
-                </div>
-              </div>
-            </div>
-            <div style={{ padding: 28 }}>
-              <div
-                style={{
-                  fontSize: "0.9375rem",
-                  lineHeight: 1.75,
-                  color: "var(--color-text-secondary)",
-                  marginBottom: 24,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {lesson.body.replace(/\*\*(.*?)\*\*/g, "$1")}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 12,
-                  padding: "16px 18px",
-                  background: `${CL}0.06)`,
-                  border: `1px solid ${CL}0.2)`,
-                  borderRadius: "var(--radius-md)",
-                  marginBottom: 28,
-                }}
-              >
-                <Lightbulb
-                  size={18}
-                  color={C}
-                  style={{ flexShrink: 0, marginTop: 1 }}
-                />
-                <p
-                  style={{
-                    fontSize: "0.875rem",
-                    color: "var(--color-text-primary)",
-                    fontStyle: "italic",
-                    fontWeight: 600,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {lesson.insight}
-                </p>
-              </div>
-              <div style={{ marginBottom: 28 }}>
-                <FunnelViz />
-              </div>
-              <div
-                style={{
-                  padding: "20px 22px",
-                  background: "var(--color-surface-2)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  marginBottom: 28,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginBottom: 12,
-                  }}
-                >
-                  <Target size={15} color="var(--color-accent-text)" />
-                  <span
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                      color: "var(--color-accent-text)",
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    TANTANGAN PRAKTIK
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.875rem",
-                    lineHeight: 1.7,
-                    color: "var(--color-text-secondary)",
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {lesson.challenge.replace(/\*\*(.*?)\*\*/g, "$1")}
-                </div>
-              </div>
-              <button
-                onClick={() => setShowAILab((v) => !v)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "12px 18px",
-                  borderRadius: "var(--radius-md)",
-                  background: showAILab
-                    ? `linear-gradient(135deg,${C},#4F46E5)`
-                    : "var(--color-surface-3)",
-                  border: "1px solid",
-                  borderColor: showAILab
-                    ? "transparent"
-                    : "var(--color-border)",
-                  color: showAILab ? "#FFF" : "var(--color-text-secondary)",
-                  fontSize: "0.875rem",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  width: "100%",
-                  justifyContent: "center",
-                  marginBottom: showAILab ? 20 : 0,
-                  fontFamily: "var(--font-sans)",
-                }}
-              >
-                <Zap size={15} />{" "}
-                {showAILab
-                  ? "Tutup AI Tutor Lab"
-                  : "Buka AI Tutor Lab â€” Tanya Langsung ke AI"}
-              </button>
-              {showAILab && (
-                <AILab
-                  moduleId="roi-attribution"
-                  moduleName="ROI Attribution"
-                  initialMessage="Halo! Aku AI Tutor untuk modul Atribusi ROI. Tanyakan tentang model atribusi, ROAS, CLV, atau dashboard budgeting!"
-                  themeColor={C}
-                  themeGradient={`linear-gradient(135deg, ${C}, #4F46E5)`}
-                />
-              )}
-            </div>
-          </div>
-          <div className="premium-card" style={{ padding: 0 }}>
-            <div
-              style={{
-                padding: "20px 24px",
-                borderBottom: "1px solid var(--color-border)",
-                background: "var(--color-surface-2)",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-              }}
-            >
-              <DollarSign size={18} color="var(--color-accent-text)" />
-              <span style={{ fontWeight: 800, fontSize: "1rem" }}>
-                Cek Pemahaman
-              </span>
-              {quizAnswer && (
-                <span
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    padding: "2px 10px",
-                    borderRadius: 100,
-                    background: quizAnswer.correct
-                      ? "rgba(34,197,94,0.1)"
-                      : "rgba(239,68,68,0.1)",
-                    color: quizAnswer.correct ? "#16A34A" : "#DC2626",
-                  }}
-                >
-                  {quizAnswer.correct ? "âœ“ Benar!" : "âœ— Coba lagi"}
-                </span>
-              )}
-            </div>
-            <div style={{ padding: "24px 28px" }}>
-              <p
-                style={{
-                  fontWeight: 700,
-                  fontSize: "1rem",
-                  color: "var(--color-text-primary)",
-                  marginBottom: 20,
-                  lineHeight: 1.5,
-                }}
-              >
-                {lesson.quiz.question}
-              </p>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 10 }}
-              >
-                {lesson.quiz.options.map((opt, i) => {
-                  const isS = quizAnswer?.selected === i;
-                  const isC = i === lesson.quiz.correct;
-                  const sr = !!quizAnswer;
-                  let bg = "var(--color-surface-2)";
-                  let border = "1px solid var(--color-border)";
-                  let color = "var(--color-text-secondary)";
-                  if (sr && isC) {
-                    bg = "rgba(34,197,94,0.08)";
-                    border = "1px solid rgba(34,197,94,0.4)";
-                    color = "#15803D";
-                  } else if (sr && isS && !isC) {
-                    bg = "rgba(239,68,68,0.08)";
-                    border = "1px solid rgba(239,68,68,0.4)";
-                    color = "#B91C1C";
-                  }
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => handleQuizAnswer(i)}
-                      disabled={!!quizAnswer}
-                      style={{
-                        padding: "14px 18px",
-                        borderRadius: "var(--radius-md)",
-                        background: bg,
-                        border,
-                        color,
-                        fontSize: "0.875rem",
-                        fontWeight: 500,
-                        cursor: quizAnswer ? "not-allowed" : "pointer",
-                        textAlign: "left",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        lineHeight: 1.5,
-                        fontFamily: "var(--font-sans)",
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: "50%",
-                          background:
-                            sr && isC
-                              ? "#16A34A"
-                              : sr && isS
-                                ? "#DC2626"
-                                : "var(--color-surface-3)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "0.6875rem",
-                          fontWeight: 800,
-                          color:
-                            (sr && isC) || (sr && isS)
-                              ? "#FFF"
-                              : "var(--color-text-muted)",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {String.fromCharCode(65 + i)}
-                      </span>
-                      {opt}
-                    </button>
-                  );
-                })}
-              </div>
-              {quizAnswer && (
-                <div
-                  style={{
-                    marginTop: 20,
-                    padding: "16px 18px",
-                    background: quizAnswer.correct
-                      ? "rgba(34,197,94,0.06)"
-                      : "rgba(239,68,68,0.06)",
-                    border: `1px solid ${quizAnswer.correct ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
-                    borderRadius: "var(--radius-md)",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                      color: quizAnswer.correct ? "#16A34A" : "#DC2626",
-                      marginBottom: 6,
-                    }}
-                  >
-                    {quizAnswer.correct ? "âœ“ PENJELASAN" : "âœ— PENJELASAN"}
-                  </div>
-                  <p
-                    style={{
-                      fontSize: "0.875rem",
-                      lineHeight: 1.65,
-                      color: "var(--color-text-secondary)",
-                    }}
-                  >
-                    {lesson.quiz.explanation}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 12,
-            }}
-          >
-            <button
-              onClick={() => goToLesson(currentLesson - 1)}
-              disabled={currentLesson === 0}
-              className="btn btn-secondary"
-              style={{ gap: 8, opacity: currentLesson === 0 ? 0.4 : 1 }}
-            >
-              <ChevronLeft size={16} /> Sebelumnya
-            </button>
-            {currentLesson < LESSONS.length - 1 ? (
-              <button
-                onClick={() => goToLesson(currentLesson + 1)}
-                disabled={!quizAnswer}
-                className="btn btn-primary"
-                style={{ gap: 8, opacity: quizAnswer ? 1 : 0.5 }}
-              >
-                Materi Berikutnya <ChevronRight size={16} />
-              </button>
-            ) : (
-              <Link
-                href="/dashboard/learn"
-                className="btn btn-primary"
-                style={{ gap: 8 }}
-              >
-                Selesai! Kembali ke Kurikulum <CheckCircle size={16} />
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+ // Restore quiz answer for current lesson from Firestore
+ useEffect(() => {
+ const saved = quizAnswers[currentLesson];
+ if (saved) {
+ setQuizAnswer({ questionIndex: currentLesson, selected: saved.selected, correct: saved.correct });
+ } else {
+ setQuizAnswer(null);
+ }
+ }, [currentLesson, quizAnswers]);
+ const lesson = LESSONS[currentLesson];
+ const progress = (completedLessons.size / LESSONS.length) * 100;
+ function goToLesson(idx: number) {
+ setCurrentLesson(idx);
+ setShowAILab(false);
+ window.scrollTo({ top: 0, behavior: "smooth" });
+ }
+ async function handleQuizAnswer(i: number) {
+ if (quizAnswer) return;
+ const correct = i === lesson.quiz.correct;
+ setQuizAnswer({ questionIndex: currentLesson, selected: i, correct });
+ await saveAnswer(currentLesson, i, correct);
+ }
+ return (
+ <div
+ className="animate-fade-in-up"
+ style={{ display: "flex", flexDirection: "column" }}
+ >
+ <div
+ style={{
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "space-between",
+ marginBottom: 32,
+ flexWrap: "wrap",
+ gap: 12,
+ }}
+ >
+ <Link
+ href="/dashboard/learn"
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 8,
+ color: "var(--color-text-secondary)",
+ textDecoration: "none",
+ fontSize: "0.875rem",
+ fontWeight: 600,
+ }}
+ >
+ <ArrowLeft size={16} /> Kembali ke Kurikulum
+ </Link>
+ <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+ <div
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 8,
+ fontSize: "0.875rem",
+ color: "var(--color-text-muted)",
+ }}
+ >
+ <BookOpen size={15} />
+ {completedLessons.size}/{LESSONS.length} selesai
+ </div>
+ <div
+ style={{
+ width: 120,
+ height: 6,
+ background: "var(--color-surface-3)",
+ borderRadius: 999,
+ overflow: "hidden",
+ }}
+ >
+ <div
+ style={{
+ height: "100%",
+ width: `${progress}%`,
+ background: `linear-gradient(90deg,${C},#4F46E5)`,
+ borderRadius: 999,
+ transition: "width 0.5s ease",
+ }}
+ />
+ </div>
+ </div>
+ </div>
+ <div
+ style={{
+ background: "linear-gradient(135deg,#1A1D23 0%,#2D2F3A 100%)",
+ borderRadius: "var(--radius-xl)",
+ padding: "32px 36px",
+ marginBottom: 32,
+ position: "relative",
+ overflow: "hidden",
+ }}
+ >
+ <div
+ style={{
+ position: "absolute",
+ top: -50,
+ right: -50,
+ width: 200,
+ height: 200,
+ borderRadius: "50%",
+ background: `radial-gradient(circle,${CL}0.3) 0%,transparent 70%)`,
+ }}
+ />
+ <div style={{ position: "relative", zIndex: 1 }}>
+ <div
+ style={{
+ display: "inline-flex",
+ alignItems: "center",
+ gap: 8,
+ background: `${CL}0.2)`,
+ border: `1px solid ${CL}0.4)`,
+ borderRadius: 100,
+ padding: "4px 14px",
+ marginBottom: 12,
+ }}
+ >
+ <DollarSign size={13} color="#A5B4FC" />
+ <span
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "#A5B4FC",
+ letterSpacing: "0.06em",
+ }}
+ >
+ MODUL 9 · ROI ATTRIBUTION
+ </span>
+ </div>
+ <h1
+ style={{
+ fontSize: "clamp(1.375rem,3vw,1.875rem)",
+ color: "#F8F9FA",
+ letterSpacing: "-0.04em",
+ marginBottom: 8,
+ }}
+ >
+ Atribusi ROI & Revenue
+ </h1>
+ <p style={{ color: "#9CA3AF", maxWidth: 480 }}>
+ Menghubungkan metrik engagement dengan penjualan nyata menggunakan
+ model atribusi.
+ </p>
+ <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+ <span
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 6,
+ fontSize: "0.8125rem",
+ color: "#9CA3AF",
+ }}
+ >
+ <BookOpen size={14} /> 4 Materi
+ </span>
+ <span
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 6,
+ fontSize: "0.8125rem",
+ color: "#9CA3AF",
+ }}
+ >
+ <Clock size={14} /> 3.5 jam
+ </span>
+ <span
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 6,
+ fontSize: "0.8125rem",
+ color: "#A5B4FC",
+ fontWeight: 700,
+ }}
+ >
+ <Zap size={14} /> AI Tutor Lab
+ </span>
+ </div>
+ </div>
+ </div>
+ <div
+ style={{
+ display: "flex",
+ gap: 28,
+ alignItems: "flex-start",
+ flexWrap: "wrap",
+ }}
+ >
+ <div
+ style={{
+ flex: "0 0 260px",
+ display: "flex",
+ flexDirection: "column",
+ gap: 6,
+ position: "sticky",
+ top: 24,
+ }}
+ >
+ <div
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "var(--color-text-muted)",
+ letterSpacing: "0.08em",
+ marginBottom: 8,
+ }}
+ >
+ DAFTAR MATERI
+ </div>
+ {LESSONS.map((l, i) => {
+ const isDone = completedLessons.has(i);
+ const isActive = i === currentLesson;
+ return (
+ <button
+ key={l.id}
+ onClick={() => goToLesson(i)}
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ padding: "10px 12px",
+ borderRadius: "var(--radius-md)",
+ border: isActive
+ ? `1px solid ${CL}0.5)`
+ : "1px solid transparent",
+ background: isActive ? `${CL}0.1)` : "transparent",
+ cursor: "pointer",
+ textAlign: "left",
+ transition: "all 0.2s",
+ width: "100%",
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ {isDone ? (
+ <CheckCircle
+ size={16}
+ color="#6EE12B"
+ style={{ flexShrink: 0 }}
+ />
+ ) : (
+ <Circle
+ size={16}
+ color={isActive ? C : "var(--color-border-2)"}
+ style={{ flexShrink: 0 }}
+ />
+ )}
+ <span
+ style={{
+ fontSize: "0.8125rem",
+ fontWeight: isActive ? 700 : 500,
+ color: isActive ? C : "var(--color-text-secondary)",
+ lineHeight: 1.4,
+ }}
+ >
+ {i + 1}. {l.title}
+ </span>
+ </button>
+ );
+ })}
+ </div>
+ <div
+ style={{
+ flex: "1 1 400px",
+ display: "flex",
+ flexDirection: "column",
+ gap: 24,
+ minWidth: 0,
+ }}
+ >
+ <div className="premium-card" style={{ padding: 0 }}>
+ <div
+ style={{
+ padding: "24px 28px",
+ borderBottom: "1px solid var(--color-border)",
+ background: `${CL}0.05)`,
+ display: "flex",
+ alignItems: "flex-start",
+ gap: 14,
+ }}
+ >
+ <div
+ style={{
+ width: 48,
+ height: 48,
+ borderRadius: "var(--radius-md)",
+ background: `${CL}0.15)`,
+ border: `1px solid ${CL}0.3)`,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ flexShrink: 0,
+ }}
+ >
+ <DollarSign size={22} color={C} strokeWidth={2} />
+ </div>
+ <div>
+ <div
+ style={{
+ fontSize: "0.6875rem",
+ fontWeight: 700,
+ color: C,
+ letterSpacing: "0.08em",
+ marginBottom: 4,
+ }}
+ >
+ MATERI {currentLesson + 1} DARI {LESSONS.length}
+ </div>
+ <h2
+ style={{
+ fontSize: "1.25rem",
+ letterSpacing: "-0.02em",
+ color: "var(--color-text-primary)",
+ marginBottom: 2,
+ }}
+ >
+ {lesson.title}
+ </h2>
+ <div
+ style={{
+ fontSize: "0.8125rem",
+ color: "var(--color-text-muted)",
+ }}
+ >
+ {lesson.concept}
+ </div>
+ </div>
+ </div>
+ <div style={{ padding: 28 }}>
+ <div
+ style={{
+ fontSize: "0.9375rem",
+ lineHeight: 1.75,
+ color: "var(--color-text-secondary)",
+ marginBottom: 24,
+ whiteSpace: "pre-wrap",
+ }}
+ >
+ {lesson.body.replace(/\*\*(.*?)\*\*/g, "$1")}
+ </div>
+ <div
+ style={{
+ display: "flex",
+ alignItems: "flex-start",
+ gap: 12,
+ padding: "16px 18px",
+ background: `${CL}0.06)`,
+ border: `1px solid ${CL}0.2)`,
+ borderRadius: "var(--radius-md)",
+ marginBottom: 28,
+ }}
+ >
+ <Lightbulb
+ size={18}
+ color={C}
+ style={{ flexShrink: 0, marginTop: 1 }}
+ />
+ <p
+ style={{
+ fontSize: "0.875rem",
+ color: "var(--color-text-primary)",
+ fontStyle: "italic",
+ fontWeight: 600,
+ lineHeight: 1.6,
+ }}
+ >
+ {lesson.insight}
+ </p>
+ </div>
+ <div style={{ marginBottom: 28 }}>
+ <FunnelViz />
+ </div>
+ <div
+ style={{
+ padding: "20px 22px",
+ background: "var(--color-surface-2)",
+ border: "1px solid var(--color-border)",
+ borderRadius: "var(--radius-md)",
+ marginBottom: 28,
+ }}
+ >
+ <div
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 8,
+ marginBottom: 12,
+ }}
+ >
+ <Target size={15} color="var(--color-accent-text)" />
+ <span
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: "var(--color-accent-text)",
+ letterSpacing: "0.08em",
+ }}
+ >
+ TANTANGAN PRAKTIK
+ </span>
+ </div>
+ <div
+ style={{
+ fontSize: "0.875rem",
+ lineHeight: 1.7,
+ color: "var(--color-text-secondary)",
+ whiteSpace: "pre-wrap",
+ }}
+ >
+ {lesson.challenge.replace(/\*\*(.*?)\*\*/g, "$1")}
+ </div>
+ </div>
+ <button
+ onClick={() => setShowAILab((v) => !v)}
+ style={{
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ padding: "12px 18px",
+ borderRadius: "var(--radius-md)",
+ background: showAILab
+ ? `linear-gradient(135deg,${C},#4F46E5)`
+ : "var(--color-surface-3)",
+ border: "1px solid",
+ borderColor: showAILab
+ ? "transparent"
+ : "var(--color-border)",
+ color: showAILab ? "#FFF" : "var(--color-text-secondary)",
+ fontSize: "0.875rem",
+ fontWeight: 700,
+ cursor: "pointer",
+ width: "100%",
+ justifyContent: "center",
+ marginBottom: showAILab ? 20 : 0,
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ <Zap size={15} />{" "}
+ {showAILab
+ ? "Tutup AI Tutor Lab"
+ : "Buka AI Tutor Lab — Tanya Langsung ke AI"}
+ </button>
+ {showAILab && (
+ <AILab
+ moduleId="roi-attribution"
+ moduleName="ROI Attribution"
+ initialMessage="Halo! Aku AI Tutor untuk modul Atribusi ROI. Tanyakan tentang model atribusi, ROAS, CLV, atau dashboard budgeting!"
+ themeColor={C}
+ themeGradient={`linear-gradient(135deg, ${C}, #4F46E5)`}
+ />
+ )}
+ </div>
+ </div>
+ <div className="premium-card" style={{ padding: 0 }}>
+ <div
+ style={{
+ padding: "20px 24px",
+ borderBottom: "1px solid var(--color-border)",
+ background: "var(--color-surface-2)",
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ }}
+ >
+ <DollarSign size={18} color="var(--color-accent-text)" />
+ <span style={{ fontWeight: 800, fontSize: "1rem" }}>
+ Cek Pemahaman
+ </span>
+ {quizAnswer && (
+ <span
+ style={{
+ marginLeft: "auto",
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ padding: "2px 10px",
+ borderRadius: 100,
+ background: quizAnswer.correct
+ ? "rgba(34,197,94,0.1)"
+ : "rgba(239,68,68,0.1)",
+ color: quizAnswer.correct ? "#16A34A" : "#DC2626",
+ }}
+ >
+ {quizAnswer.correct ? "✓ Benar!" : "✗ Coba lagi"}
+ </span>
+ )}
+ </div>
+ <div style={{ padding: "24px 28px" }}>
+ <p
+ style={{
+ fontWeight: 700,
+ fontSize: "1rem",
+ color: "var(--color-text-primary)",
+ marginBottom: 20,
+ lineHeight: 1.5,
+ }}
+ >
+ {lesson.quiz.question}
+ </p>
+ <div
+ style={{ display: "flex", flexDirection: "column", gap: 10 }}
+ >
+ {lesson.quiz.options.map((opt, i) => {
+ const isSelected = quizAnswer?.selected === i;
+ const isCorrect = i === lesson.quiz.correct;
+ const showResult = !!quizAnswer;
+ let bg = "var(--color-surface-2)";
+ let border = "1px solid var(--color-border)";
+ let color = "var(--color-text-secondary)";
+ if (showResult && isCorrect && quizAnswer.correct) {
+ bg = "rgba(34,197,94,0.08)";
+ border = "1px solid rgba(34,197,94,0.4)";
+ color = "#15803D";
+ } else if (showResult && isSelected && !isCorrect) {
+ bg = "rgba(239,68,68,0.08)";
+ border = "1px solid rgba(239,68,68,0.4)";
+ color = "#B91C1C";
+ }
+ return (
+ <button
+ key={i}
+ onClick={() => handleQuizAnswer(i)}
+ disabled={!!quizAnswer}
+ style={{
+ padding: "14px 18px",
+ borderRadius: "var(--radius-md)",
+ background: bg,
+ border,
+ color,
+ fontSize: "0.875rem",
+ fontWeight: 500,
+ cursor: quizAnswer ? "not-allowed" : "pointer",
+ textAlign: "left",
+ display: "flex",
+ alignItems: "center",
+ gap: 10,
+ lineHeight: 1.5,
+ fontFamily: "var(--font-sans)",
+ }}
+ >
+ <span
+ style={{
+ width: 24,
+ height: 24,
+ borderRadius: "50%",
+ background:
+ showResult && isCorrect && quizAnswer.correct
+ ? "#16A34A"
+ : showResult && isSelected && !isCorrect
+ ? "#DC2626"
+ : "var(--color-surface-3)",
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ fontSize: "0.6875rem",
+ fontWeight: 800,
+ color:
+ (showResult && isCorrect && quizAnswer.correct) ||
+ (showResult && isSelected)
+ ? "#FFF"
+ : "var(--color-text-muted)",
+ flexShrink: 0,
+ }}
+ >
+ {String.fromCharCode(65 + i)}
+ </span>
+ {opt}
+ </button>
+ );
+ })}
+ </div>
+ {quizAnswer && (
+ <div
+ style={{
+ marginTop: 20,
+ padding: "16px 18px",
+ background: quizAnswer.correct
+ ? "rgba(34,197,94,0.06)"
+ : "rgba(239,68,68,0.06)",
+ border: `1px solid ${quizAnswer.correct ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}`,
+ borderRadius: "var(--radius-md)",
+ }}
+ >
+ <div
+ style={{
+ fontSize: "0.75rem",
+ fontWeight: 700,
+ color: quizAnswer.correct ? "#16A34A" : "#DC2626",
+ marginBottom: 6,
+ letterSpacing: "0.06em",
+ }}
+ >
+ {quizAnswer.correct ? "✓ PENJELASAN" : "✗ JAWABAN SALAH"}
+ </div>
+ <p
+ style={{
+ fontSize: "0.875rem",
+ lineHeight: 1.65,
+ color: "var(--color-text-secondary)",
+ }}
+ >
+ {quizAnswer.correct ? lesson.quiz.explanation : "Jawaban Anda kurang tepat. Silakan coba lagi untuk menemukan jawaban yang benar!"}
+ </p>
+ {!quizAnswer.correct && (
+ <button
+ onClick={async () => {
+ setQuizAnswer(null);
+ await resetAnswer(currentLesson);
+ }}
+ className="btn btn-secondary"
+ style={{ marginTop: 12, fontSize: "0.8rem", padding: "6px 12px" }}
+ >
+ Coba Lagi
+ </button>
+ )}
+ </div>
+ )}
+ </div>
+ </div>
+ <div
+ style={{
+ display: "flex",
+ justifyContent: "space-between",
+ gap: 12,
+ }}
+ >
+ <button
+ onClick={() => goToLesson(currentLesson - 1)}
+ disabled={currentLesson === 0}
+ className="btn btn-secondary"
+ style={{ gap: 8, opacity: currentLesson === 0 ? 0.4 : 1 }}
+ >
+ <ChevronLeft size={16} /> Sebelumnya
+ </button>
+ {currentLesson < LESSONS.length - 1 ? (
+ <button
+ onClick={() => goToLesson(currentLesson + 1)}
+ disabled={!quizAnswer || !quizAnswer.correct}
+ className="btn btn-primary"
+ style={{ gap: 8, opacity: quizAnswer && quizAnswer.correct ? 1 : 0.5 }}
+ >
+ Materi Berikutnya <ChevronRight size={16} />
+ </button>
+ ) : (
+ <Link
+ href="/dashboard/learn"
+ className="btn btn-primary"
+ style={{ gap: 8 }}
+ >
+ Selesai! Kembali ke Kurikulum <CheckCircle size={16} />
+ </Link>
+ )}
+ </div>
+ </div>
+ </div>
+ </div>
+ );
 }
